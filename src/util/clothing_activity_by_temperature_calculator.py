@@ -155,9 +155,9 @@ class ClothingActivityByTemperatureCalculator:
         """
         met = settings.low_temp_settings.met.bedtime if is_sleeping else settings.low_temp_settings.met.daytime
         icl = (
-            max(1.05 - 0.025 * max(min(outdoor_temperature, 40) - 12, 0), 0.6)
+            max(1.00 - 0.025 * max(min(outdoor_temperature, 40) - 12, 0), 0.6)
             if not is_sleeping
-            else max(1.3 - 0.06 * max(min(outdoor_temperature, 15) - 9, 0), 1.2)
+            else max(2.0 - 0.06 * max(min(outdoor_temperature, 15) - 9, 0), 1.2)
         )
 
         return ComfortFactors(met=met, icl=icl)
