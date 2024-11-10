@@ -14,7 +14,7 @@ temperature_settings:
 
   normal_speed_thresholds:  # 高温以外の時のスピード設定
     - threshold: 3.0
-      speed: 2
+      speed: 3
     - threshold: 2.5
       speed: 2
     - threshold: 2.0
