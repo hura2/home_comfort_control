@@ -100,6 +100,14 @@ class ThermalComfortCalculator:
         # 動的な衣服の熱抵抗を計算（活動量と衣服による熱抵抗の変化を考慮）
         dynamic_clothing_insulation = clo_dynamic(clo=comfort_factors.icl, met=comfort_factors.met)
 
+        print("dry_bulb_temp", dry_bulb_temp)
+        print("mean_radiant_temp", mean_radiant_temp)
+        print("relative_air_speed", relative_air_speed)
+        print("humidity", humidity)
+        print("comfort_factors.met", comfort_factors.met)
+        print("comfort_factors.icl", comfort_factors.icl)
+        print("dynamic_clothing_insulation", dynamic_clothing_insulation)
+
         # PMVとPPDを計算
         results = pmv_ppd(
             tdb=dry_bulb_temp,  # ドライバルブ温度
@@ -111,6 +119,8 @@ class ThermalComfortCalculator:
             standard="ISO",  # 計算基準（ISO規格）
         )
 
+        print("results", results)
+        
         # PMV計算結果をPMVCalculationオブジェクトとして返す
         return PMVResults(
             pmv=float(results["pmv"]),  # PMV値（予測平均投票）
