@@ -20,6 +20,6 @@ temperature_settings:
     - threshold: 2.0
       speed: 2
     - threshold: 1.5
-      speed: 0
+      speed: 2
     - threshold: 1.0
-      speed: 0
+      speed: 1
