@@ -44,7 +44,7 @@ class LoggerUtil:
 
         # サブセンサーの情報をログに出力（存在すれば）
         if home_sensor.sub:
-            LoggerUtil._log_sensor_data(home_sensor.sub)
+            LoggerUtil._log_sensor_data(home_sensor.sub, home_sensor.main)
 
         # 補助センサーの情報をログに出力（存在すれば）
         if home_sensor.supplementaries:
