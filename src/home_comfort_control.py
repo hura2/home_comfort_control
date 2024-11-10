@@ -3,7 +3,8 @@ import datetime
 from api.jma_forecast_api import JmaForecastApi
 from api.switchbot_api import SwitchBotApi
 from common import constants
-from common.data_types import CirculatorState, ComfortFactors, HomeSensor, PMVResults
+from common.data_types import (CirculatorState, ComfortFactors, HomeSensor,
+                               PMVResults)
 from db.aircon_min_runtime_manager import AirconMinRuntimeManager
 from db.analytics import Analytics
 from devices.aircon.aircon_operation import AirconOperation
@@ -17,6 +18,7 @@ from util.time import TimeUtil
 
 
 class HomeComfortControl:
+    """家の快適環境を制御するクラス"""  
     def __init__(self, settings: GeneralSettings):
         self.settings = settings
 

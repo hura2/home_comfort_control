@@ -32,7 +32,7 @@ class LoggerUtil:
             now (datetime.datetime): 現在時刻
         """
         # 現在時刻と最高気温予報をログに出力
-        logger.info(f"現在時刻: {now}")
+        logger.info(f"現在時刻: {now.strftime('%Y-%m-%d %H:%M:%S')}")
         logger.info(f"最高気温予報: {forecast_max_temperature}°")
 
         # CO2濃度があれば出力
@@ -56,7 +56,7 @@ class LoggerUtil:
 
         # 屋外センサーの情報をログに出力（存在すれば）
         if home_sensor.outdoor:
-            LoggerUtil._log_sensor_data(home_sensor.outdoor)
+            LoggerUtil._log_sensor_data(home_sensor.outdoor, home_sensor.average_indoor_sensor)
 
     def _left(digit, msg):
         """
@@ -99,7 +99,7 @@ class LoggerUtil:
         # 温度差の計算と表示（参照センサーがある場合）
         if reference_sensor:
             temp_diff = abs(reference_sensor.air_quality.temperature - sensor.air_quality.temperature)
-            sensor_info += f", {reference_sensor.label}との温度差{temp_diff:.1f}°"
+            sensor_info += f", {reference_sensor.label}:{reference_sensor.location}との温度差{temp_diff:.1f}°"
 
         # CO2センサーのログ
         if sensor.type == constants.SensorType.CO2:

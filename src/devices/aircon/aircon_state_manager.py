@@ -45,7 +45,7 @@ class AirconStateManager:
             logger.info("最低経過時間前なのでモードを継続します。経過時間:{}時間{}分".format(int(hours), int(minutes)))
             return False  # まだ継続時間内であるため変更不可
 
-        logger.info("最低経過時間を経過したので、設定を変更します。%s", start_time.strftime("%Y-%m-%d %H:%M:%S"))
+        logger.info("最低経過時間を経過したので、設定を変更可能です。")
         return True  # 継続時間が経過したため変更可能
 
     # エアコンの設定を変更
