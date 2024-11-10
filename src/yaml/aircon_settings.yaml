@@ -3,10 +3,10 @@ pmv_threshold_settings:  # PMV閾値設定
     - threshold: -0.2  # PMVが-0.2以下の場合
       temperature: "29"       # 温度設定を29度にする
       mode: POWERFUL_HEATING  # モードを強力暖房に設定
-    - threshold: -0.18  # PMVが-0.18以下の場合
+    - threshold: -0.16  # PMVが-0.18以下の場合
       temperature: "25"       # 温度設定を25度にする
       mode: HEATING     # モードを暖房に設定
-    - threshold: -0.13   # PMVが-0.13以下の場合
+    - threshold: -0.1   # PMVが-0.13以下の場合
       temperature: "23"       # 温度設定を23度にする
       mode: HEATING     # モードを暖房に設定
     - threshold: 0      # PMVが0の場合
