@@ -1,3 +1,5 @@
+import datetime
+import time
 from enum import Enum
 from pathlib import Path
 
@@ -21,13 +23,19 @@ class ClothingActivityByTemperatureSettings:
     def __init__(self):
         # 設定ファイルのパスを定義
 
-        self.config_file = Path(__file__).parent.parent / "yaml" / "clothing_activity_by_temperature_settings.yaml"
+        self.config_file = (
+            Path(__file__).parent.parent / "yaml" / "clothing_activity_by_temperature_settings.yaml"
+        )
         # 設定をロード
         self.config = self._load_config()
         # 高温時の設定を初期化
-        self.high_temp_settings = self._HighTempSettings(self.config[self._Settings.HIGH_TEMP_SETTINGS.value])
+        self.high_temp_settings = self._HighTempSettings(
+            self.config[self._Settings.HIGH_TEMP_SETTINGS.value]
+        )
         # 低温時の設定を初期化
-        self.low_temp_settings = self._LowTempSettings(self.config[self._Settings.LOW_TEMP_SETTINGS.value])
+        self.low_temp_settings = self._LowTempSettings(
+            self.config[self._Settings.LOW_TEMP_SETTINGS.value]
+        )
 
     def _load_config(self):
         # YAMLファイルを読み込み、設定を返す
@@ -94,28 +102,38 @@ class ClothingActivityByTemperatureSettings:
             class _TimePeriod:
                 """時間帯設定を管理するクラス"""
 
+                class _Settings(Enum):
+                    """設定項目を定義する列挙型"""
+
+                    START = "start"
+                    END = "end"
+                    MET = "met"
+                    USE = "use"
+
                 def __init__(self, config):
                     self.config = config
 
                 @property
-                def start(self) -> str:
+                def start(self) -> time:
                     """開始時間を取得"""
-                    return self.config.get("start", "")
+                    hour, minute = map(int, self.config[self._Settings.START.value].split(":"))
+                    return datetime.time(hour, minute)
 
                 @property
-                def end(self) -> str:
+                def end(self) -> time:
                     """終了時間を取得"""
-                    return self.config.get("end", "")
+                    hour, minute = map(int, self.config[self._Settings.END.value].split(":"))
+                    return datetime.time(hour, minute)
 
                 @property
                 def met(self) -> float:
                     """加算代謝量を取得"""
-                    return self.config.get("met", 0.0)
+                    return self.config.get(self._Settings.MET.value, 0.0)
 
                 @property
                 def use(self) -> bool:
                     """設定を使用するかどうかのフラグを取得"""
-                    return self.config.get("use", False)
+                    return self.config.get(self._Settings.USE.value, False)
 
     class _LowTempSettings:
         """低温時の設定を管理するクラス"""
@@ -184,18 +202,28 @@ class ClothingActivityByTemperatureSettings:
                 class _TimePeriod:
                     """時間帯の調整設定を管理するクラス"""
 
+                    class _Settings(Enum):
+                        """設定項目を定義する列挙型"""
+
+                        START = "start"
+                        END = "end"
+                        ADJUSTMENT = "adjustment"
+
                     def __init__(self, config):
                         self.config = config
 
                     @property
-                    def start(self) -> str:
+                    def start(self) -> time:
                         """開始時間を取得"""
-                        return self.config.get("start", "")
+                        hour, minute = map(int, self.config[self._Settings.START.value].split(":"))
+                        return datetime.time(hour, minute)
 
                     @property
-                    def end(self) -> str:
+                    def end(self) -> time:
                         """終了時間を取得"""
-                        return self.config.get("end", "")
+                        hour, minute = map(int, self.config[self._Settings.END.value].split(":"))
+                        return datetime.time(hour, minute)
+
 
                     @property
                     def adjustment(self) -> float:

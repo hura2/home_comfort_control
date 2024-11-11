@@ -70,7 +70,7 @@ class AirconOperation:
                 logger.info("現在モードが冷房モード")
                 if constants.AirconMode.is_cooling_mode(new_mode):
                     logger.info("新しいモードも冷房モード")
-                    return AirconOperation._update_aircon_state(aircon_state)
+                    return AirconStateManager.update_aircon_state(aircon_state)
                 else:
                     logger.info("新しいモードが冷房モード以外")
                     return AirconOperation._apply_weakest_setting(aircon_state, current_aircon_state)
@@ -79,7 +79,7 @@ class AirconOperation:
                 logger.info("現在モードが暖房モード")
                 if constants.AirconMode.is_heating_mode(new_mode):
                     logger.info("新しいモードも暖房モード")
-                    return AirconOperation._update_aircon_state(aircon_state)
+                    return AirconStateManager.update_aircon_state(aircon_state)
                 else:
                     logger.info("新しいモードが暖房モード以外")
                     return AirconOperation._apply_weakest_setting(aircon_state, current_aircon_state)
