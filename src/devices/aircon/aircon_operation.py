@@ -85,6 +85,7 @@ class AirconOperation:
                     return AirconOperation._apply_weakest_setting(aircon_state, current_aircon_state)
 
             logger.info("現在モードが冷房でも暖房でもない場合")
+            aircon_state.mode = current_aircon_state.mode
             AirconOperation._update_if_settings_differ(aircon_state, current_aircon_state)
             return False  # 同一モードなので設定を更新するが、モードは変更しない
 
@@ -132,7 +133,6 @@ class AirconOperation:
         Returns:
             bool: 設定が変更された場合はTrue、そうでない場合はFalse。
         """
-        aircon_state.mode = current_aircon_state.mode
         # 温度、ファン速度、電源設定のいずれかが異なる場合、設定を更新
         if (
             current_aircon_state.temperature != aircon_state.temperature

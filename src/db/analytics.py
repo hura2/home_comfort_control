@@ -2,6 +2,8 @@ import datetime
 from collections import defaultdict
 from typing import Optional, Tuple
 
+import pandas as pd
+
 import common.constants as constants
 from api.jma_forecast_api import JmaForecastApi
 from common.data_types import AirconState, CirculatorState, HomeSensor, Sensor
@@ -620,3 +622,43 @@ class Analytics:
             return -1
 
         return data.data[0]["id"]
+
+    @staticmethod
+    def get_hourly_average_temperature(location_id: int):
+        """
+        指定されたlocation_idの7時間前までのデータから、1時間ごとの平均気温を取得します。
+
+        :param location_id: 対象とする場所のID
+        :return: 各1時間ごとの平均気温（リスト）
+        """
+        # 現在のUTC時間と7時間前までの時間範囲を定義
+        end_time = TimeUtil.get_current_time()
+        start_time = end_time - datetime.timedelta(hours=6)
+
+        # Supabaseからデータを取得
+        data = (
+            SupabaseClient.get_supabase()
+            .table("temperatures")
+            .select("created_at, temperature")
+            .filter("location_id", "eq", location_id)
+            .filter("created_at", "gte", start_time.isoformat())
+            .filter("created_at", "lte", end_time.isoformat())
+            .execute()
+        )
+
+        # DataFrameに変換し、1時間ごとの平均気温を計算
+        df = pd.DataFrame(data.data)
+        if df.empty:
+            print("No data found for the specified location and time range.")
+            return None
+
+        # 'created_at'列をDatetime型に変換し、インデックスとして設定
+        df['created_at'] = pd.to_datetime(df['created_at'])
+        df.set_index('created_at', inplace=True)
+
+        # 1時間ごとの平均気温を計算し、新しい順に並べ替えて辞書のリスト形式で返す
+        hourly_avg = df['temperature'].resample('H').mean().dropna()
+        hourly_avg = hourly_avg.iloc[::-1]  # 新しい順に並べ替え
+
+        # 結果をリスト形式で返す（辞書で時間ごとのデータを保持）
+        return hourly_avg.reset_index().rename(columns={'created_at': 'hour', 'temperature': 'average_temperature'}).to_dict(orient='records')

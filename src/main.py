@@ -13,6 +13,7 @@ def main():
     home_comfort_control = HomeComfortControl(settings)
     # 最高気温を取得（天気予報）
     forecast_max_temperature = home_comfort_control.fetch_forecast_max_temperature()
+    home_comfort_control.get_running_mean_temperature()
     # センサー情報を取得
     home_sensor = home_comfort_control.initialize_home_sensor()
     # outdoorセンサーの設定がある場合、外気温を設定。ない場合は、天気予報の最高気温を設定

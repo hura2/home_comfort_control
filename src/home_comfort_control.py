@@ -1,5 +1,8 @@
 import datetime
 
+import pythermalcomfort
+import pythermalcomfort.utilities
+
 from api.jma_forecast_api import JmaForecastApi
 from api.switchbot_api import SwitchBotApi
 from common import constants
@@ -254,3 +257,14 @@ class HomeComfortControl:
 
             # 昨日のエアコン強度スコアを登録
             Analytics.register_yesterday_intensity_score()
+
+    def  get_running_mean_temperature(self) -> None:
+            # 例としてlocation_idが3のデータを取得
+        result = Analytics.get_hourly_average_temperature(location_id=3)
+        if result:
+            for entry in result:
+                print(f"Hour: {entry['hour']}, Average Temperature: {entry['average_temperature']}")
+        
+        temp_array = [entry['average_temperature'] for entry in result]
+        print(temp_array)
+        print(pythermalcomfort.utilities.running_mean_outdoor_temperature(temp_array))
