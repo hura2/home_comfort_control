@@ -17,7 +17,7 @@ class ThermalComfortCalculator:
         home_sensor: HomeSensor,
         forecast_max_temperature: float,  # 最高気温（度） - 外気温度として使用される最高気温
         comfort_factors: ComfortFactors,  # 快適さの要因
-        wind_speed: float = 0.1,  # 風速（m/s）、デフォルトは0.15 m/s - 換気や風による熱伝達を考慮
+        wind_speed: float = 0.08,  # 風速（m/s）、デフォルトは0.15 m/s - 換気や風による熱伝達を考慮
     ) -> PMVResults:  # PMV計算の結果を返す - PMV計算結果を保持するPMVCalculationオブジェクト
         """PMV（Predicted Mean Vote）を計算するメソッド。
 
@@ -99,6 +99,13 @@ class ThermalComfortCalculator:
 
         # 動的な衣服の熱抵抗を計算（活動量と衣服による熱抵抗の変化を考慮）
         dynamic_clothing_insulation = clo_dynamic(clo=comfort_factors.icl, met=comfort_factors.met)
+
+        print(dry_bulb_temp)
+        print(mean_radiant_temp)
+        print(relative_air_speed)
+        print(humidity)
+        print(comfort_factors.met)
+        print(dynamic_clothing_insulation)
 
         # PMVとPPDを計算
         results = pmv_ppd(
