@@ -1,6 +1,6 @@
 high_temp_settings: # 高温時特有の設定
   met: # 代謝量に関する設定
-    daytime: 1.05 # 日中の代謝量
+    daytime: 1.0 # 日中の代謝量
     bedtime: 0.7 # 就寝時の代謝量
   icl: # 衣服熱抵抗に関する設定
     daytime: 0.6 # 日中の衣服熱抵抗
@@ -24,7 +24,7 @@ high_temp_settings: # 高温時特有の設定
 
 low_temp_settings: # 低温時の設定
   met: # 代謝量に関する設定
-    daytime: 1.05 # 日中の代謝量（活動中の推奨値）
+    daytime: 1.0 # 日中の代謝量（活動中の推奨値）
     bedtime: 0.7 # 就寝時の代謝量（安静時の推奨値）
   icl: # 衣服熱抵抗に関する設定
     daytime: 1.0 # 日中の衣服熱抵抗（軽い服装での推奨値）
