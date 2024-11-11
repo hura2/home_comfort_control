@@ -132,6 +132,7 @@ class AirconOperation:
         Returns:
             bool: 設定が変更された場合はTrue、そうでない場合はFalse。
         """
+        aircon_state.mode = current_aircon_state.mode
         # 温度、ファン速度、電源設定のいずれかが異なる場合、設定を更新
         if (
             current_aircon_state.temperature != aircon_state.temperature
@@ -140,7 +141,6 @@ class AirconOperation:
         ):
             logger.info("現在のモードを継続しつつ、設定を変更します")
             LoggerUtil.log_aircon_state(current_aircon_state)
-            aircon_state.mode = current_aircon_state.mode
             AirconStateManager.update_aircon_state(aircon_state)
             return False  # 設定が異なるため更新を行った
 
