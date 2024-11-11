@@ -167,6 +167,7 @@ class HomeComfortControl:
                 AirconMinRuntimeManager.update_start_time_if_exists(aircon_state.mode, forecast_max_temperature)
         else:
             # データベースを使わない場合、エアコンの状態を直接更新
+            LoggerUtil.log_aircon_state(current_aircon_state)
             AirconStateManager.update_aircon_state(aircon_state)
 
 

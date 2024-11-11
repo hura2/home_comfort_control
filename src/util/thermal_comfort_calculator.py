@@ -17,7 +17,7 @@ class ThermalComfortCalculator:
         home_sensor: HomeSensor,
         forecast_max_temperature: float,  # 最高気温（度） - 外気温度として使用される最高気温
         comfort_factors: ComfortFactors,  # 快適さの要因
-        wind_speed: float = 0.15,  # 風速（m/s）、デフォルトは0.15 m/s - 換気や風による熱伝達を考慮
+        wind_speed: float = 0.1,  # 風速（m/s）、デフォルトは0.15 m/s - 換気や風による熱伝達を考慮
     ) -> PMVResults:  # PMV計算の結果を返す - PMV計算結果を保持するPMVCalculationオブジェクト
         """PMV（Predicted Mean Vote）を計算するメソッド。
 
@@ -100,14 +100,6 @@ class ThermalComfortCalculator:
         # 動的な衣服の熱抵抗を計算（活動量と衣服による熱抵抗の変化を考慮）
         dynamic_clothing_insulation = clo_dynamic(clo=comfort_factors.icl, met=comfort_factors.met)
 
-        print("dry_bulb_temp", dry_bulb_temp)
-        print("mean_radiant_temp", mean_radiant_temp)
-        print("relative_air_speed", relative_air_speed)
-        print("humidity", humidity)
-        print("comfort_factors.met", comfort_factors.met)
-        print("comfort_factors.icl", comfort_factors.icl)
-        print("dynamic_clothing_insulation", dynamic_clothing_insulation)
-
         # PMVとPPDを計算
         results = pmv_ppd(
             tdb=dry_bulb_temp,  # ドライバルブ温度
@@ -116,13 +108,11 @@ class ThermalComfortCalculator:
             rh=humidity,  # 湿度
             met=comfort_factors.met,  # メタボリックエネルギー消費量
             clo=dynamic_clothing_insulation,  # 動的な衣服の熱抵抗
-            standard="ISO",  # 計算基準（ISO規格）
+            limit_inputs=False,
+            standard="ASHRAE",  # 計算基準（ASHRAE）
         )
 
-        print("results", results)
-        
-        # PMV計算結果をPMVCalculationオブジェクトとして返す
-        return PMVResults(
+        pmv_results = PMVResults(
             pmv=float(results["pmv"]),  # PMV値（予測平均投票）
             ppd=float(results["ppd"]),  # PPD値（不快感を示す指標）
             clo=dynamic_clothing_insulation.item(0),  # 動的衣服熱抵抗（clo）
@@ -136,6 +126,9 @@ class ThermalComfortCalculator:
             relative_air_speed=relative_air_speed,  # 相対空気速度
             dynamic_clothing_insulation=dynamic_clothing_insulation,  # 動的衣服熱抵抗
         )
+       
+        # PMV計算結果をPMVCalculationオブジェクトとして返す
+        return pmv_results
 
     @staticmethod
     def calculate_absolute_humidity(temperature: float, relative_humidity: float) -> float:

@@ -27,6 +27,7 @@ class AirconOperation:
         """
         # 強制送風のフラグが有効なら、設定を送風に変更
         if aircon_state.force_fan_below_dew_point:
+            LoggerUtil.log_aircon_state(current_aircon_state)
             AirconStateManager.update_aircon_state(aircon_state)
             return True
 
@@ -36,6 +37,7 @@ class AirconOperation:
             return AirconOperation._handle_same_mode_or_adjust(aircon_state, current_aircon_state)
 
         # 設定を更新してTrueを返す
+        LoggerUtil.log_aircon_state(current_aircon_state)
         AirconStateManager.update_aircon_state(aircon_state)
         return True
 
@@ -103,6 +105,7 @@ class AirconOperation:
             aircon_state.fan_speed = weakest_state.fan_speed
 
         # 最弱設定を適用
+        LoggerUtil.log_aircon_state(current_aircon_state)
         AirconStateManager.update_aircon_state(aircon_state)
 
     # 現在の設定と異なる場合にエアコン設定を更新
@@ -127,8 +130,10 @@ class AirconOperation:
             or current_aircon_state.power.id != aircon_state.power.id
         ):
             logger.info("現在のモードを継続しつつ、設定を変更します")
+            LoggerUtil.log_aircon_state(current_aircon_state)
             AirconStateManager.update_aircon_state(aircon_state)
             return False  # 設定が異なるため更新を行った
 
+        LoggerUtil.log_aircon_state(current_aircon_state)
         LoggerUtil.log_aircon_state(aircon_state)
         return False  # 設定は同じのため更新は行わない
