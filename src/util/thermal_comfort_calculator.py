@@ -17,7 +17,7 @@ class ThermalComfortCalculator:
         home_sensor: HomeSensor,
         forecast_max_temperature: float,  # 最高気温（度） - 外気温度として使用される最高気温
         comfort_factors: ComfortFactors,  # 快適さの要因
-        wind_speed: float = 0.1,  # 風速（m/s）、デフォルトは0.15 m/s - 換気や風による熱伝達を考慮
+        wind_speed: float = 0.08,  # 風速（m/s）、デフォルトは0.08 m/s - 換気や風による熱伝達を考慮
     ) -> PMVResults:  # PMV計算の結果を返す - PMV計算結果を保持するPMVCalculationオブジェクト
         """PMV（Predicted Mean Vote）を計算するメソッド。
 
