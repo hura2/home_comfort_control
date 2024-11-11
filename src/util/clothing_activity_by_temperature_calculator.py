@@ -199,6 +199,6 @@ class ClothingActivityByTemperatureCalculator:
         # 各食事時間帯に応じてMETを調整
         for use, start, end, adjustment in meal_adjustments:
             if use and start <= now.time() <= end:  # 設定が有効で、現在の時間帯に該当する場合
-                met += adjustment  # METを増加
+                met = round(met + adjustment, 2) # METを増加
 
         return met
