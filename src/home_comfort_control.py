@@ -15,7 +15,7 @@ from devices.aircon.aircon_settings_determiner import AirconSettingsDeterminer
 from devices.aircon.aircon_state_manager import AirconStateManager
 from devices.circulator import Circulator
 from settings.general_settings import GeneralSettings
-from util.logger import LoggerUtil
+from util.logger import LoggerUtil,logger
 from util.thermal_comfort_calculator import ThermalComfortCalculator
 from util.time import TimeUtil
 
@@ -261,10 +261,10 @@ class HomeComfortControl:
     def  get_running_mean_temperature(self) -> None:
             # 例としてlocation_idが3のデータを取得
         result = Analytics.get_hourly_average_temperature(location_id=3)
-        if result:
-            for entry in result:
-                print(f"Hour: {entry['hour']}, Average Temperature: {entry['average_temperature']}")
+        # if result:
+        #     for entry in result:
+        #         logger.info(f"Hour: {entry['hour']}, Average Temperature: {entry['average_temperature']}")
         
         temp_array = [entry['average_temperature'] for entry in result]
-        print(temp_array)
-        print(pythermalcomfort.utilities.running_mean_outdoor_temperature(temp_array))
+        logger.info(temp_array)
+        logger.info(pythermalcomfort.utilities.running_mean_outdoor_temperature(temp_array))

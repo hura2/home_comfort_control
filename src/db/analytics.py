@@ -657,7 +657,7 @@ class Analytics:
         df.set_index('created_at', inplace=True)
 
         # 1時間ごとの平均気温を計算し、新しい順に並べ替えて辞書のリスト形式で返す
-        hourly_avg = df['temperature'].resample('H').mean().dropna()
+        hourly_avg = df['temperature'].resample('h').mean().dropna()
         hourly_avg = hourly_avg.iloc[::-1]  # 新しい順に並べ替え
 
         # 結果をリスト形式で返す（辞書で時間ごとのデータを保持）
