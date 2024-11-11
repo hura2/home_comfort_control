@@ -57,25 +57,34 @@ class AirconOperation:
             bool: 設定が変更された場合はTrue、そうでない場合はFalse。
         """
         # 現在のエアコンモードに基づき処理を振り分け
-        new_mode = aircon_state.mode.id
-        current_mode = current_aircon_state.mode.id
+        new_mode = aircon_state.mode
+        current_mode = current_aircon_state.mode
 
         # 現在のモードと新しいモードが同じ場合の処理
         if new_mode == current_mode:
+            logger.info("現在のモードと新しいモードが同じ")
             return AirconOperation._update_if_settings_differ(aircon_state, current_aircon_state)
         else:
+            logger.info("現在のモードと新しいモードが違う")
             if constants.AirconMode.is_cooling_mode(current_mode):
+                logger.info("現在モードが冷房モード")
                 if constants.AirconMode.is_cooling_mode(new_mode):
+                    logger.info("新しいモードも冷房モード")
                     return AirconOperation._update_aircon_state(aircon_state)
                 else:
+                    logger.info("新しいモードが冷房モード以外")
                     return AirconOperation._apply_weakest_setting(aircon_state, current_aircon_state)
 
             if constants.AirconMode.is_heating_mode(current_mode):
+                logger.info("現在モードが暖房モード")
                 if constants.AirconMode.is_heating_mode(new_mode):
+                    logger.info("新しいモードも暖房モード")
                     return AirconOperation._update_aircon_state(aircon_state)
                 else:
+                    logger.info("新しいモードが暖房モード以外")
                     return AirconOperation._apply_weakest_setting(aircon_state, current_aircon_state)
 
+            logger.info("現在モードが冷房でも暖房でもない場合")
             AirconOperation._update_if_settings_differ(aircon_state, current_aircon_state)
             return False  # 同一モードなので設定を更新するが、モードは変更しない
 
@@ -131,6 +140,7 @@ class AirconOperation:
         ):
             logger.info("現在のモードを継続しつつ、設定を変更します")
             LoggerUtil.log_aircon_state(current_aircon_state)
+            aircon_state.mode = current_aircon_state.mode
             AirconStateManager.update_aircon_state(aircon_state)
             return False  # 設定が異なるため更新を行った
 
