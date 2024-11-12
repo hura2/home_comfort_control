@@ -1,7 +1,8 @@
 import datetime
 
-import pythermalcomfort
-import pythermalcomfort.utilities
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 
 from api.jma_forecast_api import JmaForecastApi
 from api.switchbot_api import SwitchBotApi
@@ -261,10 +262,22 @@ class HomeComfortControl:
     def  get_running_mean_temperature(self) -> None:
             # 例としてlocation_idが3のデータを取得
         result = Analytics.get_hourly_average_temperature(location_id=3)
-        # if result:
-        #     for entry in result:
-        #         logger.info(f"Hour: {entry['hour']}, Average Temperature: {entry['average_temperature']}")
         
         temp_array = [entry['average_temperature'] for entry in result]
         logger.info(temp_array)
-        logger.info(pythermalcomfort.utilities.running_mean_outdoor_temperature(temp_array))
+        # 時間データの作成
+        hours = np.array(range(len(temp_array))).reshape(-1, 1)
+
+        # 2次の多項式特徴量を生成
+        poly = PolynomialFeatures(degree=3)
+        hours_poly = poly.fit_transform(hours)
+
+        # 線形回帰モデルの作成と学習
+        model = LinearRegression()
+        model.fit(hours_poly, temp_array)
+
+        # 1時間後の気温予測
+        next_hour_poly = poly.transform([[len(temp_array)]])
+        predicted_temperature = model.predict(next_hour_poly)
+
+        print(f"1時間後の予測気温: {predicted_temperature[0]:.2f}°C")

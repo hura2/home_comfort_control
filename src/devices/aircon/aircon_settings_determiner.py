@@ -159,10 +159,6 @@ class AirconSettingsDeterminer:
                 aircon_state.update_if_none(cooling_stop_settings)
                 aircon_state.force_fan_below_dew_point = True
 
-        # 寝る時間の送風はLOWにする
-        # if bedtime == True and aircon_state.mode.id == constants.AirconMode.FAN.id:
-        # aircon_state.fan_speed = constants.AirconFanSpeed.LOW
-
         # CO2が高い場合、風量を上げる
         if home_sensor.main_co2_level > settings.co2_thresholds.warning_level_threshold:
             if aircon_state.fan_speed != constants.AirconFanSpeed.HIGH:
@@ -170,5 +166,10 @@ class AirconSettingsDeterminer:
         elif home_sensor.main_co2_level > settings.co2_thresholds.high_level_threshold:
             if aircon_state.fan_speed not in [constants.AirconFanSpeed.MEDIUM, constants.AirconFanSpeed.HIGH]:
                 aircon_state.fan_speed = constants.AirconFanSpeed.MEDIUM
+
+        # CO2テスト
+        if is_sleeping == True:
+            aircon_state.fan_speed = constants.AirconFanSpeed.HIGH
+            aircon_state.mode = constants.AirconMode.DRY
 
         return aircon_state  # 調整されたエアコン設定を返す
