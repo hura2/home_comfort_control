@@ -168,8 +168,8 @@ class AirconSettingsDeterminer:
                 aircon_state.fan_speed = constants.AirconFanSpeed.MEDIUM
 
         # CO2テスト
-        if is_sleeping == True:
-            aircon_state.fan_speed = constants.AirconFanSpeed.HIGH
-            aircon_state.mode = constants.AirconMode.DRY
+        # if is_sleeping == True:
+        #     aircon_state.fan_speed = constants.AirconFanSpeed.HIGH
+        #     aircon_state.mode = constants.AirconMode.DRY
 
         return aircon_state  # 調整されたエアコン設定を返す
