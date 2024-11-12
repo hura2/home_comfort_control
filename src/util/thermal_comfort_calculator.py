@@ -100,13 +100,6 @@ class ThermalComfortCalculator:
         # 動的な衣服の熱抵抗を計算（活動量と衣服による熱抵抗の変化を考慮）
         dynamic_clothing_insulation = clo_dynamic(clo=comfort_factors.icl, met=comfort_factors.met)
 
-        print(dry_bulb_temp)
-        print(mean_radiant_temp)
-        print(relative_air_speed)
-        print(humidity)
-        print(comfort_factors.met)
-        print(dynamic_clothing_insulation)
-
         # PMVとPPDを計算
         results = pmv_ppd(
             tdb=dry_bulb_temp,  # ドライバルブ温度

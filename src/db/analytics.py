@@ -71,7 +71,13 @@ class Analytics:
             SupabaseClient.get_supabase()
             .from_("humidities")
             .insert(
-                [{"location_id": id, "humidity": sensor.air_quality.humidity, "created_at": created_at.isoformat()}]
+                [
+                    {
+                        "location_id": id,
+                        "humidity": sensor.air_quality.humidity,
+                        "created_at": created_at.isoformat(),
+                    }
+                ]
             )
             .execute()
         )
@@ -97,7 +103,13 @@ class Analytics:
             SupabaseClient.get_supabase()
             .from_("co2_levels")  # CO2濃度を格納するテーブル名
             .insert(
-                [{"location_id": id, "co2_level": sensor.air_quality.co2_level, "created_at": created_at.isoformat()}]
+                [
+                    {
+                        "location_id": id,
+                        "co2_level": sensor.air_quality.co2_level,
+                        "created_at": created_at.isoformat(),
+                    }
+                ]
             )
             .execute()
         )
@@ -170,7 +182,9 @@ class Analytics:
 
     # エアコン設定情報をデータベースに挿入
     @staticmethod
-    def insert_aircon_state(aircon_state: AirconState, current_time: Optional[datetime.datetime] = None):
+    def insert_aircon_state(
+        aircon_state: AirconState, current_time: Optional[datetime.datetime] = None
+    ):
         """
         エアコン設定をデータベースに挿入します。
 
@@ -424,7 +438,9 @@ class Analytics:
             )
 
             created_at_str = setting["created_at"]
-            created_at_str = created_at_str.split(".")[0] + created_at_str[-6:]  # 秒以下の部分を切り捨て
+            created_at_str = (
+                created_at_str.split(".")[0] + created_at_str[-6:]
+            )  # 秒以下の部分を切り捨て
             current_time = datetime.datetime.fromisoformat(created_at_str)
 
             if last_setting is not None:
@@ -449,7 +465,9 @@ class Analytics:
 
         # 最後の設定の持続時間を計算するかどうか
         if calculate_last_duration and last_setting is not None:
-            end_of_day = datetime.datetime.strptime(f"{date} 23:59:59", "%Y-%m-%d %H:%M:%S").replace(tzinfo=JST)
+            end_of_day = datetime.datetime.strptime(
+                f"{date} 23:59:59", "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=JST)
             time_difference = (end_of_day - last_setting["created_at"]).total_seconds()
             intensity_score = AirconIntensityCalculator.calculate_intensity(
                 temperature=float(last_setting["temperature"]),
@@ -559,7 +577,9 @@ class Analytics:
             .filter("record_date", "eq", str(yesterday))
             .execute()
         )
-        yesterday_score = int(yesterday_score_data.data[0]["intensity_score"]) if yesterday_score_data.data else 0
+        yesterday_score = (
+            int(yesterday_score_data.data[0]["intensity_score"]) if yesterday_score_data.data else 0
+        )
 
         # 今日のスコアを計算
         today_score = int(Analytics.get_daily_aircon_intensity(today.strftime("%Y-%m-%d"), False))
@@ -653,12 +673,16 @@ class Analytics:
             return None
 
         # 'created_at'列をDatetime型に変換し、インデックスとして設定
-        df['created_at'] = pd.to_datetime(df['created_at'])
-        df.set_index('created_at', inplace=True)
+        df["created_at"] = pd.to_datetime(df["created_at"])
+        df.set_index("created_at", inplace=True)
 
         # 1時間ごとの平均気温を計算し、新しい順に並べ替えて辞書のリスト形式で返す
-        hourly_avg = df['temperature'].resample('h').mean().dropna()
+        hourly_avg = round(df["temperature"].resample("h").mean().dropna(), 2)
         hourly_avg = hourly_avg.iloc[::-1]  # 新しい順に並べ替え
 
         # 結果をリスト形式で返す（辞書で時間ごとのデータを保持）
-        return hourly_avg.reset_index().rename(columns={'created_at': 'hour', 'temperature': 'average_temperature'}).to_dict(orient='records')
+        return (
+            hourly_avg.reset_index()
+            .rename(columns={"created_at": "hour", "temperature": "average_temperature"})
+            .to_dict(orient="records")
+        )
