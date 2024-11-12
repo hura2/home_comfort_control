@@ -280,4 +280,4 @@ class HomeComfortControl:
         next_hour_poly = poly.transform([[len(temp_array)]])
         predicted_temperature = model.predict(next_hour_poly)
 
-        print(f"1時間後の予測気温: {predicted_temperature[0]:.2f}°C")
+        logger.info(f"1時間後の予測気温: {predicted_temperature[0]:.2f}°C")
