@@ -2,6 +2,7 @@ from datetime import datetime
 
 from settings.clothing_activity_by_temperature_settings import ClothingActivityByTemperatureSettings
 from settings.general_settings import GeneralSettings
+from util.logger import logger
 from util.time import TimeUtil
 
 
@@ -96,8 +97,16 @@ class ClothingActivityByTemperatureCalculator:
         戻り値:
             ComfortFactors: 高温時のMETとICLを含むComfortFactorsインスタンス。
         """
-        met = settings.high_temp_settings.met.bedtime if is_sleeping else settings.high_temp_settings.met.daytime
-        icl = settings.high_temp_settings.icl.bedtime if is_sleeping else settings.high_temp_settings.icl.daytime
+        met = (
+            settings.high_temp_settings.met.bedtime
+            if is_sleeping
+            else settings.high_temp_settings.met.daytime
+        )
+        icl = (
+            settings.high_temp_settings.icl.bedtime
+            if is_sleeping
+            else settings.high_temp_settings.icl.daytime
+        )
 
         # 食事時間帯の調整
         met = ClothingActivityByTemperatureCalculator.adjust_met_for_meal_times(met, now, settings)
@@ -117,8 +126,16 @@ class ClothingActivityByTemperatureCalculator:
         戻り値:
             ComfortFactors: 低温時のMETとICLを含むComfortFactorsインスタンス。
         """
-        met = settings.low_temp_settings.met.bedtime if is_sleeping else settings.low_temp_settings.met.daytime
-        icl = settings.low_temp_settings.icl.bedtime if is_sleeping else settings.low_temp_settings.icl.daytime
+        met = (
+            settings.low_temp_settings.met.bedtime
+            if is_sleeping
+            else settings.low_temp_settings.met.daytime
+        )
+        icl = (
+            settings.low_temp_settings.icl.bedtime
+            if is_sleeping
+            else settings.low_temp_settings.icl.daytime
+        )
 
         # 高コスト時間帯でのICL調整
         current_day = now.weekday()
@@ -128,6 +145,9 @@ class ClothingActivityByTemperatureCalculator:
             <= settings.low_temp_settings.time_settings.heating.high_cost.end
         ):
             icl += settings.low_temp_settings.time_settings.heating.high_cost.adjustment
+            logger.info(
+                f"高コスト時間帯のICL調整を行いました:{settings.low_temp_settings.time_settings.heating.high_cost.start} - {settings.low_temp_settings.time_settings.heating.high_cost.end}"
+            )
 
         # 低コスト時間帯でのICL調整
         if (current_day not in [5, 6]) and (
@@ -136,12 +156,17 @@ class ClothingActivityByTemperatureCalculator:
             <= settings.low_temp_settings.time_settings.heating.low_cost.end
         ):
             icl += settings.low_temp_settings.time_settings.heating.low_cost.adjustment
+            logger.info(
+                f"低コスト時間帯のICL調整を行いました:{settings.low_temp_settings.time_settings.heating.low_cost.start} - {settings.low_temp_settings.time_settings.heating.low_cost.end}"
+            )
 
         return ComfortFactors(met=met, icl=icl)
 
     @staticmethod
     def _calculate_mid_temp_comfort_factors(
-        outdoor_temperature: float, is_sleeping: bool, settings: ClothingActivityByTemperatureSettings
+        outdoor_temperature: float,
+        is_sleeping: bool,
+        settings: ClothingActivityByTemperatureSettings,
     ) -> ComfortFactors:
         """中間温度時のComfortFactorsを計算し、返す。
 
@@ -153,7 +178,11 @@ class ClothingActivityByTemperatureCalculator:
         戻り値:
             ComfortFactors: 中間温度時のMETとICLを含むComfortFactorsインスタンス。
         """
-        met = settings.low_temp_settings.met.bedtime if is_sleeping else settings.low_temp_settings.met.daytime
+        met = (
+            settings.low_temp_settings.met.bedtime
+            if is_sleeping
+            else settings.low_temp_settings.met.daytime
+        )
         icl = (
             max(1.00 - 0.025 * max(min(outdoor_temperature, 40) - 10, 0), 0.7)
             if not is_sleeping
@@ -163,7 +192,9 @@ class ClothingActivityByTemperatureCalculator:
         return ComfortFactors(met=met, icl=icl)
 
     @staticmethod
-    def adjust_met_for_meal_times(met: float, now: datetime, settings: ClothingActivityByTemperatureSettings) -> float:
+    def adjust_met_for_meal_times(
+        met: float, now: datetime, settings: ClothingActivityByTemperatureSettings
+    ) -> float:
         """食事時間帯によるMETの調整を行う。
 
         引数:
@@ -199,6 +230,6 @@ class ClothingActivityByTemperatureCalculator:
         # 各食事時間帯に応じてMETを調整
         for use, start, end, adjustment in meal_adjustments:
             if use and start <= now.time() <= end:  # 設定が有効で、現在の時間帯に該当する場合
-                met = round(met + adjustment, 2) # METを増加
+                met = round(met + adjustment, 2)  # METを増加
 
         return met
