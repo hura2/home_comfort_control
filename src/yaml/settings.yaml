@@ -17,8 +17,8 @@ temperature_thresholds:
 
 # CO2に関する閾値設定
 co2_thresholds:
-  high_level_threshold: 3000      # CO2がこの値以上の場合、換気が推奨される
-  warning_level_threshold: 3800   # CO2がこの値以上の場合、強制的に換気が必要な状態とみなす
+  high_level_threshold: 600      # CO2がこの値以上の場合、換気が推奨される
+  warning_level_threshold: 800   # CO2がこの値以上の場合、強制的に換気が必要な状態とみなす
 
 # センサーに関する設定
 sensors:
