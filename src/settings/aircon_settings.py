@@ -4,8 +4,8 @@ from typing import List
 
 import yaml
 from common import constants
-from common.data_types import AirconState, PMVThresholdState
-
+from models.aircon_state import AirconState
+from models.pmv_threshold_state import PMVThresholdState
 
 class _BaseAirconSettings:
     """エアコン設定の基底クラス"""

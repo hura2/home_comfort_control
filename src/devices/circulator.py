@@ -1,6 +1,6 @@
 import common.constants as constants
 from api.switchbot_api import SwitchBotApi
-from common.data_types import CirculatorState
+from models.circulator_state import CirculatorState
 from settings.circulator_settings import CirculatorSettings
 from settings.general_settings import GeneralSettings
 
@@ -40,7 +40,9 @@ class Circulator:
         return current_speed
 
     @staticmethod
-    def set_circulator(current_circulator_state: CirculatorState, target_fan_speed: int) -> constants.CirculatorPower:
+    def set_circulator(
+        current_circulator_state: CirculatorState, target_fan_speed: int
+    ) -> constants.CirculatorPower:
         """
         サーキュレーターの電源とファンスピードを設定します。
 
@@ -55,7 +57,9 @@ class Circulator:
         if target_fan_speed == 0:
             # ターゲットファンスピードが0の場合、サーキュレーターを停止する
             if power == constants.CirculatorPower.ON:
-                Circulator.adjust_fan_speed(current_circulator_state.fan_speed, target_fan_speed)  # スピード調整
+                Circulator.adjust_fan_speed(
+                    current_circulator_state.fan_speed, target_fan_speed
+                )  # スピード調整
                 SwitchBotApi.power_on_off()  # 電源をオフにする
                 power = constants.CirculatorPower.OFF
         else:
@@ -63,13 +67,17 @@ class Circulator:
             if power == constants.CirculatorPower.OFF:
                 SwitchBotApi.power_on_off()  # 電源をオンにする
                 power = constants.CirculatorPower.ON
-            Circulator.adjust_fan_speed(current_circulator_state.fan_speed, target_fan_speed)  # スピード調整
+            Circulator.adjust_fan_speed(
+                current_circulator_state.fan_speed, target_fan_speed
+            )  # スピード調整
 
         return power
 
     @staticmethod
     def set_fan_speed_based_on_temperature_diff(
-        outdoor_temperature: float, temperature_diff: float, current_circulator_state: CirculatorState
+        outdoor_temperature: float,
+        temperature_diff: float,
+        current_circulator_state: CirculatorState,
     ) -> CirculatorState:
         """
         温度差に基づいてファンスピードを設定します。
@@ -100,7 +108,9 @@ class Circulator:
             threshold = item["threshold"]
             speed = item["speed"]
             if temperature_diff >= float(threshold):
-                return CirculatorState(Circulator.set_circulator(current_circulator_state, speed), speed)
+                return CirculatorState(
+                    Circulator.set_circulator(current_circulator_state, speed), speed
+                )
 
         # 温度差がしきい値を満たさない場合はファンスピードを0に設定
         return CirculatorState(Circulator.set_circulator(current_circulator_state, 0), 0)

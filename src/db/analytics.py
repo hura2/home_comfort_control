@@ -6,8 +6,11 @@ import pandas as pd
 
 import common.constants as constants
 from api.jma_forecast_api import JmaForecastApi
-from common.data_types import AirconState, CirculatorState, HomeSensor, Sensor
 from db.supabase_client import SupabaseClient
+from models.aircon_state import AirconState
+from models.circulator_state import CirculatorState
+from models.home_sensor import HomeSensor
+from models.sensor import Sensor
 from util.aircon_intensity_calculator import AirconIntensityCalculator
 from util.time import TimeUtil
 

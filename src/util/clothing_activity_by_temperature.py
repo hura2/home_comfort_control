@@ -1,12 +1,13 @@
 from datetime import datetime
 
+from models.comfort_factors import ComfortFactors
 from settings.clothing_activity_by_temperature_settings import ClothingActivityByTemperatureSettings
 from settings.general_settings import GeneralSettings
 from util.logger import logger
 from util.time import TimeUtil
 
 
-class ClothingActivityByTemperatureCalculator:
+class ClothingActivityByTemperature:
     """
     外気温、最高気温、および就寝状況に基づき、適切なMET（代謝当量）とICL（快適さ指標）を計算するクラス。
 
@@ -38,15 +39,7 @@ from datetime import datetime
 from typing import Tuple
 
 
-@dataclass
-class ComfortFactors:
-    """快適さの要因を保持するクラス。MET（代謝当量）とICL（衣服断熱）を含む。"""
-
-    met: float
-    icl: float
-
-
-class ClothingActivityByTemperatureCalculator:
+class ClothingActivityByTemperature:
     @staticmethod
     def calculate_comfort_factors(
         outdoor_or_forecast_temperature: float, forecast_max_temperature: int, is_sleeping: bool
@@ -71,15 +64,15 @@ class ClothingActivityByTemperatureCalculator:
 
         # 高温、低温、中間の条件に応じてComfortFactorsを取得
         if forecast_max_temperature >= settings.temperature_thresholds.high_temperature_threshold:
-            return ClothingActivityByTemperatureCalculator._calculate_high_temp_comfort_factors(
+            return ClothingActivityByTemperature._calculate_high_temp_comfort_factors(
                 is_sleeping, now, cat_settings
             )
         elif forecast_max_temperature <= settings.temperature_thresholds.low_temperature_threshold:
-            return ClothingActivityByTemperatureCalculator._calculate_low_temp_comfort_factors(
+            return ClothingActivityByTemperature._calculate_low_temp_comfort_factors(
                 is_sleeping, now, cat_settings
             )
         else:
-            return ClothingActivityByTemperatureCalculator._calculate_mid_temp_comfort_factors(
+            return ClothingActivityByTemperature._calculate_mid_temp_comfort_factors(
                 outdoor_or_forecast_temperature, is_sleeping, cat_settings
             )
 
@@ -109,7 +102,7 @@ class ClothingActivityByTemperatureCalculator:
         )
 
         # 食事時間帯の調整
-        met = ClothingActivityByTemperatureCalculator.adjust_met_for_meal_times(met, now, settings)
+        met = ClothingActivityByTemperature.adjust_met_for_meal_times(met, now, settings)
         return ComfortFactors(met=met, icl=icl)
 
     @staticmethod

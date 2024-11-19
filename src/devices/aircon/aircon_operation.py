@@ -1,6 +1,6 @@
 from common import constants
-from common.data_types import AirconState
 from devices.aircon.aircon_state_manager import AirconStateManager
+from models.aircon_state import AirconState
 from settings.aircon_settings import AirconSettings
 from util.logger import LoggerUtil, logger
 
@@ -32,7 +32,9 @@ class AirconOperation:
             return True
 
         # 最低限の経過時間が確保されているかを確認し、可能であればエアコン設定を更新
-        if not AirconStateManager._can_change_aircon_state(current_aircon_state.mode, forecast_max_temperature):
+        if not AirconStateManager._can_change_aircon_state(
+            current_aircon_state.mode, forecast_max_temperature
+        ):
             # 同一モードの場合や微調整の処理を実施
             return AirconOperation._handle_same_mode_or_adjust(aircon_state, current_aircon_state)
 
@@ -73,7 +75,9 @@ class AirconOperation:
                     return AirconStateManager.update_aircon_state(aircon_state)
                 else:
                     logger.info("新しいモードが冷房モード以外")
-                    return AirconOperation._apply_weakest_setting(aircon_state, current_aircon_state)
+                    return AirconOperation._apply_weakest_setting(
+                        aircon_state, current_aircon_state
+                    )
 
             if constants.AirconMode.is_heating_mode(current_mode):
                 logger.info("現在モードが暖房モード")
@@ -82,7 +86,9 @@ class AirconOperation:
                     return AirconStateManager.update_aircon_state(aircon_state)
                 else:
                     logger.info("新しいモードが暖房モード以外")
-                    return AirconOperation._apply_weakest_setting(aircon_state, current_aircon_state)
+                    return AirconOperation._apply_weakest_setting(
+                        aircon_state, current_aircon_state
+                    )
 
             logger.info("現在モードが冷房でも暖房でもない場合")
             aircon_state.mode = current_aircon_state.mode

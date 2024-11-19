@@ -1,5 +1,7 @@
 from common import constants
-from common.data_types import AirconState, HomeSensor, PMVResults
+from models.aircon_state import AirconState
+from models.home_sensor import HomeSensor
+from models.pmv_results import PMVResults
 from settings.aircon_settings import AirconSettings
 from settings.general_settings import GeneralSettings
 from util.logger import logger
@@ -68,7 +70,7 @@ class AirconSettingsDeterminer:
     @staticmethod
     def _get_aircon_state_for_conditions(
         aircon_state: AirconState,
-        pmvCalculation: PMVResults,
+        pmv_results: PMVResults,
         home_sensor: HomeSensor,
         is_sleeping: bool,
     ) -> AirconState:
@@ -77,7 +79,7 @@ class AirconSettingsDeterminer:
         各種環境条件に基づいてエアコンの温度、モード、風量を変更する。
         Args:
             aircon_state (constants.AirconState): 現在のエアコン設定。
-            pmvCalculation (PMVCalculation): PMV計算結果を持つオブジェクト。
+            pmv_results (PMVResults): PMV計算結果を持つオブジェクト。
             home_sensor (HomeSensor): 家庭の環境情報を格納したオブジェクト。
             is_sleeping (bool): 寝ている時間。
         Returns:
@@ -90,36 +92,54 @@ class AirconSettingsDeterminer:
         dew_point_control = aircon_settings.environmental_control_settings.dew_point_control
         cooling_stop_settings = dew_point_control.cooling_stop_settings
         cooling_settings = dew_point_control.cooling_settings
-        cooling_activation_criteria = aircon_settings.environmental_control_settings.cooling_activation_criteria
-        heating_activation_criteria = aircon_settings.environmental_control_settings.heating_activation_criteria
-        dehumidification_settings = aircon_settings.environmental_control_settings.dehumidification_settings
+        cooling_activation_criteria = (
+            aircon_settings.environmental_control_settings.cooling_activation_criteria
+        )
+        heating_activation_criteria = (
+            aircon_settings.environmental_control_settings.heating_activation_criteria
+        )
+        dehumidification_settings = (
+            aircon_settings.environmental_control_settings.dehumidification_settings
+        )
         # 外気センサーがある場合のみ処理を実行
         if home_sensor.outdoor:
             # 冷房設定の場合の処理
-            if aircon_state.mode in [constants.AirconMode.POWERFUL_COOLING, constants.AirconMode.COOLING]:
+            if aircon_state.mode in [
+                constants.AirconMode.POWERFUL_COOLING,
+                constants.AirconMode.COOLING,
+            ]:
                 if (
-                    pmvCalculation.mean_radiant_temperature - cooling_activation_criteria.outdoor_temperature_difference
+                    pmv_results.mean_radiant_temperature
+                    - cooling_activation_criteria.outdoor_temperature_difference
                     > home_sensor.outdoor.air_quality.temperature
-                    and pmvCalculation.pmv < cooling_activation_criteria.pmv_threshold
+                    and pmv_results.pmv < cooling_activation_criteria.pmv_threshold
                 ):
                     aircon_state.update_if_none(cooling_activation_criteria.aircon_state)
                     logger.info("外気温が低いので自然に温度が下がるのを待ちます。")
 
             # 暖房設定の場合の処理
-            if aircon_state.mode in [constants.AirconMode.POWERFUL_HEATING, constants.AirconMode.HEATING]:
+            if aircon_state.mode in [
+                constants.AirconMode.POWERFUL_HEATING,
+                constants.AirconMode.HEATING,
+            ]:
                 if (
-                    pmvCalculation.mean_radiant_temperature - heating_activation_criteria.outdoor_temperature_difference
+                    pmv_results.mean_radiant_temperature
+                    - heating_activation_criteria.outdoor_temperature_difference
                     < home_sensor.outdoor.air_quality.temperature
-                    and pmvCalculation.pmv > heating_activation_criteria.pmv_threshold
+                    and pmv_results.pmv > heating_activation_criteria.pmv_threshold
                 ):
                     aircon_state.update_if_none(heating_activation_criteria.aircon_state)
                     logger.info("外気温が高いので自然に温度が上がるのを待ちます。")
 
         # 送風モードの場合の処理
         if aircon_state.mode == constants.AirconMode.FAN:
-            if home_sensor.average_indoor_absolute_humidity > settings.environment_settings.dehumidification_threshold:
+            if (
+                home_sensor.average_indoor_absolute_humidity
+                > settings.environment_settings.dehumidification_threshold
+            ):
                 logger.info(
-                    "絶対湿度が閾値(%.1f)を超えました。", settings.environment_settings.dehumidification_threshold
+                    "絶対湿度が閾値(%.1f)を超えました。",
+                    settings.environment_settings.dehumidification_threshold,
                 )
                 aircon_state.update_if_none(dehumidification_settings.aircon_state)
 
@@ -129,7 +149,9 @@ class AirconSettingsDeterminer:
 
         for supplementary in home_sensor.supplementaries:
             # メインセンサーと補助センサー間の気温差を計算
-            diff = abs(home_sensor.main.air_quality.temperature - supplementary.air_quality.temperature)
+            diff = abs(
+                home_sensor.main.air_quality.temperature - supplementary.air_quality.temperature
+            )
 
             # 最大の気温差が見つかった場合、そのセンサーと差分を保存
             if diff > max_diff_value:
@@ -137,7 +159,8 @@ class AirconSettingsDeterminer:
 
         if (
             is_sleeping == False
-            and max_diff_value > aircon_settings.environmental_control_settings.air_circulation_threshold
+            and max_diff_value
+            > aircon_settings.environmental_control_settings.air_circulation_threshold
         ):
             logger.info(
                 "リビングと他の部屋の温度の差が%s度以上です。温度差改善のため風量を上げます。",
@@ -150,8 +173,8 @@ class AirconSettingsDeterminer:
             home_sensor.main.air_quality.temperature
             < home_sensor.indoor_dew_point - dew_point_control.condensation_prevention_threshold
         ):
-            if pmvCalculation.pmv > dew_point_control.pmv_threshold_for_cooling:
-                logger.info("室内温度が露点温度より低いが、PMVが高い（%s）。", pmvCalculation.pmv)
+            if pmv_results.pmv > dew_point_control.pmv_threshold_for_cooling:
+                logger.info("室内温度が露点温度より低いが、PMVが高い（%s）。", pmv_results.pmv)
                 aircon_state.update_if_none(cooling_settings)
                 aircon_state.force_fan_below_dew_point = True
             else:
@@ -164,7 +187,10 @@ class AirconSettingsDeterminer:
             if aircon_state.fan_speed != constants.AirconFanSpeed.HIGH:
                 aircon_state.fan_speed = constants.AirconFanSpeed.HIGH
         elif home_sensor.main_co2_level > settings.co2_thresholds.high_level_threshold:
-            if aircon_state.fan_speed not in [constants.AirconFanSpeed.MEDIUM, constants.AirconFanSpeed.HIGH]:
+            if aircon_state.fan_speed not in [
+                constants.AirconFanSpeed.MEDIUM,
+                constants.AirconFanSpeed.HIGH,
+            ]:
                 aircon_state.fan_speed = constants.AirconFanSpeed.MEDIUM
 
         # CO2テスト

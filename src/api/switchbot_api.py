@@ -11,9 +11,11 @@ from dotenv import load_dotenv
 
 # 定数を管理するファイル
 import common.constants as constants
-from common.data_types import AirconState, AirQuality, Sensor
 
 # ロギング用のライブラリ
+from models.air_quality import AirQuality
+from models.aircon_state import AirconState
+from models.sensor import Sensor
 from util.logger import logger
 
 # 環境変数の読み込み

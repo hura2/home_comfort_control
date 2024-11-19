@@ -4,13 +4,19 @@ from datetime import time
 from pythermalcomfort.models import pmv_ppd
 from pythermalcomfort.utilities import clo_dynamic, v_relative
 
-from common.data_types import ComfortFactors, HomeSensor, PMVResults
+from models.comfort_factors import ComfortFactors
+from models.home_sensor import HomeSensor
+from models.pmv_results import PMVResults
 from settings.thermal_properties_settings import ThermalPropertiesSettings
 from util.time import TimeUtil
 
 
-class ThermalComfortCalculator:
-    """熱伝達性能を計算するクラス。"""
+class ThermalComfort:
+    """熱伝達性能を計算するクラス。
+
+    Attributes:
+        thermal_settings (ThermalPropertiesSettings): 熱特性設定
+    """
 
     @staticmethod
     def calculate_pmv(
@@ -53,13 +59,15 @@ class ThermalComfortCalculator:
         )
 
         # 屋根の表面温度を計算（外気温度を元に計算）
-        roof_surface_temp = ThermalComfortCalculator._calculate_roof_surface_temperature(outdoor_temperature)
+        roof_surface_temp = ThermalComfort._calculate_roof_surface_temperature(outdoor_temperature)
 
         # 西側外壁の表面温度を計算（外気温度に基づく計算）
-        west_wall_surface_temp = ThermalComfortCalculator._calculate_west_wall_temperature(outdoor_temperature)
+        west_wall_surface_temp = ThermalComfort._calculate_west_wall_temperature(
+            outdoor_temperature
+        )
 
         # 壁の内部表面温度を計算（西側外壁温度と床温度を元に計算）
-        wall_surface_temp = ThermalComfortCalculator._calculate_wall_surface_temperature(
+        wall_surface_temp = ThermalComfort._calculate_wall_surface_temperature(
             west_wall_surface_temp,  # 西側外壁の温度
             floor_temperature,  # 床の温度
             thermal_settings.thermal_properties.wall_thermal_conductivity,  # 壁材の熱伝導率
@@ -69,7 +77,7 @@ class ThermalComfortCalculator:
         )
 
         # 天井の内部表面温度を計算（屋根表面温度と天井温度を元に計算）
-        ceiling_surface_temp = ThermalComfortCalculator._calculate_interior_surface_temperature(
+        ceiling_surface_temp = ThermalComfort._calculate_interior_surface_temperature(
             roof_surface_temp,  # 屋根の表面温度
             ceiling_temperature,  # 天井の温度
             thermal_settings.thermal_properties.ceiling_thermal_conductivity,  # 天井材の熱伝導率
@@ -77,9 +85,11 @@ class ThermalComfortCalculator:
         )
 
         # 床の内部表面温度を計算（外気と床温度を加重平均し、床の熱特性に基づいて計算）
-        floor_surface_temp = ThermalComfortCalculator._calculate_interior_surface_temperature(
+        floor_surface_temp = ThermalComfort._calculate_interior_surface_temperature(
             (floor_temperature + outdoor_temperature)
-            * (1 - thermal_settings.thermal_properties.temp_diff_coefficient_under_floor),  # 外気と床温度の加重平均
+            * (
+                1 - thermal_settings.thermal_properties.temp_diff_coefficient_under_floor
+            ),  # 外気と床温度の加重平均
             floor_temperature,  # 床の温度
             thermal_settings.thermal_properties.floor_thermal_conductivity,  # 床材の熱伝導率
             thermal_settings.thermal_properties.floor_surface_heat_transfer_resistance,  # 床の表面熱伝達抵抗
@@ -126,53 +136,9 @@ class ThermalComfortCalculator:
             relative_air_speed=relative_air_speed,  # 相対空気速度
             dynamic_clothing_insulation=dynamic_clothing_insulation,  # 動的衣服熱抵抗
         )
-       
+
         # PMV計算結果をPMVCalculationオブジェクトとして返す
         return pmv_results
-
-    @staticmethod
-    def calculate_absolute_humidity(temperature: float, relative_humidity: float) -> float:
-        """絶対湿度を計算するメソッド。
-
-        Args:
-            temperature (float): 温度（摂氏）
-            relative_humidity (float): 相対湿度（％）
-
-        Returns:
-            float: 計算された絶対湿度（g/m³）
-        """
-        # 摂氏からケルビンに変換
-        temperature_kelvin = temperature + 273.15
-
-        # 飽和水蒸気圧の計算（hPa）
-        saturated_vapor_pressure = 6.1078 * 10 ** ((7.5 * temperature) / (temperature + 237.3))
-
-        # 絶対湿度の計算（g/m³）
-        absolute_humidity = (217 * (relative_humidity / 100) * saturated_vapor_pressure) / temperature_kelvin
-
-        return absolute_humidity  # 絶対湿度を返す
-
-    @staticmethod
-    def calculate_dew_point(temperature_celsius: float, relative_humidity: float) -> float:
-        """露点温度を計算するメソッド。
-
-        Args:
-            temperature_celsius (float): 温度（摂氏）
-            relative_humidity (float): 相対湿度（％）
-
-        Returns:
-            float: 計算された露点温度（摂氏）
-        """
-        a = 17.27  # 定数
-        b = 237.7  # 定数
-
-        # αを計算
-        alpha = ((a * temperature_celsius) / (b + temperature_celsius)) + math.log(relative_humidity / 100.0)
-
-        # 露点温度の計算
-        dew_point = math.ceil(((b * alpha) / (a - alpha)) * 10) / 10  # 小数点第一位まで切り上げ
-
-        return dew_point  # 露点温度を返す
 
     @staticmethod
     def _calculate_interior_surface_temperature(
@@ -197,7 +163,8 @@ class ThermalComfortCalculator:
 
         # 内部表面温度の計算
         interior_surface_temperature = indoor_temperature - (
-            (surface_heat_transfer_resistance * (indoor_temperature - outdoor_temperature)) / thermal_resistance
+            (surface_heat_transfer_resistance * (indoor_temperature - outdoor_temperature))
+            / thermal_resistance
         )
 
         return interior_surface_temperature  # 計算された内部表面温度を返す
@@ -226,12 +193,16 @@ class ThermalComfortCalculator:
         """
         # 複合熱伝導率を計算
         composite_thermal_conductivity = (
-            window_to_wall_ratio * window_thermal_conductivity + (1 - window_to_wall_ratio) * wall_thermal_conductivity
+            window_to_wall_ratio * window_thermal_conductivity
+            + (1 - window_to_wall_ratio) * wall_thermal_conductivity
         )
 
         # 内部表面温度の計算を呼び出す
-        return ThermalComfortCalculator._calculate_interior_surface_temperature(
-            outdoor_temperature, indoor_temperature, composite_thermal_conductivity, surface_heat_transfer_resistance
+        return ThermalComfort._calculate_interior_surface_temperature(
+            outdoor_temperature,
+            indoor_temperature,
+            composite_thermal_conductivity,
+            surface_heat_transfer_resistance,
         )
 
     @staticmethod

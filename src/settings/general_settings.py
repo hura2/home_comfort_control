@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 from common.constants import SensorType
-from common.data_types import Sensor
+from models.sensor import Sensor
 
 
 class GeneralSettings:

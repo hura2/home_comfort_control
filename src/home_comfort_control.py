@@ -7,22 +7,25 @@ from sklearn.preprocessing import PolynomialFeatures
 from api.jma_forecast_api import JmaForecastApi
 from api.switchbot_api import SwitchBotApi
 from common import constants
-from common.data_types import (CirculatorState, ComfortFactors, HomeSensor,
-                               PMVResults)
 from db.aircon_min_runtime_manager import AirconMinRuntimeManager
 from db.analytics import Analytics
 from devices.aircon.aircon_operation import AirconOperation
 from devices.aircon.aircon_settings_determiner import AirconSettingsDeterminer
 from devices.aircon.aircon_state_manager import AirconStateManager
 from devices.circulator import Circulator
+from models.circulator_state import CirculatorState
+from models.comfort_factors import ComfortFactors
+from models.home_sensor import HomeSensor
+from models.pmv_results import PMVResults
 from settings.general_settings import GeneralSettings
-from util.logger import LoggerUtil,logger
-from util.thermal_comfort_calculator import ThermalComfortCalculator
+from util.logger import LoggerUtil, logger
+from util.thermal_comfort import ThermalComfort
 from util.time import TimeUtil
 
 
 class HomeComfortControl:
-    """家の快適環境を制御するクラス"""  
+    """家の快適環境を制御するクラス"""
+
     def __init__(self, settings: GeneralSettings):
         self.settings = settings
 
@@ -40,19 +43,24 @@ class HomeComfortControl:
             outdoor=self.settings.sensors.outdoor,
         )
         # mainセンサーの空気質情報を取得
-        home_sensor.main.air_quality = SwitchBotApi.get_air_quality_by_sensor(self.settings.sensors.main)
+        home_sensor.main.air_quality = SwitchBotApi.get_air_quality_by_sensor(
+            self.settings.sensors.main
+        )
         # subセンサーの設定がある場合、subセンサーの空気質情報を取得
         if self.settings.sensors.sub:
-            home_sensor.sub.air_quality = SwitchBotApi.get_air_quality_by_sensor(self.settings.sensors.sub)
+            home_sensor.sub.air_quality = SwitchBotApi.get_air_quality_by_sensor(
+                self.settings.sensors.sub
+            )
         # supplementariesセンサーの設定がある場合、supplementariesセンサーの空気質情報を取得
         if self.settings.sensors.supplementaries:
             for supplementary in home_sensor.supplementaries:
                 supplementary.air_quality = SwitchBotApi.get_air_quality_by_sensor(supplementary)
         # outdoorセンサーの設定がある場合、outdoorセンサーの空気質情報を取得
         if self.settings.sensors.outdoor:
-            home_sensor.outdoor.air_quality = SwitchBotApi.get_air_quality_by_sensor(self.settings.sensors.outdoor)
+            home_sensor.outdoor.air_quality = SwitchBotApi.get_air_quality_by_sensor(
+                self.settings.sensors.outdoor
+            )
         return home_sensor
-
 
     def fetch_forecast_max_temperature(self) -> int:
         """天気予報の最高気温を取得する
@@ -72,7 +80,6 @@ class HomeComfortControl:
 
         return forecast_max_temperature if forecast_max_temperature else 20
 
-
     def is_within_sleeping_period(self, now: datetime.datetime) -> bool:
         """現在の時刻が就寝時間内かどうかをチェックする
         Args:
@@ -82,7 +89,9 @@ class HomeComfortControl:
         """
         # 起床時間を取得
         awake_period_start = TimeUtil.timezone().localize(
-            datetime.datetime.combine(now.date(), self.settings.time_settings.awake_period.start_time)
+            datetime.datetime.combine(
+                now.date(), self.settings.time_settings.awake_period.start_time
+            )
         )
         # 就寝時間を取得
         awake_period_end = TimeUtil.timezone().localize(
@@ -90,7 +99,6 @@ class HomeComfortControl:
         )
         # 就寝中かどうかを判断（起床時間内ならFalse、それ以外ならTrue）
         return awake_period_start > now or awake_period_end < now
-
 
     def activate_circulator_in_heat_conditions(
         self, home_sensor: HomeSensor, pmv: float, forecast_max_temperature: int
@@ -112,7 +120,6 @@ class HomeComfortControl:
             )
         return circulator_state
 
-
     def recalculate_pmv_with_circulator(
         self,
         home_sensor: HomeSensor,
@@ -129,18 +136,17 @@ class HomeComfortControl:
             comfort_factors (ComfortFactors): コンフォーマンス因子の値
         Returns:
             PMVResults: PMV計算結果
-        """ 
+        """
         pmv = None
         # サーキュレーター使用設定が有効かどうかを確認
         if self.settings.circulator_settings.use_circulator:
             # サーキュレーターをオンにしている場合、風量を増やしてPMV値を再計算
             if circulator_state.power == constants.CirculatorPower.ON:
-                pmv = ThermalComfortCalculator.calculate_pmv(
+                pmv = ThermalComfort.calculate_pmv(
                     home_sensor, forecast_max_temperature, comfort_factors, wind_speed=0.3
                 )
 
         return pmv
-
 
     def update_aircon_state(
         self,
@@ -158,7 +164,9 @@ class HomeComfortControl:
             is_sleeping (bool): 寝ている時間
         """
         # PMVを元にエアコンの設定を判断
-        aircon_state = AirconSettingsDeterminer.determine_aircon_settings(pmv_result, home_sensor, is_sleeping)
+        aircon_state = AirconSettingsDeterminer.determine_aircon_settings(
+            pmv_result, home_sensor, is_sleeping
+        )
 
         if self.settings.database_settings.use_database:
             # 前回のエアコン設定を取得し、経過時間をログに出力
@@ -167,13 +175,16 @@ class HomeComfortControl:
             LoggerUtil.log_elapsed_time(hours, minutes)
 
             # エアコンの設定が必要か確認し、更新
-            if AirconOperation.update_aircon_if_necessary(aircon_state, current_aircon_state, forecast_max_temperature):
-                AirconMinRuntimeManager.update_start_time_if_exists(aircon_state.mode, forecast_max_temperature)
+            if AirconOperation.update_aircon_if_necessary(
+                aircon_state, current_aircon_state, forecast_max_temperature
+            ):
+                AirconMinRuntimeManager.update_start_time_if_exists(
+                    aircon_state.mode, forecast_max_temperature
+                )
         else:
             # データベースを使わない場合、エアコンの状態を直接更新
             LoggerUtil.log_aircon_state(current_aircon_state)
             AirconStateManager.update_aircon_state(aircon_state)
-
 
     def update_circulator_state(
         self,
@@ -216,7 +227,8 @@ class HomeComfortControl:
                     if home_sensor.sub:
                         circulator_state = Circulator.set_fan_speed_based_on_temperature_diff(
                             outdoor_or_forecast_temperature,
-                            home_sensor.sub.air_quality.temperature - home_sensor.main.air_quality.temperature,
+                            home_sensor.sub.air_quality.temperature
+                            - home_sensor.main.air_quality.temperature,
                             current_circulator_state,
                         )
 
@@ -224,7 +236,6 @@ class HomeComfortControl:
             LoggerUtil.log_circulator_state(current_circulator_state, circulator_state.fan_speed)
 
         return circulator_state
-
 
     def record_environment_data(
         self,
@@ -259,11 +270,11 @@ class HomeComfortControl:
             # 昨日のエアコン強度スコアを登録
             Analytics.register_yesterday_intensity_score()
 
-    def  get_running_mean_temperature(self) -> None:
-            # 例としてlocation_idが3のデータを取得
+    def get_running_mean_temperature(self) -> None:
+        # 例としてlocation_idが3のデータを取得
         result = Analytics.get_hourly_average_temperature(location_id=3)
-        
-        temp_array = [entry['average_temperature'] for entry in result]
+
+        temp_array = [entry["average_temperature"] for entry in result]
         logger.info(temp_array)
         # 時間データの作成
         hours = np.array(range(len(temp_array))).reshape(-1, 1)

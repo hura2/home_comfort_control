@@ -1,8 +1,8 @@
 from home_comfort_control import HomeComfortControl
 from settings.general_settings import GeneralSettings
-from util.clothing_activity_by_temperature_calculator import ClothingActivityByTemperatureCalculator
+from util.clothing_activity_by_temperature import ClothingActivityByTemperature
 from util.logger import LoggerUtil
-from util.thermal_comfort_calculator import ThermalComfortCalculator
+from util.thermal_comfort import ThermalComfort
 from util.time import TimeUtil
 
 
@@ -18,7 +18,9 @@ def main():
     home_sensor = home_comfort_control.initialize_home_sensor()
     # outdoorセンサーの設定がある場合、外気温を設定。ない場合は、天気予報の最高気温を設定
     outdoor_or_forecast_temperature = (
-        home_sensor.outdoor.air_quality.temperature if home_sensor.outdoor else forecast_max_temperature
+        home_sensor.outdoor.air_quality.temperature
+        if home_sensor.outdoor
+        else forecast_max_temperature
     )
     # 現在時刻を取得
     now = TimeUtil.get_current_time()
@@ -27,11 +29,13 @@ def main():
     # ログに環境情報を出力
     LoggerUtil.log_environment_data(home_sensor, forecast_max_temperature, now)
     # METとICLの値を計算
-    comfort_factors = ClothingActivityByTemperatureCalculator.calculate_comfort_factors(
+    comfort_factors = ClothingActivityByTemperature.calculate_comfort_factors(
         outdoor_or_forecast_temperature, forecast_max_temperature, is_sleeping
     )
     # PMV値を計算
-    pmv_result = ThermalComfortCalculator.calculate_pmv(home_sensor, forecast_max_temperature, comfort_factors)
+    pmv_result = ThermalComfort.calculate_pmv(
+        home_sensor, forecast_max_temperature, comfort_factors
+    )
     # 高温条件の場合の、サーキュレーターの状態を取得
     circulator_state_heat_conditions = home_comfort_control.activate_circulator_in_heat_conditions(
         home_sensor, pmv_result.pmv, forecast_max_temperature
@@ -47,7 +51,9 @@ def main():
     # 結果をログに出力
     LoggerUtil.log_pmv_results(pmv_result, comfort_factors)
     # PMVを元にエアコンの設定を判断
-    home_comfort_control.update_aircon_state(home_sensor, pmv_result, forecast_max_temperature, is_sleeping)
+    home_comfort_control.update_aircon_state(
+        home_sensor, pmv_result, forecast_max_temperature, is_sleeping
+    )
     # サーキュレーターの状態を更新
     circulator_state = home_comfort_control.update_circulator_state(
         home_sensor, circulator_state_heat_conditions, is_sleeping, outdoor_or_forecast_temperature
