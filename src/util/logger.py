@@ -9,7 +9,7 @@ from models.aircon_state import AirconState
 from models.circulator_state import CirculatorState
 from models.comfort_factors import ComfortFactors
 from models.home_sensor import HomeSensor
-from models.pmv_results import PMVResults
+from models.pmv_result import PMVResult
 from models.sensor import Sensor
 
 formatter = "%(message)s"
@@ -118,12 +118,12 @@ class LoggerUtil:
         logger.info(sensor_info)
 
     @staticmethod
-    def log_pmv_results(pmv: PMVResults, comfort_factors: ComfortFactors):
+    def log_pmv_result(pmv: PMVResult, comfort_factors: ComfortFactors):
         """
         PMV計算の結果をログに出力します。
 
         Args:
-            pmv (PMVCalculation): PMV計算の結果
+            pmv (PMVResult): PMV計算の結果
             comfort_factors (ComfortFactors): コンフォーマンス因子の値
         """
         logger.info(
@@ -158,9 +158,7 @@ class LoggerUtil:
             current_aircon_state (AirconState): 現在のエアコンの状態。
         """
         if current_aircon_state == None:
-            logger.info(
-                f"{LoggerUtil._format_state(aircon_state)}に変更"
-            )         
+            logger.info(f"{LoggerUtil._format_state(aircon_state)}に変更")
         else:
             logger.info(
                 f"{LoggerUtil._format_state(current_aircon_state)}から{LoggerUtil._format_state(aircon_state)}に変更"
@@ -178,7 +176,6 @@ class LoggerUtil:
             str: フォーマットされたエアコンの状態。
         """
         return f"{state.mode.description}:{state.temperature}:{state.fan_speed.description}:{state.power.description}"
-
 
     @staticmethod
     def log_circulator_state(current_circulator_state: CirculatorState, fan_speed: str):

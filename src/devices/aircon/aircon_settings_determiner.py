@@ -1,7 +1,7 @@
 from common import constants
 from models.aircon_state import AirconState
 from models.home_sensor import HomeSensor
-from models.pmv_results import PMVResults
+from models.pmv_result import PMVResult
 from settings.aircon_settings import AirconSettings
 from settings.general_settings import GeneralSettings
 from util.logger import logger
@@ -15,23 +15,23 @@ class AirconSettingsDeterminer:
     # エアコンの動作を設定する関数
     @staticmethod
     def determine_aircon_settings(
-        pmvCalculation: PMVResults,
+        pmvResult: PMVResult,
         home_sensor: HomeSensor,
         is_sleeping: bool,
     ):
         """
         エアコンの設定を決定するメソッド
         Args:
-            pmvCalculation (PMVCalculation): PMV計算結果を持つオブジェクト。
+            pmvResult (PMVResult): PMV計算結果を持つオブジェクト。
             home_sensor (HomeSensor): 家庭の環境情報を格納したオブジェクト。
             is_sleeping (bool): 寝ている時間。
         Returns:
             constants.AirconState: 設定されたエアコンの設定。
         """
         # エアコンの設定を決定
-        aircon_state = AirconSettingsDeterminer._get_aircon_state_for_pmv(pmvCalculation.pmv)
+        aircon_state = AirconSettingsDeterminer._get_aircon_state_for_pmv(pmvResult.pmv)
         aircon_state = AirconSettingsDeterminer._get_aircon_state_for_conditions(
-            aircon_state, pmvCalculation, home_sensor, is_sleeping
+            aircon_state, pmvResult, home_sensor, is_sleeping
         )
         return aircon_state
 
@@ -70,7 +70,7 @@ class AirconSettingsDeterminer:
     @staticmethod
     def _get_aircon_state_for_conditions(
         aircon_state: AirconState,
-        pmv_results: PMVResults,
+        pmv_result: PMVResult,
         home_sensor: HomeSensor,
         is_sleeping: bool,
     ) -> AirconState:
@@ -79,7 +79,7 @@ class AirconSettingsDeterminer:
         各種環境条件に基づいてエアコンの温度、モード、風量を変更する。
         Args:
             aircon_state (constants.AirconState): 現在のエアコン設定。
-            pmv_results (PMVResults): PMV計算結果を持つオブジェクト。
+            pmv_result (PMVResult): PMV計算結果を持つオブジェクト。
             home_sensor (HomeSensor): 家庭の環境情報を格納したオブジェクト。
             is_sleeping (bool): 寝ている時間。
         Returns:
@@ -101,6 +101,7 @@ class AirconSettingsDeterminer:
         dehumidification_settings = (
             aircon_settings.environmental_control_settings.dehumidification_settings
         )
+
         # 外気センサーがある場合のみ処理を実行
         if home_sensor.outdoor:
             # 冷房設定の場合の処理
@@ -109,10 +110,10 @@ class AirconSettingsDeterminer:
                 constants.AirconMode.COOLING,
             ]:
                 if (
-                    pmv_results.mean_radiant_temperature
+                    pmv_result.mean_radiant_temperature
                     - cooling_activation_criteria.outdoor_temperature_difference
                     > home_sensor.outdoor.air_quality.temperature
-                    and pmv_results.pmv < cooling_activation_criteria.pmv_threshold
+                    and pmv_result.pmv < cooling_activation_criteria.pmv_threshold
                 ):
                     aircon_state.update_if_none(cooling_activation_criteria.aircon_state)
                     logger.info("外気温が低いので自然に温度が下がるのを待ちます。")
@@ -123,10 +124,10 @@ class AirconSettingsDeterminer:
                 constants.AirconMode.HEATING,
             ]:
                 if (
-                    pmv_results.mean_radiant_temperature
+                    pmv_result.mean_radiant_temperature
                     - heating_activation_criteria.outdoor_temperature_difference
                     < home_sensor.outdoor.air_quality.temperature
-                    and pmv_results.pmv > heating_activation_criteria.pmv_threshold
+                    and pmv_result.pmv > heating_activation_criteria.pmv_threshold
                 ):
                     aircon_state.update_if_none(heating_activation_criteria.aircon_state)
                     logger.info("外気温が高いので自然に温度が上がるのを待ちます。")
@@ -173,8 +174,8 @@ class AirconSettingsDeterminer:
             home_sensor.main.air_quality.temperature
             < home_sensor.indoor_dew_point - dew_point_control.condensation_prevention_threshold
         ):
-            if pmv_results.pmv > dew_point_control.pmv_threshold_for_cooling:
-                logger.info("室内温度が露点温度より低いが、PMVが高い（%s）。", pmv_results.pmv)
+            if pmv_result.pmv > dew_point_control.pmv_threshold_for_cooling:
+                logger.info("室内温度が露点温度より低いが、PMVが高い（%s）。", pmv_result.pmv)
                 aircon_state.update_if_none(cooling_settings)
                 aircon_state.force_fan_below_dew_point = True
             else:

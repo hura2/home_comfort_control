@@ -16,7 +16,7 @@ from devices.circulator import Circulator
 from models.circulator_state import CirculatorState
 from models.comfort_factors import ComfortFactors
 from models.home_sensor import HomeSensor
-from models.pmv_results import PMVResults
+from models.pmv_result import PMVResult
 from settings.general_settings import GeneralSettings
 from util.logger import LoggerUtil, logger
 from util.thermal_comfort import ThermalComfort
@@ -126,7 +126,7 @@ class HomeComfortControl:
         forecast_max_temperature: int,
         circulator_state: CirculatorState,
         comfort_factors: ComfortFactors,
-    ) -> PMVResults:
+    ) -> PMVResult:
         """
         PMV値を再計算する
         Args:
@@ -151,7 +151,7 @@ class HomeComfortControl:
     def update_aircon_state(
         self,
         home_sensor: HomeSensor,
-        pmv_result: PMVResults,
+        pmv_result: PMVResult,
         forecast_max_temperature: int,
         is_sleeping: bool,
     ) -> None:
@@ -239,7 +239,7 @@ class HomeComfortControl:
     def record_environment_data(
         self,
         home_sensor: HomeSensor,
-        pmv: PMVResults,
+        pmv: PMVResult,
         circulator_state: CirculatorState,
         now: datetime.datetime,
     ) -> None:

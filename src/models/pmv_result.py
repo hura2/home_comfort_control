@@ -1,4 +1,4 @@
-class PMVResults:
+class PMVResult:
     """
     PMV（Predicted Mean Vote）計算結果を表すクラス。
 
@@ -17,9 +17,21 @@ class PMVResults:
         dynamic_clothing_insulation (float): 動的な衣服の断熱性。
     """
 
-    def __init__(self, pmv: float, ppd: float, clo: float, air: float, met: float, wall: float, ceiling: float,
-                 floor: float, mean_radiant_temperature: float, dry_bulb_temperature: float,
-                 relative_air_speed: float, dynamic_clothing_insulation: float):
+    def __init__(
+        self,
+        pmv: float,
+        ppd: float,
+        clo: float,
+        air: float,
+        met: float,
+        wall: float,
+        ceiling: float,
+        floor: float,
+        mean_radiant_temperature: float,
+        dry_bulb_temperature: float,
+        relative_air_speed: float,
+        dynamic_clothing_insulation: float,
+    ):
         # 属性の初期化とバリデーション
         self.pmv = pmv
         self.ppd = ppd

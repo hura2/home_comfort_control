@@ -6,7 +6,7 @@ from pythermalcomfort.utilities import clo_dynamic, v_relative
 
 from models.comfort_factors import ComfortFactors
 from models.home_sensor import HomeSensor
-from models.pmv_results import PMVResults
+from models.pmv_result import PMVResult
 from settings.thermal_properties_settings import ThermalPropertiesSettings
 from util.time import TimeUtil
 
@@ -24,7 +24,7 @@ class ThermalComfort:
         forecast_max_temperature: float,  # 最高気温（度） - 外気温度として使用される最高気温
         comfort_factors: ComfortFactors,  # 快適さの要因
         wind_speed: float = 0.08,  # 風速（m/s）、デフォルトは0.08 m/s - 換気や風による熱伝達を考慮
-    ) -> PMVResults:  # PMV計算の結果を返す - PMV計算結果を保持するPMVCalculationオブジェクト
+    ) -> PMVResult:  # PMV計算の結果を返す - PMV計算結果を保持するPMVResultオブジェクト
         """PMV（Predicted Mean Vote）を計算するメソッド。
 
         人間の熱的快適性を評価するために、室内環境の様々なパラメータ（温度、湿度、風速、衣服の熱抵抗など）を元にPMVとPPD（Predicted Percentage of Dissatisfied）を計算します。これらの指標は、室内の温熱環境がどれくらい快適であるかを示します。
@@ -36,7 +36,7 @@ class ThermalComfort:
             wind_speed (float, optional): 風速（m/s）。室内空間での換気や空気の流れを考慮した補正値。デフォルトは0.15 m/s。
 
         Returns:
-            PMVCalculation: PMV、PPD、衣服の熱抵抗、相対空気速度など、計算に基づく結果をまとめたオブジェクト。
+            PMVResult: PMV、PPD、衣服の熱抵抗、相対空気速度など、計算に基づく結果をまとめたオブジェクト。
         """
         # 熱特性設定をロードする
         thermal_settings = ThermalPropertiesSettings()
@@ -122,7 +122,7 @@ class ThermalComfort:
             standard="ASHRAE",  # 計算基準（ASHRAE）
         )
 
-        pmv_results = PMVResults(
+        pmv_result = PMVResult(
             pmv=float(results["pmv"]),  # PMV値（予測平均投票）
             ppd=float(results["ppd"]),  # PPD値（不快感を示す指標）
             clo=dynamic_clothing_insulation.item(0),  # 動的衣服熱抵抗（clo）
@@ -137,8 +137,8 @@ class ThermalComfort:
             dynamic_clothing_insulation=dynamic_clothing_insulation,  # 動的衣服熱抵抗
         )
 
-        # PMV計算結果をPMVCalculationオブジェクトとして返す
-        return pmv_results
+        # PMV計算結果をPMVResultオブジェクトとして返す
+        return pmv_result
 
     @staticmethod
     def _calculate_interior_surface_temperature(

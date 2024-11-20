@@ -10,6 +10,7 @@ from util.time import TimeUtil
 def main():
     # 設定ファイル読み込み
     settings = GeneralSettings()
+    # ホームコンフォートコントロールを初期化
     home_comfort_control = HomeComfortControl(settings)
     # 最高気温を取得（天気予報）
     forecast_max_temperature = home_comfort_control.fetch_forecast_max_temperature()
@@ -49,7 +50,7 @@ def main():
     )
 
     # 結果をログに出力
-    LoggerUtil.log_pmv_results(pmv_result, comfort_factors)
+    LoggerUtil.log_pmv_result(pmv_result, comfort_factors)
     # PMVを元にエアコンの設定を判断
     home_comfort_control.update_aircon_state(
         home_sensor, pmv_result, forecast_max_temperature, is_sleeping
