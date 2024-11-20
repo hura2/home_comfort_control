@@ -2,6 +2,7 @@ from api.switchbot_api import SwitchBotApi
 from common import constants
 from db.aircon_min_runtime_manager import AirconMinRuntimeManager
 from db.analytics import Analytics
+from models.aircon_state import AirconState
 from settings.general_settings import GeneralSettings
 from util.logger import LoggerUtil, logger
 from util.time import TimeUtil
@@ -22,7 +23,9 @@ class AirconStateManager:
         Returns:
             bool: 設定変更が可能であればTrue、そうでなければFalse。
         """
-        latest_operation = AirconMinRuntimeManager.get_aircon_min_runtime_tracker_for_conditions(mode, max_temperature)
+        latest_operation = AirconMinRuntimeManager.get_aircon_min_runtime_tracker_for_conditions(
+            mode, max_temperature
+        )
 
         if latest_operation is None:
             # 条件に合致する設定がない場合は変更可能
@@ -42,7 +45,11 @@ class AirconStateManager:
             # 最低経過時間前なのでモードを継続します
             hours, remainder = divmod(elapsed_seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
-            logger.info("最低経過時間前なのでモードを継続します。経過時間:{}時間{}分".format(int(hours), int(minutes)))
+            logger.info(
+                "最低経過時間前なのでモードを継続します。経過時間:{}時間{}分".format(
+                    int(hours), int(minutes)
+                )
+            )
             return False  # まだ継続時間内であるため変更不可
 
         logger.info("最低経過時間を経過したので、設定を変更可能です。")
@@ -50,7 +57,7 @@ class AirconStateManager:
 
     # エアコンの設定を変更
     @staticmethod
-    def update_aircon_state(aircon_state):
+    def update_aircon_state(aircon_state: AirconState, current_aircon_state: AirconState = None):
         """エアコンの状態を更新し、設定をログに記録する。
 
         Args:
@@ -58,7 +65,7 @@ class AirconStateManager:
         """
         SwitchBotApi.aircon(aircon_state)
         # エアコンの設定をログに出力
-        LoggerUtil.log_aircon_state(aircon_state)
+        LoggerUtil.log_aircon_state(aircon_state, current_aircon_state)
         # 設定ファイル読み込み
         settings = GeneralSettings()
         if settings.database_settings.use_database:

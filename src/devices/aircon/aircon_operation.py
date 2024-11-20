@@ -27,8 +27,7 @@ class AirconOperation:
         """
         # 強制送風のフラグが有効なら、設定を送風に変更
         if aircon_state.force_fan_below_dew_point:
-            LoggerUtil.log_aircon_state(current_aircon_state)
-            AirconStateManager.update_aircon_state(aircon_state)
+            AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
             return True
 
         # 最低限の経過時間が確保されているかを確認し、可能であればエアコン設定を更新
@@ -39,8 +38,7 @@ class AirconOperation:
             return AirconOperation._handle_same_mode_or_adjust(aircon_state, current_aircon_state)
 
         # 設定を更新してTrueを返す
-        LoggerUtil.log_aircon_state(current_aircon_state)
-        AirconStateManager.update_aircon_state(aircon_state)
+        AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
         return True
 
     # エアコンが同一モードの場合やモード切り替えが必要な場合の処理
@@ -72,7 +70,7 @@ class AirconOperation:
                 logger.info("現在モードが冷房モード")
                 if constants.AirconMode.is_cooling_mode(new_mode):
                     logger.info("新しいモードも冷房モード")
-                    return AirconStateManager.update_aircon_state(aircon_state)
+                    return AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
                 else:
                     logger.info("新しいモードが冷房モード以外")
                     return AirconOperation._apply_weakest_setting(
@@ -83,7 +81,7 @@ class AirconOperation:
                 logger.info("現在モードが暖房モード")
                 if constants.AirconMode.is_heating_mode(new_mode):
                     logger.info("新しいモードも暖房モード")
-                    return AirconStateManager.update_aircon_state(aircon_state)
+                    return AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
                 else:
                     logger.info("新しいモードが暖房モード以外")
                     return AirconOperation._apply_weakest_setting(
@@ -121,8 +119,7 @@ class AirconOperation:
             aircon_state.fan_speed = weakest_state.fan_speed
 
         # 最弱設定を適用
-        LoggerUtil.log_aircon_state(current_aircon_state)
-        AirconStateManager.update_aircon_state(aircon_state)
+        AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
 
     # 現在の設定と異なる場合にエアコン設定を更新
     @staticmethod
@@ -146,10 +143,8 @@ class AirconOperation:
             or current_aircon_state.power.id != aircon_state.power.id
         ):
             logger.info("現在のモードを継続しつつ、設定を変更します")
-            LoggerUtil.log_aircon_state(current_aircon_state)
-            AirconStateManager.update_aircon_state(aircon_state)
+            AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
             return False  # 設定が異なるため更新を行った
 
-        LoggerUtil.log_aircon_state(current_aircon_state)
-        LoggerUtil.log_aircon_state(aircon_state)
+        LoggerUtil.log_aircon_state(aircon_state, current_aircon_state)
         return False  # 設定は同じのため更新は行わない

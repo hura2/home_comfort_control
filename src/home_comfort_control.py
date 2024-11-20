@@ -183,7 +183,6 @@ class HomeComfortControl:
                 )
         else:
             # データベースを使わない場合、エアコンの状態を直接更新
-            LoggerUtil.log_aircon_state(current_aircon_state)
             AirconStateManager.update_aircon_state(aircon_state)
 
     def update_circulator_state(

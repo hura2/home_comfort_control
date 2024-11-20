@@ -3,6 +3,7 @@ import logging
 import unicodedata
 from typing import Tuple
 
+from api.line_notify import LineNotify
 from common import constants
 from models.aircon_state import AirconState
 from models.circulator_state import CirculatorState
@@ -10,6 +11,7 @@ from models.comfort_factors import ComfortFactors
 from models.home_sensor import HomeSensor
 from models.pmv_results import PMVResults
 from models.sensor import Sensor
+
 formatter = "%(message)s"
 logging.basicConfig(level=logging.INFO, format=formatter)
 
@@ -102,8 +104,12 @@ class LoggerUtil:
 
         # 温度差の計算と表示（参照センサーがある場合）
         if reference_sensor:
-            temp_diff = abs(reference_sensor.air_quality.temperature - sensor.air_quality.temperature)
-            sensor_info += f", {reference_sensor.label}:{reference_sensor.location}との温度差{temp_diff:.1f}°"
+            temp_diff = abs(
+                reference_sensor.air_quality.temperature - sensor.air_quality.temperature
+            )
+            sensor_info += (
+                f", {reference_sensor.label}:{reference_sensor.location}との温度差{temp_diff:.1f}°"
+            )
 
         # CO2センサーのログ
         if sensor.type == constants.SensorType.CO2:
@@ -123,7 +129,9 @@ class LoggerUtil:
         logger.info(
             f"表面温度:壁 {pmv.wall:.1f}°, 天井 {pmv.ceiling:.1f}°, 床 {pmv.floor:.1f}°, 平均放射温度: {pmv.mean_radiant_temperature:.1f}°"
         )
-        logger.info(f"体感温度: {(pmv.dry_bulb_temperature + pmv.mean_radiant_temperature) / 2:.1f}°")
+        logger.info(
+            f"体感温度: {(pmv.dry_bulb_temperature + pmv.mean_radiant_temperature) / 2:.1f}°"
+        )
         logger.info(f"met: {comfort_factors.met}, icl: {comfort_factors.icl:.2f}")
         logger.info(f"相対風速: {pmv.relative_air_speed:.1f}m/s")
         logger.info(f"動的な衣服の断熱性: {pmv.dynamic_clothing_insulation:.2f}")
@@ -141,16 +149,36 @@ class LoggerUtil:
         logger.info(f"前回のエアコン設定からの経過: {hours}時間{minutes}分")
 
     @staticmethod
-    def log_aircon_state(aircon_state: AirconState):
+    def log_aircon_state(aircon_state: AirconState, current_aircon_state: AirconState):
         """
-        エアコンの状態をログに出力します。
+        エアコンの状態変更をログに出力します。
 
         Args:
-            aircon_state (AirconState): エアコンの状態
+            aircon_state (AirconState): 変更後のエアコンの状態。
+            current_aircon_state (AirconState): 現在のエアコンの状態。
         """
-        logger.info(
-            f"{aircon_state.mode.description}:{aircon_state.temperature}:{aircon_state.fan_speed.description}:{aircon_state.power.description}"
-        )
+        if current_aircon_state == None:
+            logger.info(
+                f"{LoggerUtil._format_state(aircon_state)}に変更"
+            )         
+        else:
+            logger.info(
+                f"{LoggerUtil._format_state(current_aircon_state)}から{LoggerUtil._format_state(aircon_state)}に変更"
+            )
+
+    @staticmethod
+    def _format_state(state: AirconState) -> str:
+        """
+        エアコンの状態を文字列にフォーマットします。
+
+        Args:
+            state (AirconState): エアコンの状態。
+
+        Returns:
+            str: フォーマットされたエアコンの状態。
+        """
+        return f"{state.mode.description}:{state.temperature}:{state.fan_speed.description}:{state.power.description}"
+
 
     @staticmethod
     def log_circulator_state(current_circulator_state: CirculatorState, fan_speed: str):
@@ -164,6 +192,13 @@ class LoggerUtil:
         logger.info(f"現在のサーキュレーターの電源:{current_circulator_state.power.description}")
         logger.info(f"現在のサーキュレーターの風量:{current_circulator_state.fan_speed}")
         logger.info(f"サーキュレーターの風量を{fan_speed}に設定")
+
+        if current_circulator_state.power == constants.CirculatorPower.OFF and fan_speed > 0:
+            line_notify = LineNotify()
+            line_notify.send_message(f"サーキュレーターの風量を{fan_speed}に設定")
+        if current_circulator_state.power == constants.CirculatorPower.ON and fan_speed == 0:
+            line_notify = LineNotify()
+            line_notify.send_message(f"サーキュレーターの電源をOFFに設定")
 
     @staticmethod
     def log_aircon_scores(scores: Tuple[int, int, int, int]):
