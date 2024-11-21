@@ -1,3 +1,4 @@
+from api.line_notify import LineNotify
 from api.switchbot_api import SwitchBotApi
 from common import constants
 from db.aircon_min_runtime_manager import AirconMinRuntimeManager
@@ -63,10 +64,17 @@ class AirconStateManager:
         Args:
             aircon_state (AirconState): 更新するエアコンの状態。
         """
-        SwitchBotApi.aircon(aircon_state)
         # エアコンの設定をログに出力
         LoggerUtil.log_aircon_state(aircon_state, current_aircon_state)
-        # 設定ファイル読み込み
-        settings = GeneralSettings()
-        if settings.database_settings.use_database:
-            Analytics.insert_aircon_state(aircon_state)
+        res = SwitchBotApi.aircon(aircon_state)
+        data = res.json()
+        if data["statusCode"] != 200:
+            logger.info(f"エアコンの設定を更新できませんでした。{res.text}")
+            line_notify = LineNotify()
+            line_notify.send_message(f"エアコンの設定を更新できませんでした。{res.text}")
+        else:
+            logger.info(f"エアコンの設定を更新しました。{res.text}")
+            # 設定ファイル読み込み
+            settings = GeneralSettings()
+            if settings.database_settings.use_database:
+                Analytics.insert_aircon_state(aircon_state)

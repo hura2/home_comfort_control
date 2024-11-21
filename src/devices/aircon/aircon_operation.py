@@ -143,8 +143,9 @@ class AirconOperation:
             or current_aircon_state.power.id != aircon_state.power.id
         ):
             logger.info("現在のモードを継続しつつ、設定を変更します")
-            AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
-            return False  # 設定が異なるため更新を行った
+            # AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
+            # return False  # 設定が異なるため更新を行った
 
-        LoggerUtil.log_aircon_state(aircon_state, current_aircon_state)
-        return False  # 設定は同じのため更新は行わない
+        # LoggerUtil.log_aircon_state(aircon_state, current_aircon_state)
+        AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
+        return False 
