@@ -42,7 +42,7 @@ from typing import Tuple
 class ClothingActivityByTemperature:
     @staticmethod
     def calculate_comfort_factors(
-        outdoor_or_forecast_temperature: float, forecast_max_temperature: int, is_sleeping: bool
+        outdoor_temperature: float, forecast_max_temperature: float, is_sleeping: bool
     ) -> ComfortFactors:
         """
         METとICLを計算し、ComfortFactorsとして返す関数。
@@ -51,8 +51,8 @@ class ClothingActivityByTemperature:
         食事時間帯や電気代高騰の時間帯も考慮しています。
 
         引数:
-            outdoor_or_forecast_temperature (float): 外気温（摂氏）。
-            forecast_max_temperature (int): 予報された最高気温（摂氏）。
+            outdoor_temperature (float): 外気温（摂氏）。
+            forecast_max_temperature (float): 予報された最高気温（摂氏）。
             is_sleeping (bool): 就寝中かどうかのフラグ。
 
         戻り値:
@@ -73,7 +73,7 @@ class ClothingActivityByTemperature:
             )
         else:
             return ClothingActivityByTemperature._calculate_mid_temp_comfort_factors(
-                outdoor_or_forecast_temperature, is_sleeping, cat_settings
+                outdoor_temperature, forecast_max_temperature, is_sleeping, cat_settings
             )
 
     @staticmethod
@@ -158,6 +158,7 @@ class ClothingActivityByTemperature:
     @staticmethod
     def _calculate_mid_temp_comfort_factors(
         outdoor_temperature: float,
+        forecast_max_temperature: float,
         is_sleeping: bool,
         settings: ClothingActivityByTemperatureSettings,
     ) -> ComfortFactors:
@@ -165,6 +166,7 @@ class ClothingActivityByTemperature:
 
         引数:
             outdoor_temperature (float): 外気温（摂氏）。
+            forecast_max_temperature (float): 予報された最高気温（摂氏）。
             is_sleeping (bool): 就寝中かどうかのフラグ。
             settings (ClothingActivityByTemperatureSettings): 温度設定。
 
@@ -176,10 +178,11 @@ class ClothingActivityByTemperature:
             if is_sleeping
             else settings.low_temp_settings.met.daytime
         )
+        temperature = outdoor_temperature if outdoor_temperature is not None else forecast_max_temperature
         icl = (
-            max(1.00 - 0.025 * max(min(outdoor_temperature, 40) - 10, 0), 0.7)
+            max(1.00 - 0.025 * max(min(temperature, 40) - 10, 0), 0.7)
             if not is_sleeping
-            else max(2.0 - 0.06 * max(min(outdoor_temperature, 15) - 9, 0), 1.2)
+            else max(2.0 - 0.06 * max(min(temperature, 15) - 9, 0), 1.2)
         )
 
         return ComfortFactors(met=met, icl=icl)

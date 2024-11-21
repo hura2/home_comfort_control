@@ -78,7 +78,7 @@ class HomeComfortControl:
                 TimeUtil.get_current_time().date().isoformat()
             )
 
-        return forecast_max_temperature if forecast_max_temperature else 20
+        return forecast_max_temperature if forecast_max_temperature is not None else 20
 
     def is_within_sleeping_period(self, now: datetime.datetime) -> bool:
         """現在の時刻が就寝時間内かどうかをチェックする
@@ -190,7 +190,8 @@ class HomeComfortControl:
         home_sensor: HomeSensor,
         circulator_state_heat_conditions: CirculatorState,
         is_sleeping: bool,
-        outdoor_or_forecast_temperature: float,
+        outdoor_temperature: float,
+        forecast_max_temperature: float,
     ) -> CirculatorState:
         """
         サーキュレーターの状態を更新する
@@ -225,7 +226,8 @@ class HomeComfortControl:
                     # 温度差に基づいてサーキュレーターを設定
                     if home_sensor.sub:
                         circulator_state = Circulator.set_fan_speed_based_on_temperature_diff(
-                            outdoor_or_forecast_temperature,
+                            outdoor_temperature,
+                            forecast_max_temperature,
                             home_sensor.sub.air_quality.temperature
                             - home_sensor.main.air_quality.temperature,
                             current_circulator_state,

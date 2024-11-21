@@ -1,3 +1,4 @@
+
 from home_comfort_control import HomeComfortControl
 from settings.general_settings import GeneralSettings
 from util.clothing_activity_by_temperature import ClothingActivityByTemperature
@@ -18,11 +19,11 @@ def main():
     # センサー情報を取得
     home_sensor = home_comfort_control.initialize_home_sensor()
     # outdoorセンサーの設定がある場合、外気温を設定。ない場合は、天気予報の最高気温を設定
-    outdoor_or_forecast_temperature = (
-        home_sensor.outdoor.air_quality.temperature
-        if home_sensor.outdoor
-        else forecast_max_temperature
-    )
+    # outdoor_or_forecast_temperature = (
+    #     home_sensor.outdoor.air_quality.temperature
+    #     if home_sensor.outdoor
+    #     else forecast_max_temperature
+    # )
     # 現在時刻を取得
     now = TimeUtil.get_current_time()
     # 就寝中かどうかを判断（起動時間内ならばFalse,それ以外はTrue）
@@ -31,7 +32,7 @@ def main():
     LoggerUtil.log_environment_data(home_sensor, forecast_max_temperature, now)
     # METとICLの値を計算
     comfort_factors = ClothingActivityByTemperature.calculate_comfort_factors(
-        outdoor_or_forecast_temperature, forecast_max_temperature, is_sleeping
+        home_sensor.outdoor.air_quality.temperature, forecast_max_temperature, is_sleeping
     )
     # PMV値を計算
     pmv_result = ThermalComfort.calculate_pmv(
@@ -57,7 +58,11 @@ def main():
     )
     # サーキュレーターの状態を更新
     circulator_state = home_comfort_control.update_circulator_state(
-        home_sensor, circulator_state_heat_conditions, is_sleeping, outdoor_or_forecast_temperature
+        home_sensor,
+        circulator_state_heat_conditions,
+        is_sleeping,
+        home_sensor.outdoor.air_quality.temperature,
+        forecast_max_temperature,
     )
     # データベースに記録
     home_comfort_control.record_environment_data(home_sensor, pmv_result, circulator_state, now)

@@ -76,6 +76,7 @@ class Circulator:
     @staticmethod
     def set_fan_speed_based_on_temperature_diff(
         outdoor_temperature: float,
+        forest_max_temperature: float,
         temperature_diff: float,
         current_circulator_state: CirculatorState,
     ) -> CirculatorState:
@@ -84,6 +85,7 @@ class Circulator:
 
         Args:
             outdoor_temperature (float): 屋外の温度（摂氏）。
+            forecast_max_temperature (float): 予報された最高気温（摂氏）。
             temperature_diff (float): 室内外の温度差（摂氏）。
             current_circulator_state (CirculatorState): 現在のサーキュレーターの状態。
 
@@ -97,10 +99,13 @@ class Circulator:
         # 高温時および高温以外のスピード設定を取得
         high_speed_thresholds = circulator_settings.high_speed_thresholds
         normal_speed_thresholds = circulator_settings.normal_speed_thresholds
+
+        temperature = outdoor_temperature if outdoor_temperature is not None else forecast_max_temperature
+
         # 屋外の温度に応じてしきい値を選択
         threshold_speeds = (
             high_speed_thresholds
-            if outdoor_temperature >= settings.temperature_thresholds.high_temperature_threshold
+            if temperature >= settings.temperature_thresholds.high_temperature_threshold
             else normal_speed_thresholds
         )
         # 温度差に基づいてファンスピードを決定
