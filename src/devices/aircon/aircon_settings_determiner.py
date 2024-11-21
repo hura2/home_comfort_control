@@ -110,12 +110,23 @@ class AirconSettingsDeterminer:
                 constants.AirconMode.COOLING,
             ]:
                 if (
+                    # PMV結果の平均放射温度から、冷却開始基準値（外気温との差）を引いた値が
+                    # 室外の温度よりも高い場合
                     pmv_result.mean_radiant_temperature
                     - cooling_activation_criteria.outdoor_temperature_difference
                     > home_sensor.outdoor.air_quality.temperature
-                    and pmv_result.pmv < cooling_activation_criteria.pmv_threshold
+                    and
+                    # PMVが冷却開始基準値のPMVしきい値より低い場合
+                    pmv_result.pmv < cooling_activation_criteria.pmv_threshold
+                    or
+                    # 室外の温度が設定された低温しきい値より低い場合
+                    home_sensor.outdoor.air_quality.temperature
+                    < settings.temperature_thresholds.low_temperature_threshold
                 ):
+                    # 上記条件が満たされた場合、冷房は使用しない
                     aircon_state.update_if_none(cooling_activation_criteria.aircon_state)
+
+                    # 外気温が低いため、自然に温度が下がるのを待機することをログに記録
                     logger.info("外気温が低いので自然に温度が下がるのを待ちます。")
 
             # 暖房設定の場合の処理
@@ -124,12 +135,23 @@ class AirconSettingsDeterminer:
                 constants.AirconMode.HEATING,
             ]:
                 if (
+                    # PMV結果の平均放射温度から、加熱開始基準値（外気温との差）を引いた値が
+                    # 室内外の温度差よりも低い場合
                     pmv_result.mean_radiant_temperature
                     - heating_activation_criteria.outdoor_temperature_difference
                     < home_sensor.outdoor.air_quality.temperature
-                    and pmv_result.pmv > heating_activation_criteria.pmv_threshold
+                    and
+                    # PMVが加熱開始基準値のPMVしきい値より高い場合
+                    pmv_result.pmv > heating_activation_criteria.pmv_threshold
+                    or
+                    # 室外の温度が設定された高温しきい値より高い場合
+                    home_sensor.outdoor.air_quality.temperature
+                    > settings.temperature_thresholds.high_temperature_threshold
                 ):
+                    # 上記条件が満たされた場合、エアコンの暖房は使用しない
                     aircon_state.update_if_none(heating_activation_criteria.aircon_state)
+
+                    # 外気温が高いため、自然に温度が上がるのを待機することをログに記録
                     logger.info("外気温が高いので自然に温度が上がるのを待ちます。")
 
         # 送風モードの場合の処理
