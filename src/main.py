@@ -1,4 +1,6 @@
 
+from api.line_notify import LineNotify
+from api.smart_devices.smart_devise_exception import SmartDeviceException
 from home_comfort_control import HomeComfortControl
 from settings.general_settings import GeneralSettings
 from util.clothing_activity_by_temperature import ClothingActivityByTemperature
@@ -72,4 +74,9 @@ def main():
 
 # メイン関数を呼び出す
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SmartDeviceException as sde:
+        LoggerUtil.log_exception(sde)
+        LineNotify().send_message(f"スマートデバイス操作でエラーが発生しました。{sde}")
+        exit(1)

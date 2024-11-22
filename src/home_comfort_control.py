@@ -5,7 +5,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 
 from api.jma_forecast_api import JmaForecastApi
-from api.switchbot_api import SwitchBotApi
+from api.smart_devices.smart_device_factory import SmartDeviceFactory
 from common import constants
 from db.aircon_min_runtime_manager import AirconMinRuntimeManager
 from db.analytics import Analytics
@@ -42,22 +42,24 @@ class HomeComfortControl:
             supplementaries=self.settings.sensors.supplementaries,
             outdoor=self.settings.sensors.outdoor,
         )
+        smart_device = SmartDeviceFactory.create_device()
+
         # mainセンサーの空気質情報を取得
-        home_sensor.main.air_quality = SwitchBotApi.get_air_quality_by_sensor(
+        home_sensor.main.air_quality = smart_device.get_air_quality_by_sensor(
             self.settings.sensors.main
         )
         # subセンサーの設定がある場合、subセンサーの空気質情報を取得
         if self.settings.sensors.sub:
-            home_sensor.sub.air_quality = SwitchBotApi.get_air_quality_by_sensor(
+            home_sensor.sub.air_quality = smart_device.get_air_quality_by_sensor(
                 self.settings.sensors.sub
             )
         # supplementariesセンサーの設定がある場合、supplementariesセンサーの空気質情報を取得
         if self.settings.sensors.supplementaries:
             for supplementary in home_sensor.supplementaries:
-                supplementary.air_quality = SwitchBotApi.get_air_quality_by_sensor(supplementary)
+                supplementary.air_quality = smart_device.get_air_quality_by_sensor(supplementary)
         # outdoorセンサーの設定がある場合、outdoorセンサーの空気質情報を取得
         if self.settings.sensors.outdoor:
-            home_sensor.outdoor.air_quality = SwitchBotApi.get_air_quality_by_sensor(
+            home_sensor.outdoor.air_quality = smart_device.get_air_quality_by_sensor(
                 self.settings.sensors.outdoor
             )
         return home_sensor

@@ -54,3 +54,7 @@ circulator_settings:
 # DB設定
 database_settings:
   use_database: true  # DBにログを残すかどうか
+
+# スマートデバイス設定
+smart_device_settings:
+  device_type: "SWITCHBOT"  # 使用するスマートデバイス

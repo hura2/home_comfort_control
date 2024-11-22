@@ -271,3 +271,10 @@ class SensorType(Enum):
             str: センサーの説明。
         """
         return next((sensor.description for sensor in cls if sensor.id == id), None)
+
+class SmartDeviceType(Enum):
+    """
+    スマートデバイスのタイプを定義するEnumクラス。
+    """
+
+    SWITCH_BOT = "SWITCHBOT"

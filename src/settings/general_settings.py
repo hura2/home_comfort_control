@@ -26,6 +26,7 @@ class GeneralSettings:
         SENSORS = "sensors"  # センサー設定
         CIRCULATOR_SETTINGS = "circulator_settings"  # サーキュレーター設定
         DATABSE_SETTINGS = "database_settings"  # データベース設定
+        SMART_DEVICE_SETTINGS = "smart_device_settings" # SmartDevice設定
 
     def __init__(self):
         # 設定ファイルのパスを定義
@@ -42,7 +43,7 @@ class GeneralSettings:
         self.sensors = self._Sensors(self.config[self._Settings.SENSORS.value])
         self.circulator_settings = self._CirculatorSettings(self.config[self._Settings.CIRCULATOR_SETTINGS.value])
         self.database_settings = self._DatabaseSettings(self.config[self._Settings.DATABSE_SETTINGS.value])
-
+        self.smart_device_settings = self._SmartDeviceSettings(self.config[self._Settings.SMART_DEVICE_SETTINGS.value])
     def _load_config(self):
         # YAMLファイルを読み込み、設定を返す
         with open(self.config_file, "r", encoding="utf-8") as file:
@@ -296,3 +297,19 @@ class GeneralSettings:
             Databaseを使用するかどうかを取得する
             """
             return self.config[self._Settings.USE_DATABASE.value]
+        
+    class _SmartDeviceSettings:
+        """SmartDevice設定を管理するクラス"""
+
+        class _Settings(Enum):
+            DEVICE_TYPE = "device_type" # SmartDeviceの種類
+
+        def __init__(self, config):
+            self.config = config
+
+        @property
+        def device_type(self) -> str:
+            """  
+            SmartDeviceの種類を取得する
+            """
+            return self.config[self._Settings.DEVICE_TYPE.value]

@@ -210,3 +210,11 @@ class LoggerUtil:
         logger.info(f"今週のスコア平均: {scores[2]}")
         logger.info(f"昨日のスコア: {scores[3]}")
         logger.info(f"今日のスコア予想: {scores[4]}")
+
+    @staticmethod
+    def log_exception(e: Exception):
+        logger.error(f"例外発生: {e}")
+        # line_notify = LineNotify()
+        # line_notify.send_message(
+        #     f"エアコンの設定を更新できませんでした。{response.error_message}"
+        # )

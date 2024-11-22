@@ -1,5 +1,5 @@
 import common.constants as constants
-from api.switchbot_api import SwitchBotApi
+from api.smart_devices.smart_device_factory import SmartDeviceFactory
 from models.circulator_state import CirculatorState
 from settings.circulator_settings import CirculatorSettings
 from settings.general_settings import GeneralSettings
@@ -18,26 +18,26 @@ class Circulator:
         - set_fan_speed_based_on_temperature_diff: 温度差に基づいてファンスピードを設定します。
     """
 
-    @staticmethod
-    def adjust_fan_speed(current_speed: int, target_speed: int) -> int:
-        """
-        現在のファンスピードをターゲットスピードに調整します。
+    # @staticmethod
+    # def adjust_fan_speed(current_speed: int, target_speed: int) -> int:
+    #     """
+    #     現在のファンスピードをターゲットスピードに調整します。
 
-        Args:
-            current_speed (int): 現在のファンスピード（0以上の整数）。
-            target_speed (int): 調整したいターゲットスピード（0以上の整数）。
+    #     Args:
+    #         current_speed (int): 現在のファンスピード（0以上の整数）。
+    #         target_speed (int): 調整したいターゲットスピード（0以上の整数）。
 
-        Returns:
-            int: 調整後のファンスピード。target_speedに達するまでループします。
-        """
-        while current_speed != target_speed:
-            if target_speed > current_speed:
-                SwitchBotApi.increase_circulator_volume()  # ファンスピードを増加させる
-                current_speed += 1
-            else:
-                SwitchBotApi.decrease_circulator_volume()  # ファンスピードを減少させる
-                current_speed -= 1
-        return current_speed
+    #     Returns:
+    #         int: 調整後のファンスピード。target_speedに達するまでループします。
+    #     """
+    #     while current_speed != target_speed:
+    #         if target_speed > current_speed:
+    #             SwitchBotApi.increase_circulator_volume()  # ファンスピードを増加させる
+    #             current_speed += 1
+    #         else:
+    #             SwitchBotApi.decrease_circulator_volume()  # ファンスピードを減少させる
+    #             current_speed -= 1
+    #     return current_speed
 
     @staticmethod
     def set_circulator(
@@ -53,23 +53,24 @@ class Circulator:
         Returns:
             str: 更新後の電源状態（'ON'または'OFF'）。
         """
+        smart_device = SmartDeviceFactory.create_device()
         power = current_circulator_state.power
         if target_fan_speed == 0:
             # ターゲットファンスピードが0の場合、サーキュレーターを停止する
             if power == constants.CirculatorPower.ON:
-                Circulator.adjust_fan_speed(
-                    current_circulator_state.fan_speed, target_fan_speed
-                )  # スピード調整
-                SwitchBotApi.power_on_off()  # 電源をオフにする
+                smart_device.circulator_fan_speed(
+                    target_fan_speed, current_circulator_state.fan_speed
+                )
+                smart_device.power_on_off()  # 電源をオフにする
                 power = constants.CirculatorPower.OFF
         else:
             # ターゲットファンスピードが0でない場合、サーキュレーターをオンにする
             if power == constants.CirculatorPower.OFF:
-                SwitchBotApi.power_on_off()  # 電源をオンにする
+                smart_device.power_on_off()  # 電源をオンにする
                 power = constants.CirculatorPower.ON
-            Circulator.adjust_fan_speed(
-                current_circulator_state.fan_speed, target_fan_speed
-            )  # スピード調整
+                smart_device.circulator_fan_speed(
+                    target_fan_speed, current_circulator_state.fan_speed
+                )
 
         return power
 
@@ -100,7 +101,9 @@ class Circulator:
         high_speed_thresholds = circulator_settings.high_speed_thresholds
         normal_speed_thresholds = circulator_settings.normal_speed_thresholds
 
-        temperature = outdoor_temperature if outdoor_temperature is not None else forecast_max_temperature
+        temperature = (
+            outdoor_temperature if outdoor_temperature is not None else forecast_max_temperature
+        )
 
         # 屋外の温度に応じてしきい値を選択
         threshold_speeds = (
