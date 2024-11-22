@@ -61,12 +61,12 @@ class Circulator:
                 smart_device.circulator_fan_speed(
                     target_fan_speed, current_circulator_state.fan_speed
                 )
-                smart_device.power_on_off()  # 電源をオフにする
+                smart_device.circulator_off()  # 電源をオフにする
                 power = constants.CirculatorPower.OFF
         else:
             # ターゲットファンスピードが0でない場合、サーキュレーターをオンにする
             if power == constants.CirculatorPower.OFF:
-                smart_device.power_on_off()  # 電源をオンにする
+                smart_device.circulator_on()  # 電源をオンにする
                 power = constants.CirculatorPower.ON
                 smart_device.circulator_fan_speed(
                     target_fan_speed, current_circulator_state.fan_speed

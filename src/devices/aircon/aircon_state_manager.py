@@ -68,7 +68,7 @@ class AirconStateManager:
         LoggerUtil.log_aircon_state(aircon_state, current_aircon_state)
         smart_device = SmartDeviceFactory.create_device()
         response = smart_device.aircon(aircon_state)
-        logger.info(f"エアコンの設定を更新しました。{response.data}")
+        logger.info(f"エアコンの設定を更新しました。{response}")
         # 設定ファイル読み込み
         settings = GeneralSettings()
         if settings.database_settings.use_database:

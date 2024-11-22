@@ -9,6 +9,7 @@ from typing import Dict
 import requests
 from dotenv import load_dotenv
 
+from api.line_notify import LineNotify
 from api.smart_devices.smart_device_interface import SmartDeviceInterface
 from api.smart_devices.smart_device_response import SmartDeviceResponse
 from api.smart_devices.smart_devise_exception import SmartDeviceException
@@ -33,6 +34,9 @@ class SwitchBotApi(SmartDeviceInterface):
         self._AIR_CONDITIONER_SUPPORT_DEVICE_ID = os.environ[
             "SWITCHBOT_AIR_CONDITIONER_SUPPORT_DEVICE_ID"
         ]
+        self._AIR_CONDITIONER_EMERGENCY_DEVICE_ID = os.environ[
+            "SWITCHBOT_AIR_CONDITIONER_EMERGENCY_DEVICE_ID"
+        ]
 
         # APIのベースURL
         self._API_BASE_URL = os.environ["SWITCHBOT_BASE_URL"]
@@ -40,8 +44,8 @@ class SwitchBotApi(SmartDeviceInterface):
     def circulator_on(self) -> SmartDeviceResponse:
         """サーキュレーターをオンにする"""
         try:
-            return SwitchBotApi._post_command(
-                SwitchBotApi._CIRCULATOR_DEVICE_ID,
+            return self._post_command(
+                self._CIRCULATOR_DEVICE_ID,
                 constants.CirculatorPower.ON.id,
                 "default",
                 "customize",
@@ -52,8 +56,8 @@ class SwitchBotApi(SmartDeviceInterface):
     def circulator_off(self) -> SmartDeviceResponse:
         """サーキュレーターをoffにする"""
         try:
-            return SwitchBotApi._post_command(
-                SwitchBotApi._CIRCULATOR_DEVICE_ID,
+            return self._post_command(
+                self._CIRCULATOR_DEVICE_ID,
                 constants.CirculatorPower.OFF.id,
                 "default",
                 "customize",
@@ -117,12 +121,22 @@ class SwitchBotApi(SmartDeviceInterface):
                     "customize",
                 )
 
-            return self._post_command(
-                self._AIR_CONDITIONER_DEVICE_ID,
-                "setAll",
-                f"{aircon_state.temperature},{aircon_state.mode.id},{aircon_state.fan_speed.id},{aircon_state.power.id}",
-                "command",
-            )
+            try:
+                res =  self._post_command(
+                    self._AIR_CONDITIONER_DEVICE_ID,
+                    "setAll",
+                    f"{aircon_state.temperature},{aircon_state.mode.id},{aircon_state.fan_speed.id},{aircon_state.power.id}",
+                    "command",
+                )
+                LineNotify().send_message("なおったよ")
+                return res
+            except SmartDeviceException as e:
+                return self._post_command(
+                    self._AIR_CONDITIONER_EMERGENCY_DEVICE_ID,
+                    aircon_state.mode.description,
+                    "default",
+                    "customize",
+                )
         except SmartDeviceException as e:
             raise SmartDeviceException(e.message, e.send_command, "aircon")
 
@@ -167,6 +181,7 @@ class SwitchBotApi(SmartDeviceInterface):
         except requests.exceptions.RequestException as e:
             raise SmartDeviceException(str(e))
 
+        
     def _get_temperature_and_humidity(self, device_id: str) -> AirQuality:
         """
         指定したデバイスの温度と湿度を取得し、AirQualityオブジェクトを返します。
@@ -264,8 +279,8 @@ class SwitchBotApi(SmartDeviceInterface):
         Returns:
             requests.Response: コマンドの実行結果を表すResponseオブジェクト
         """
-        return SwitchBotApi._post_command(
-            SwitchBotApi._CIRCULATOR_DEVICE_ID,
+        return self._post_command(
+            self._CIRCULATOR_DEVICE_ID,
             constants.CirculatorFanSpeed.UP.value,
             "default",
             "customize",
@@ -278,8 +293,8 @@ class SwitchBotApi(SmartDeviceInterface):
         Returns:
             requests.Response: コマンドの実行結果を表すResponseオブジェクト
         """
-        return SwitchBotApi._post_command(
-            SwitchBotApi._CIRCULATOR_DEVICE_ID,
+        return self._post_command(
+            self._CIRCULATOR_DEVICE_ID,
             constants.CirculatorFanSpeed.DOWN.value,
             "default",
             "customize",
