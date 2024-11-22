@@ -128,9 +128,10 @@ class SwitchBotApi(SmartDeviceInterface):
                     f"{aircon_state.temperature},{aircon_state.mode.id},{aircon_state.fan_speed.id},{aircon_state.power.id}",
                     "command",
                 )
-                LineNotify().send_message("なおったよ")
                 return res
             except SmartDeviceException as e:
+                logger.info("エアコン操作でエラーが発生")
+                LineNotify().send_message("エアコン操作でエラーが発生")
                 return self._post_command(
                     self._AIR_CONDITIONER_EMERGENCY_DEVICE_ID,
                     aircon_state.mode.description,
