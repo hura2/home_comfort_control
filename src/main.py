@@ -1,5 +1,5 @@
 
-from api.line_notify import LineNotify
+from api.notify.notify_factory import NotifyFactory
 from api.smart_devices.smart_devise_exception import SmartDeviceException
 from home_comfort_control import HomeComfortControl
 from logger.system_event_logger import SystemEventLogger
@@ -79,5 +79,5 @@ if __name__ == "__main__":
         SystemEventLogger.check_and_notify()
     except SmartDeviceException as sde:
         SystemEventLogger.log_exception(sde)
-        LineNotify().send_message(f"スマートデバイス操作でエラーが発生しました。{sde}")
+        NotifyFactory.create_manager().notify(f"スマートデバイス操作でエラーが発生しました。{sde}")
         exit(1)

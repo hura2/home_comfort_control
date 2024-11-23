@@ -203,7 +203,8 @@ class CirculatorPower(Enum):
             if mode.description == description:
                 return mode
         return None
-    
+
+
 class Location(Enum):
     """
     温度・湿度の計測場所を表すEnumクラス。
@@ -272,9 +273,19 @@ class SensorType(Enum):
         """
         return next((sensor.description for sensor in cls if sensor.id == id), None)
 
+
 class SmartDeviceType(Enum):
     """
     スマートデバイスのタイプを定義するEnumクラス。
     """
 
     SWITCH_BOT = "SWITCHBOT"
+
+
+class NotifyType(Enum):
+    """
+    通知方法を定義するEnumクラス。
+    """
+
+    LINE = "LINE"
+    DISCORD = "DISCORD"

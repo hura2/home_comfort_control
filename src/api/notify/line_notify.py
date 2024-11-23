@@ -2,10 +2,12 @@ import os
 import requests
 from dotenv import load_dotenv
 
+from api.notify.notify_interface import NotifyInterface
+
 # .envファイルの読み込み
 load_dotenv(".env")
 
-class LineNotify:
+class LineNotify(NotifyInterface):
     """
     LINE Notifyを使ってメッセージを送信するクラス。
 
@@ -26,24 +28,18 @@ class LineNotify:
             raise ValueError("LINE Notifyのアクセストークンが設定されていません。")
         self.headers = {'Authorization': f'Bearer {self.access_token}'}
 
-    def send_message(self, message: str):
+    def send_message(self, message: str) -> bool:
         """
         LINE Notifyを使ってメッセージを送信します。
 
         Args:
             message (str): 送信するメッセージ
         """
-        if not message.strip():
-            raise ValueError("メッセージは空にできません。")
-
         payload = {'message': message}
 
-        try:
-            response = requests.post(self.url, headers=self.headers, params=payload)
+        response = requests.post(self.url, headers=self.headers, params=payload)
 
-            if response.status_code == 200:
-                print("メッセージが正常に送信されました。")
-            else:
-                print(f"エラーが発生しました: {response.status_code}, {response.text}")
-        except Exception as e:
-            print(f"通信エラーが発生しました: {e}")
+        if response.status_code == 200:
+            return True
+        else:
+            return False

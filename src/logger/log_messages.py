@@ -5,8 +5,8 @@ class LogMessages:
 
     # 環境データ
     CO2_LEVEL = "CO2濃度: {co2_level}ppm"
-    SENSOR_DATA = "{label}:{location}: 温度{temperature:.1f}°, 湿度{humidity:.1f}%, 絶対湿度{absolute_humidity:.2f}g/㎥"
-    TEMP_DIFF = "{reference_label}:{reference_location}との温度差{temp_diff:.1f}°"
+    SENSOR_DATA = "{label}:{location}: 温度{temperature:>5.1f}°, 湿度{humidity:>5.1f}%, 絶対湿度{absolute_humidity:>6.2f}g/㎥"
+    TEMP_DIFF = "{reference_label}:{reference_location}との温度差{temp_diff:>5.1f}°"
     CO2_SENSOR = "CO2: {co2_level}ppm"
 
     # ICL調整関連

@@ -9,7 +9,6 @@ from typing import Dict
 import requests
 from dotenv import load_dotenv
 
-from api.line_notify import LineNotify
 from api.smart_devices.smart_device_interface import SmartDeviceInterface
 from api.smart_devices.smart_device_response import SmartDeviceResponse
 from api.smart_devices.smart_devise_exception import SmartDeviceException

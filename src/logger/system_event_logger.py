@@ -4,7 +4,7 @@ import unicodedata
 from io import StringIO
 from typing import Optional, Tuple
 
-from api.line_notify import LineNotify
+from api.notify.notify_factory import NotifyFactory
 from common import constants
 from logger.log_messages import LogMessages
 from models.aircon_state import AirconState
@@ -53,7 +53,7 @@ class SystemEventLogger:
             SystemEventLogger.log_info("ログが空のため、メールは送信されません。")
             return
 
-        LineNotify().send_message(log_content)
+        NotifyFactory.create_manager().notify(log_content)
 
     @staticmethod
     def reset_log_buffer():
@@ -98,7 +98,7 @@ class SystemEventLogger:
             SystemEventLogger.logs_notify()
             # 通知後はフラグをリセット
             SystemEventLogger.error_logged = False
-            
+
     @staticmethod
     def _log_sensor_data(sensor: Sensor, reference_sensor: Optional[Sensor] = None):
         """
@@ -280,14 +280,14 @@ class SystemEventLogger:
             current_circulator_state.power == constants.CirculatorPower.OFF
             and circulator_state.fan_speed > 0
         ):
-            line_notify = LineNotify()
-            line_notify.send_message(f"サーキュレーターの風量を{circulator_state.fan_speed}に設定")
+            notify_manager = NotifyFactory.create_manager()
+            notify_manager.notify(f"サーキュレーターの風量を{circulator_state.fan_speed}に設定")
         if (
             current_circulator_state.power == constants.CirculatorPower.ON
             and circulator_state.fan_speed == 0
         ):
-            line_notify = LineNotify()
-            line_notify.send_message("サーキュレーターの電源をOFFに設定")
+            notify_manager = NotifyFactory.create_manager()
+            notify_manager.notify("サーキュレーターの電源をOFFに設定")
 
     @staticmethod
     def log_aircon_scores(scores: Tuple[int, int, int, int, int]):

@@ -1,4 +1,3 @@
-from api.line_notify import LineNotify
 from api.smart_devices.smart_device_factory import SmartDeviceFactory
 from common import constants
 from db.aircon_min_runtime_manager import AirconMinRuntimeManager

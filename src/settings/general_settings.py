@@ -27,6 +27,7 @@ class GeneralSettings:
         CIRCULATOR_SETTINGS = "circulator_settings"  # サーキュレーター設定
         DATABSE_SETTINGS = "database_settings"  # データベース設定
         SMART_DEVICE_SETTINGS = "smart_device_settings" # SmartDevice設定
+        NOTIFY_SETTINGS = "notify_settings" # 通知設定
 
     def __init__(self):
         # 設定ファイルのパスを定義
@@ -44,6 +45,7 @@ class GeneralSettings:
         self.circulator_settings = self._CirculatorSettings(self.config[self._Settings.CIRCULATOR_SETTINGS.value])
         self.database_settings = self._DatabaseSettings(self.config[self._Settings.DATABSE_SETTINGS.value])
         self.smart_device_settings = self._SmartDeviceSettings(self.config[self._Settings.SMART_DEVICE_SETTINGS.value])
+        self.notify_settings = self._NotifySettings(self.config[self._Settings.NOTIFY_SETTINGS.value])
     def _load_config(self):
         # YAMLファイルを読み込み、設定を返す
         with open(self.config_file, "r", encoding="utf-8") as file:
@@ -313,3 +315,27 @@ class GeneralSettings:
             SmartDeviceの種類を取得する
             """
             return self.config[self._Settings.DEVICE_TYPE.value]
+        
+    class _NotifySettings:
+        """Notify設定を管理するクラス"""
+
+        class _Settings(Enum):
+            ENABLE_LINE_NOTIFY = "enable_line_notify"
+            ENABLE_DISCORD_NOTIFY = "enable_discord_notify"
+
+        def __init__(self, config):
+            self.config = config
+
+        @property
+        def enable_line_notify(self) -> bool:
+            """  
+            Line Notifyを使用するかどうかを取得する
+            """
+            return self.config[self._Settings.ENABLE_LINE_NOTIFY.value]
+        
+        @property
+        def enable_discord_notify(self) -> bool:
+            """  
+            Discord Notifyを使用するかどうかを取得する
+            """
+            return self.config[self._Settings.ENABLE_DISCORD_NOTIFY.value]
