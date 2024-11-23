@@ -1,6 +1,6 @@
 from typing import List
 
-from api.notify.discode_notify import DiscordNotify
+from api.notify.discord_notify import DiscordNotify
 from api.notify.line_notify import LineNotify
 from api.notify.notify_manager import NotifyManager
 from api.notify.notify_interface import NotifyInterface
