@@ -1,9 +1,10 @@
 from datetime import datetime
 
+from logger.log_messages import LogMessages
+from logger.system_event_logger import SystemEventLogger
 from models.comfort_factors import ComfortFactors
 from settings.clothing_activity_by_temperature_settings import ClothingActivityByTemperatureSettings
 from settings.general_settings import GeneralSettings
-from util.logger import logger
 from util.time import TimeUtil
 
 
@@ -138,8 +139,10 @@ class ClothingActivityByTemperature:
             <= settings.low_temp_settings.time_settings.heating.high_cost.end
         ):
             icl += settings.low_temp_settings.time_settings.heating.high_cost.adjustment
-            logger.info(
-                f"高コスト時間帯のICL調整を行いました:{settings.low_temp_settings.time_settings.heating.high_cost.start} - {settings.low_temp_settings.time_settings.heating.high_cost.end}"
+            SystemEventLogger.log_info(
+                LogMessages.ICL_ADJUSTMENT_HIGH_COST,
+                start_time=settings.low_temp_settings.time_settings.heating.high_cost.start,
+                end_time=settings.low_temp_settings.time_settings.heating.high_cost.end
             )
 
         # 低コスト時間帯でのICL調整
@@ -149,8 +152,10 @@ class ClothingActivityByTemperature:
             <= settings.low_temp_settings.time_settings.heating.low_cost.end
         ):
             icl += settings.low_temp_settings.time_settings.heating.low_cost.adjustment
-            logger.info(
-                f"低コスト時間帯のICL調整を行いました:{settings.low_temp_settings.time_settings.heating.low_cost.start} - {settings.low_temp_settings.time_settings.heating.low_cost.end}"
+            SystemEventLogger.log_info(
+                LogMessages.ICL_ADJUSTMENT_LOW_COST,
+                start_time=settings.low_temp_settings.time_settings.heating.low_cost.start,
+                end_time=settings.low_temp_settings.time_settings.heating.low_cost.end
             )
 
         return ComfortFactors(met=met, icl=icl)

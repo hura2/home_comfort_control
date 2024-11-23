@@ -2,9 +2,9 @@
 from api.line_notify import LineNotify
 from api.smart_devices.smart_devise_exception import SmartDeviceException
 from home_comfort_control import HomeComfortControl
+from logger.system_event_logger import SystemEventLogger
 from settings.general_settings import GeneralSettings
 from util.clothing_activity_by_temperature import ClothingActivityByTemperature
-from util.logger import LoggerUtil
 from util.thermal_comfort import ThermalComfort
 from util.time import TimeUtil
 
@@ -31,7 +31,7 @@ def main():
     # 就寝中かどうかを判断（起動時間内ならばFalse,それ以外はTrue）
     is_sleeping = home_comfort_control.is_within_sleeping_period(now)
     # ログに環境情報を出力
-    LoggerUtil.log_environment_data(home_sensor, forecast_max_temperature, now)
+    SystemEventLogger.log_environment_data(home_sensor, forecast_max_temperature, now)
     # METとICLの値を計算
     comfort_factors = ClothingActivityByTemperature.calculate_comfort_factors(
         home_sensor.outdoor.air_quality.temperature, forecast_max_temperature, is_sleeping
@@ -53,7 +53,7 @@ def main():
     )
 
     # 結果をログに出力
-    LoggerUtil.log_pmv_result(pmv_result, comfort_factors)
+    SystemEventLogger.log_pmv(pmv_result, comfort_factors)
     # PMVを元にエアコンの設定を判断
     home_comfort_control.update_aircon_state(
         home_sensor, pmv_result, forecast_max_temperature, is_sleeping
@@ -76,7 +76,8 @@ def main():
 if __name__ == "__main__":
     try:
         main()
+        SystemEventLogger.check_and_notify()
     except SmartDeviceException as sde:
-        LoggerUtil.log_exception(sde)
+        SystemEventLogger.log_exception(sde)
         LineNotify().send_message(f"スマートデバイス操作でエラーが発生しました。{sde}")
         exit(1)

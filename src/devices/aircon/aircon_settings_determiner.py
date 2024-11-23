@@ -1,10 +1,11 @@
 from common import constants
+from logger.log_messages import LogMessages
+from logger.system_event_logger import SystemEventLogger
 from models.aircon_state import AirconState
 from models.home_sensor import HomeSensor
 from models.pmv_result import PMVResult
 from settings.aircon_settings import AirconSettings
 from settings.general_settings import GeneralSettings
-from util.logger import logger
 
 
 class AirconSettingsDeterminer:
@@ -127,7 +128,7 @@ class AirconSettingsDeterminer:
                     aircon_state.update_if_none(cooling_activation_criteria.aircon_state)
 
                     # 外気温が低いため、自然に温度が下がるのを待機することをログに記録
-                    logger.info("外気温が低いので自然に温度が下がるのを待ちます。")
+                    SystemEventLogger.log_info(LogMessages.WAIT_FOR_NATURAL_COOLING)
 
             # 暖房設定の場合の処理
             if aircon_state.mode in [
@@ -152,7 +153,7 @@ class AirconSettingsDeterminer:
                     aircon_state.update_if_none(heating_activation_criteria.aircon_state)
 
                     # 外気温が高いため、自然に温度が上がるのを待機することをログに記録
-                    logger.info("外気温が高いので自然に温度が上がるのを待ちます。")
+                    SystemEventLogger.log_info(LogMessages.WAIT_FOR_NATURAL_HEATING)
 
         # 送風モードの場合の処理
         if aircon_state.mode == constants.AirconMode.FAN:
@@ -160,9 +161,9 @@ class AirconSettingsDeterminer:
                 home_sensor.average_indoor_absolute_humidity
                 > settings.environment_settings.dehumidification_threshold
             ):
-                logger.info(
-                    "絶対湿度が閾値(%.1f)を超えました。",
-                    settings.environment_settings.dehumidification_threshold,
+                SystemEventLogger.log_info(
+                    LogMessages.ABSOLUTE_HUMIDITY_THRESHOLD_EXCEEDED,
+                    threshold=settings.environment_settings.dehumidification_threshold
                 )
                 aircon_state.update_if_none(dehumidification_settings.aircon_state)
 
@@ -185,9 +186,9 @@ class AirconSettingsDeterminer:
             and max_diff_value
             > aircon_settings.environmental_control_settings.air_circulation_threshold
         ):
-            logger.info(
-                "リビングと他の部屋の温度の差が%s度以上です。温度差改善のため風量を上げます。",
-                aircon_settings.environmental_control_settings.air_circulation_threshold,
+            SystemEventLogger.log_info(
+                LogMessages.ROOM_TEMP_DIFF_HIGH,
+                temp_diff=aircon_settings.environmental_control_settings.air_circulation_threshold
             )
             aircon_state.fan_speed = constants.AirconFanSpeed.HIGH
 
@@ -197,11 +198,13 @@ class AirconSettingsDeterminer:
             < home_sensor.indoor_dew_point - dew_point_control.condensation_prevention_threshold
         ):
             if pmv_result.pmv > dew_point_control.pmv_threshold_for_cooling:
-                logger.info("室内温度が露点温度より低いが、PMVが高い（%s）。", pmv_result.pmv)
+                SystemEventLogger.log_info(
+                    LogMessages.INDOOR_TEMP_BELOW_DEWPOINT_HIGH_PMV, pmv=pmv_result.pmv
+                )
                 aircon_state.update_if_none(cooling_settings)
                 aircon_state.force_fan_below_dew_point = True
             else:
-                logger.info("室内温度が露点温度より低い。")
+                SystemEventLogger.log_info(LogMessages.INDOOR_TEMP_BELOW_DEWPOINT)
                 aircon_state.update_if_none(cooling_stop_settings)
                 aircon_state.force_fan_below_dew_point = True
 

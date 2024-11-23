@@ -3,9 +3,10 @@ from api.smart_devices.smart_device_factory import SmartDeviceFactory
 from common import constants
 from db.aircon_min_runtime_manager import AirconMinRuntimeManager
 from db.analytics import Analytics
+from logger.log_messages import LogMessages
+from logger.system_event_logger import SystemEventLogger
 from models.aircon_state import AirconState
 from settings.general_settings import GeneralSettings
-from util.logger import LoggerUtil, logger
 from util.time import TimeUtil
 
 
@@ -46,14 +47,12 @@ class AirconStateManager:
             # 最低経過時間前なのでモードを継続します
             hours, remainder = divmod(elapsed_seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
-            logger.info(
-                "最低経過時間前なのでモードを継続します。経過時間:{}時間{}分".format(
-                    int(hours), int(minutes)
-                )
+            SystemEventLogger.log_info(
+                LogMessages.MIN_RUNTIME_NOT_REACHED, hours=int(hours), minutes=int(minutes)
             )
             return False  # まだ継続時間内であるため変更不可
 
-        logger.info("最低経過時間を経過したので、設定を変更可能です。")
+        SystemEventLogger.log_info(LogMessages.MIN_ELAPSED_TIME_REACHED)
         return True  # 継続時間が経過したため変更可能
 
     # エアコンの設定を変更
@@ -65,10 +64,10 @@ class AirconStateManager:
             aircon_state (AirconState): 更新するエアコンの状態。
         """
         # エアコンの設定をログに出力
-        LoggerUtil.log_aircon_state(aircon_state, current_aircon_state)
+        SystemEventLogger.log_aircon_state(aircon_state, current_aircon_state)
         smart_device = SmartDeviceFactory.create_device()
-        response = smart_device.aircon(aircon_state)
-        logger.info(f"エアコンの設定を更新しました。{response}")
+        smart_device.aircon(aircon_state)
+        SystemEventLogger.log_info(LogMessages.AIRCON_SETTINGS_SUCCESS, aircon_state=SystemEventLogger.format_state(aircon_state))
         # 設定ファイル読み込み
         settings = GeneralSettings()
         if settings.database_settings.use_database:

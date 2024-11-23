@@ -1,8 +1,9 @@
 from common import constants
 from devices.aircon.aircon_state_manager import AirconStateManager
+from logger.log_messages import LogMessages
+from logger.system_event_logger import SystemEventLogger
 from models.aircon_state import AirconState
 from settings.aircon_settings import AirconSettings
-from util.logger import LoggerUtil, logger
 
 
 class AirconOperation:
@@ -62,36 +63,37 @@ class AirconOperation:
 
         # 現在のモードと新しいモードが同じ場合の処理
         if new_mode == current_mode:
-            logger.info("現在のモードと新しいモードが同じ")
+            SystemEventLogger.log_info(LogMessages.SAME_MODE, current_mode=current_mode.description)
             return AirconOperation._update_if_settings_differ(aircon_state, current_aircon_state)
         else:
-            logger.info("現在のモードと新しいモードが違う")
+            SystemEventLogger.log_info(
+                LogMessages.DIFFERENT_MODE, current_mode=current_mode, new_mode=new_mode
+            )
             if constants.AirconMode.is_cooling_mode(current_mode):
-                logger.info("現在モードが冷房モード")
+                SystemEventLogger.log_info(LogMessages.COOLING_TO_COOLING)
                 if constants.AirconMode.is_cooling_mode(new_mode):
-                    logger.info("新しいモードも冷房モード")
                     return AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
                 else:
-                    logger.info("新しいモードが冷房モード以外")
+                    SystemEventLogger.log_info(LogMessages.COOLING_TO_OTHER)
                     return AirconOperation._apply_weakest_setting(
                         aircon_state, current_aircon_state
                     )
 
             if constants.AirconMode.is_heating_mode(current_mode):
-                logger.info("現在モードが暖房モード")
+                SystemEventLogger.log_info(LogMessages.HEATING_TO_HEATING)
                 if constants.AirconMode.is_heating_mode(new_mode):
-                    logger.info("新しいモードも暖房モード")
                     return AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
                 else:
-                    logger.info("新しいモードが暖房モード以外")
+                    SystemEventLogger.log_info(LogMessages.HEATING_TO_OTHER)
                     return AirconOperation._apply_weakest_setting(
                         aircon_state, current_aircon_state
                     )
 
-            logger.info("現在モードが冷房でも暖房でもない場合")
+            SystemEventLogger.log_info(LogMessages.NON_COOLING_OR_HEATING, current_mode=current_mode)
             aircon_state.mode = current_aircon_state.mode
             AirconOperation._update_if_settings_differ(aircon_state, current_aircon_state)
             return False  # 同一モードなので設定を更新するが、モードは変更しない
+
 
     # 冷房モードでの最弱設定を適用
     @staticmethod
@@ -142,7 +144,7 @@ class AirconOperation:
             or current_aircon_state.fan_speed.id != aircon_state.fan_speed.id
             or current_aircon_state.power.id != aircon_state.power.id
         ):
-            logger.info("現在のモードを継続しつつ、設定を変更します")
+            SystemEventLogger.log_info(LogMessages.AIRCON_MODE_CONTINUE_AND_UPDATE)
             # AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
             # return False  # 設定が異なるため更新を行った
 

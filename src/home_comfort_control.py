@@ -13,12 +13,12 @@ from devices.aircon.aircon_operation import AirconOperation
 from devices.aircon.aircon_settings_determiner import AirconSettingsDeterminer
 from devices.aircon.aircon_state_manager import AirconStateManager
 from devices.circulator import Circulator
+from logger.system_event_logger import SystemEventLogger
 from models.circulator_state import CirculatorState
 from models.comfort_factors import ComfortFactors
 from models.home_sensor import HomeSensor
 from models.pmv_result import PMVResult
 from settings.general_settings import GeneralSettings
-from util.logger import LoggerUtil, logger
 from util.thermal_comfort import ThermalComfort
 from util.time import TimeUtil
 
@@ -174,7 +174,7 @@ class HomeComfortControl:
             # 前回のエアコン設定を取得し、経過時間をログに出力
             current_aircon_state, aircon_last_setting_time = Analytics.get_latest_aircon_state()
             hours, minutes = TimeUtil.calculate_elapsed_time(aircon_last_setting_time)
-            LoggerUtil.log_elapsed_time(hours, minutes)
+            SystemEventLogger.log_elapsed_time(hours, minutes)
 
             # エアコンの設定が必要か確認し、更新
             if AirconOperation.update_aircon_if_necessary(
@@ -236,7 +236,7 @@ class HomeComfortControl:
                         )
 
             # ログ出力
-            LoggerUtil.log_circulator_state(current_circulator_state, circulator_state.fan_speed)
+            SystemEventLogger.log_circulator_state(current_circulator_state, circulator_state)
 
         return circulator_state
 
@@ -258,7 +258,7 @@ class HomeComfortControl:
         # データベースを使用する場合
         if self.settings.database_settings.use_database:
             # エアコンの状態を記録
-            LoggerUtil.log_aircon_scores(Analytics.get_aircon_intensity_scores(now))
+            SystemEventLogger.log_aircon_scores(Analytics.get_aircon_intensity_scores(now))
 
             # データを記録
             Analytics.insert_temperature_humidity(home_sensor)
@@ -278,7 +278,7 @@ class HomeComfortControl:
         result = Analytics.get_hourly_average_temperature(location_id=3)
 
         temp_array = [entry["average_temperature"] for entry in result]
-        logger.info(temp_array)
+        # logger.info(temp_array)
         # 時間データの作成
         hours = np.array(range(len(temp_array))).reshape(-1, 1)
 
@@ -294,4 +294,4 @@ class HomeComfortControl:
         next_hour_poly = poly.transform([[len(temp_array)]])
         predicted_temperature = model.predict(next_hour_poly)
 
-        logger.info(f"1時間後の予測気温: {predicted_temperature[0]:.2f}°C")
+        # logger.info(f"1時間後の予測気温: {predicted_temperature[0]:.2f}°C")

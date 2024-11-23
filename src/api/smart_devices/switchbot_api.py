@@ -14,10 +14,11 @@ from api.smart_devices.smart_device_interface import SmartDeviceInterface
 from api.smart_devices.smart_device_response import SmartDeviceResponse
 from api.smart_devices.smart_devise_exception import SmartDeviceException
 from common import constants
+from logger.log_messages import LogMessages
+from logger.system_event_logger import SystemEventLogger
 from models.air_quality import AirQuality
 from models.aircon_state import AirconState
 from models.sensor import Sensor
-from util.logger import logger
 
 
 class SwitchBotApi(SmartDeviceInterface):
@@ -122,7 +123,7 @@ class SwitchBotApi(SmartDeviceInterface):
                 )
 
             try:
-                res =  self._post_command(
+                res = self._post_command(
                     self._AIR_CONDITIONER_DEVICE_ID,
                     "setAll",
                     f"{aircon_state.temperature},{aircon_state.mode.id},{aircon_state.fan_speed.id},{aircon_state.power.id}",
@@ -130,8 +131,10 @@ class SwitchBotApi(SmartDeviceInterface):
                 )
                 return res
             except SmartDeviceException as e:
-                logger.info("エアコン操作でエラーが発生")
-                LineNotify().send_message(f"エアコン操作でエラーが発生:{str(e)}")
+                SystemEventLogger.log_error(
+                    LogMessages.AIRCON_SETTINGS_FAILED, error_message=str(e)
+                )
+                SystemEventLogger.log_info(LogMessages.AIRCON_SETTINGS_RETRY)
                 return self._post_command(
                     self._AIR_CONDITIONER_EMERGENCY_DEVICE_ID,
                     aircon_state.mode.description,
@@ -182,7 +185,6 @@ class SwitchBotApi(SmartDeviceInterface):
         except requests.exceptions.RequestException as e:
             raise SmartDeviceException(str(e))
 
-        
     def _get_temperature_and_humidity(self, device_id: str) -> AirQuality:
         """
         指定したデバイスの温度と湿度を取得し、AirQualityオブジェクトを返します。
