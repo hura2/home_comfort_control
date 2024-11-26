@@ -53,7 +53,7 @@ class SystemEventLogger:
             SystemEventLogger.log_info("ログが空のため、メールは送信されません。")
             return
 
-        NotifyFactory.create_manager().notify(log_content)
+        NotifyFactory.create_manager().notify_normal(log_content)
 
     @staticmethod
     def reset_log_buffer():
@@ -281,13 +281,13 @@ class SystemEventLogger:
             and circulator_state.fan_speed > 0
         ):
             notify_manager = NotifyFactory.create_manager()
-            notify_manager.notify(f"サーキュレーターの風量を{circulator_state.fan_speed}に設定")
+            notify_manager.notify_important(f"サーキュレーターの風量を{circulator_state.fan_speed}に設定")
         if (
             current_circulator_state.power == constants.CirculatorPower.ON
             and circulator_state.fan_speed == 0
         ):
             notify_manager = NotifyFactory.create_manager()
-            notify_manager.notify("サーキュレーターの電源をOFFに設定")
+            notify_manager.notify_important("サーキュレーターの電源をOFFに設定")
 
     @staticmethod
     def log_aircon_scores(scores: Tuple[int, int, int, int, int]):

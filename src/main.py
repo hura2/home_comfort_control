@@ -79,5 +79,5 @@ if __name__ == "__main__":
         SystemEventLogger.check_and_notify()
     except SmartDeviceException as sde:
         SystemEventLogger.log_exception(sde)
-        NotifyFactory.create_manager().notify(f"スマートデバイス操作でエラーが発生しました。{sde}")
+        NotifyFactory.create_manager().notify_important(f"スマートデバイス操作でエラーが発生しました。{sde}")
         exit(1)

@@ -282,10 +282,17 @@ class SmartDeviceType(Enum):
     SWITCH_BOT = "SWITCHBOT"
 
 
-class NotifyType(Enum):
+class NotifierType(Enum):
     """
     通知方法を定義するEnumクラス。
     """
 
     LINE = "LINE"
     DISCORD = "DISCORD"
+
+class NotificationCategory(Enum):
+    """
+    通知の優先度を定義するEnumクラス。
+    """
+    NORMAL = "normal"  # 通常通知
+    IMPORTANT = "important"  # 重要通知
