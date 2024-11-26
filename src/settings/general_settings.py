@@ -4,6 +4,7 @@ from enum import Enum
 from pathlib import Path
 
 import yaml
+from common import constants
 from common.constants import SensorType
 from models.sensor import Sensor
 
@@ -26,8 +27,8 @@ class GeneralSettings:
         SENSORS = "sensors"  # センサー設定
         CIRCULATOR_SETTINGS = "circulator_settings"  # サーキュレーター設定
         DATABSE_SETTINGS = "database_settings"  # データベース設定
-        SMART_DEVICE_SETTINGS = "smart_device_settings" # SmartDevice設定
-        NOTIFY_SETTINGS = "notify_settings" # 通知設定
+        SMART_DEVICE_SETTINGS = "smart_device_settings"  # SmartDevice設定
+        NOTIFY_SETTINGS = "notify_settings"  # 通知設定
 
     def __init__(self):
         # 設定ファイルのパスを定義
@@ -36,16 +37,27 @@ class GeneralSettings:
         self.config = self._load_config()
         # 各設定を初期化
         self.time_settings = self._TimeSettings(self.config[self._Settings.TIME_SETTINGS.value])
-        self.environment_settings = self._EnvironmentSettings(self.config[self._Settings.ENVIRONMENT_SETTINGS.value])
+        self.environment_settings = self._EnvironmentSettings(
+            self.config[self._Settings.ENVIRONMENT_SETTINGS.value]
+        )
         self.temperature_thresholds = self._TemperatureThresholds(
             self.config[self._Settings.TEMPERATURE_THRESHOLDS.value]
         )
         self.co2_thresholds = self._Co2Thresholds(self.config[self._Settings.CO2_THRESHOLDS.value])
         self.sensors = self._Sensors(self.config[self._Settings.SENSORS.value])
-        self.circulator_settings = self._CirculatorSettings(self.config[self._Settings.CIRCULATOR_SETTINGS.value])
-        self.database_settings = self._DatabaseSettings(self.config[self._Settings.DATABSE_SETTINGS.value])
-        self.smart_device_settings = self._SmartDeviceSettings(self.config[self._Settings.SMART_DEVICE_SETTINGS.value])
-        self.notify_settings = self._NotifySettings(self.config[self._Settings.NOTIFY_SETTINGS.value])
+        self.circulator_settings = self._CirculatorSettings(
+            self.config[self._Settings.CIRCULATOR_SETTINGS.value]
+        )
+        self.database_settings = self._DatabaseSettings(
+            self.config[self._Settings.DATABSE_SETTINGS.value]
+        )
+        self.smart_device_settings = self._SmartDeviceSettings(
+            self.config[self._Settings.SMART_DEVICE_SETTINGS.value]
+        )
+        self.notify_settings = self._NotifySettings(
+            self.config[self._Settings.NOTIFY_SETTINGS.value]
+        )
+
     def _load_config(self):
         # YAMLファイルを読み込み、設定を返す
         with open(self.config_file, "r", encoding="utf-8") as file:
@@ -76,7 +88,7 @@ class GeneralSettings:
 
             @property
             def start_time(self) -> time:
-                """ 
+                """
                 覚醒期間の開始時間を取得する
 
                 Returns:
@@ -169,14 +181,14 @@ class GeneralSettings:
         @property
         def high_level_threshold(self) -> float:
             """
-            高レベルの閾値を取得する            
+            高レベルの閾値を取得する
             Returns:
                 float: 高レベルの閾値"""
             return self.config[self._Settings.HIGH_LEVEL_THRESHOLD.value]
 
         @property
         def warning_level_threshold(self) -> float:
-            """ 
+            """
             警告レベルの閾値を取得する
 
             Returns:
@@ -188,10 +200,10 @@ class GeneralSettings:
         """センサー設定を管理するクラス"""
 
         class _Settings(Enum):
-            MAIN = "main" # 主センサ
-            SUB = "sub" # 副センサ
-            SUPPLEMENTARIES = "supplementaries" # 付属センサ
-            OUTDOOR = "outdoor" # 屋外センサ
+            MAIN = "main"  # 主センサ
+            SUB = "sub"  # 副センサ
+            SUPPLEMENTARIES = "supplementaries"  # 付属センサ
+            OUTDOOR = "outdoor"  # 屋外センサ
 
         def __init__(self, config):
             self.config = config
@@ -205,7 +217,8 @@ class GeneralSettings:
             )
             # 付属センサー情報を格納
             self.supplementaries = [
-                self._create_sensor(self._SensorData(s)) for s in config.get(self._Settings.SUPPLEMENTARIES.value, [])
+                self._create_sensor(self._SensorData(s))
+                for s in config.get(self._Settings.SUPPLEMENTARIES.value, [])
             ]
             # 屋外センサー情報を格納
             self.outdoor = (
@@ -228,7 +241,9 @@ class GeneralSettings:
                 id=sensor_data.id,
                 label=sensor_data.label,
                 location=sensor_data.location,
-                type=SensorType.get_by_description(sensor_data.type),  # 例: SensorType.TEMPERATURE_HUMIDITY
+                type=SensorType.get_by_description(
+                    sensor_data.type
+                ),  # 例: SensorType.TEMPERATURE_HUMIDITY
             )
 
         class _SensorData:
@@ -252,7 +267,7 @@ class GeneralSettings:
 
             @property
             def label(self) -> str:
-                """ 
+                """
                 センサーのラベルを取得する
                 """
                 return self.config[self._Settings.LABEL.value]
@@ -272,70 +287,90 @@ class GeneralSettings:
         """circulator設定を管理するクラス"""
 
         class _Settings(Enum):
-            USE_CIRCULATOR = "use_circulator" # サーキュレーターを使用するかどうか
+            USE_CIRCULATOR = "use_circulator"  # サーキュレーターを使用するかどうか
 
         def __init__(self, config):
             self.config = config
 
         @property
         def use_circulator(self) -> bool:
-            """ 
+            """
             サーキュレーターを使用するかどうかを取得する
             """
             return self.config[self._Settings.USE_CIRCULATOR.value]
-    
+
     class _DatabaseSettings:
         """Database設定を管理するクラス"""
 
         class _Settings(Enum):
-            USE_DATABASE = "use_database" # Databaseを使用するかどうか
+            USE_DATABASE = "use_database"  # Databaseを使用するかどうか
 
         def __init__(self, config):
             self.config = config
 
         @property
         def use_database(self) -> bool:
-            """  
+            """
             Databaseを使用するかどうかを取得する
             """
             return self.config[self._Settings.USE_DATABASE.value]
-        
+
     class _SmartDeviceSettings:
         """SmartDevice設定を管理するクラス"""
 
         class _Settings(Enum):
-            DEVICE_TYPE = "device_type" # SmartDeviceの種類
+            DEVICE_TYPE = "device_type"  # SmartDeviceの種類
 
         def __init__(self, config):
             self.config = config
 
         @property
         def device_type(self) -> str:
-            """  
+            """
             SmartDeviceの種類を取得する
             """
             return self.config[self._Settings.DEVICE_TYPE.value]
-        
+
     class _NotifySettings:
         """Notify設定を管理するクラス"""
 
         class _Settings(Enum):
-            ENABLE_LINE_NOTIFY = "enable_line_notify"
-            ENABLE_DISCORD_NOTIFY = "enable_discord_notify"
+            NOTIFIER = "notifier"
 
         def __init__(self, config):
             self.config = config
+            self.notifiers = [
+                self._NotifierSetting(item) for item in config[self._Settings.NOTIFIER.value]
+            ]
 
-        @property
-        def enable_line_notify(self) -> bool:
-            """  
-            Line Notifyを使用するかどうかを取得する
-            """
-            return self.config[self._Settings.ENABLE_LINE_NOTIFY.value]
-        
-        @property
-        def enable_discord_notify(self) -> bool:
-            """  
-            Discord Notifyを使用するかどうかを取得する
-            """
-            return self.config[self._Settings.ENABLE_DISCORD_NOTIFY.value]
+        class _NotifierSetting:
+            class _Settings(Enum):
+                TYPE = "type"
+                CATEGORY = "category"
+                ENABLE = "enable"
+
+            def __init__(self, config):
+                self.config = config
+
+            @property
+            def type(self) -> constants.NotifierType:
+                """
+                Notifierの種類を取得する
+                """
+                return constants.NotifierType.from_value(self.config[self._Settings.TYPE.value])
+
+            @property
+            def category(self) -> constants.NotificationCategory:
+                """
+                Notifierの設定を取得する
+                """
+                return constants.NotificationCategory.from_value(
+                    self.config[self._Settings.CATEGORY.value]
+                )
+
+            @property
+            def enable(self) -> bool:
+                """
+                Notifierを使用するかどうかを取得する
+                """
+                return self.config[self._Settings.ENABLE.value]

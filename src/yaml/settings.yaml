@@ -60,5 +60,10 @@ smart_device_settings:
   device_type: "SWITCHBOT"  # 使用するスマートデバイス
 
 notify_settings:
-  enable_line_notify: true
-  enable_discord_notify: true
+  notifier:
+    - type: "LINE"
+      category: "IMPORTANT"
+      enable: true
+    - type: "DISCORD"
+      category: "NORMAL"
+      enable: true

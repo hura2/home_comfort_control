@@ -282,17 +282,52 @@ class SmartDeviceType(Enum):
     SWITCH_BOT = "SWITCHBOT"
 
 
+from enum import Enum
+
+
 class NotifierType(Enum):
     """
     通知方法を定義するEnumクラス。
     """
-
     LINE = "LINE"
     DISCORD = "DISCORD"
+
+    @classmethod
+    def from_value(cls, value: str):
+        """
+        指定された文字列に対応するEnumメンバーを取得します。
+
+        Args:
+            value (str): 通知方法を表す文字列。
+
+        Returns:
+            NotifierType: 該当するEnumメンバー。
+        """
+        try:
+            return cls(value.upper())
+        except ValueError:
+            raise ValueError(f"指定された通知方法 '{value}' は無効です。")
+
 
 class NotificationCategory(Enum):
     """
     通知の優先度を定義するEnumクラス。
     """
-    NORMAL = "normal"  # 通常通知
-    IMPORTANT = "important"  # 重要通知
+    NORMAL = "NORMAL"
+    IMPORTANT = "IMPORTANT"
+
+    @classmethod
+    def from_value(cls, value: str):
+        """
+        指定された文字列に対応するEnumメンバーを取得します。
+
+        Args:
+            value (str): 通知優先度を表す文字列。
+
+        Returns:
+            NotificationCategory: 該当するEnumメンバー。
+        """
+        try:
+            return cls(value.upper())
+        except ValueError:
+            raise ValueError(f"指定された通知優先度 '{value}' は無効です。")

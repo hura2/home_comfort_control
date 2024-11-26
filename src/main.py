@@ -1,4 +1,3 @@
-
 from api.notify.notify_factory import NotifyFactory
 from api.smart_devices.smart_devise_exception import SmartDeviceException
 from home_comfort_control import HomeComfortControl
@@ -76,8 +75,15 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-        SystemEventLogger.check_and_notify()
+        notify_manager = NotifyFactory.create_manager()
+        if SystemEventLogger.check_error():
+            notify_manager.notify_important(SystemEventLogger.get_buffered_logs())
+            notify_manager.notify_normal(SystemEventLogger.get_buffered_logs())
+        else:
+            notify_manager.notify_normal(SystemEventLogger.get_buffered_logs())
     except SmartDeviceException as sde:
         SystemEventLogger.log_exception(sde)
-        NotifyFactory.create_manager().notify_important(f"スマートデバイス操作でエラーが発生しました。{sde}")
+        NotifyFactory.create_manager().notify_important(
+            f"スマートデバイス操作でエラーが発生しました。{sde}"
+        )
         exit(1)

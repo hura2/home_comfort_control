@@ -38,13 +38,14 @@ class SystemEventLogger:
     """
     ログ関連のユーティリティ
     """
+
     # エラーが記録されたかどうかを追跡するフラグ
     error_logged = False
 
     @staticmethod
-    def logs_notify():
+    def get_buffered_logs():
         """
-        バッファに蓄積されたログを送信します。
+        バッファに蓄積されたログを取得します。
         """
         # バッファの内容を取得
         log_content = log_buffer.getvalue()
@@ -53,7 +54,7 @@ class SystemEventLogger:
             SystemEventLogger.log_info("ログが空のため、メールは送信されません。")
             return
 
-        NotifyFactory.create_manager().notify_normal(log_content)
+        return log_content
 
     @staticmethod
     def reset_log_buffer():
@@ -74,6 +75,7 @@ class SystemEventLogger:
         """
         message = message_template.format(**kwargs)
         logger.info(message)
+
     @staticmethod
     def log_error(message_template: str, **kwargs):
         """
@@ -85,19 +87,16 @@ class SystemEventLogger:
         """
         message = message_template.format(**kwargs)
         logger.error(message)
-        
+
         # エラーが記録されたことをフラグで追跡
         SystemEventLogger.error_logged = True
 
     @staticmethod
-    def check_and_notify():
+    def check_error():
         """
-        エラーが記録されていた場合、通知を送信します。
+        エラーが記録されたかどうかを判断します。
         """
-        if SystemEventLogger.error_logged:
-            SystemEventLogger.logs_notify()
-            # 通知後はフラグをリセット
-            SystemEventLogger.error_logged = False
+        return SystemEventLogger.error_logged
 
     @staticmethod
     def _log_sensor_data(sensor: Sensor, reference_sensor: Optional[Sensor] = None):
@@ -281,7 +280,9 @@ class SystemEventLogger:
             and circulator_state.fan_speed > 0
         ):
             notify_manager = NotifyFactory.create_manager()
-            notify_manager.notify_important(f"サーキュレーターの風量を{circulator_state.fan_speed}に設定")
+            notify_manager.notify_important(
+                f"サーキュレーターの風量を{circulator_state.fan_speed}に設定"
+            )
         if (
             current_circulator_state.power == constants.CirculatorPower.ON
             and circulator_state.fan_speed == 0
