@@ -34,10 +34,7 @@ class SwitchBotApi(SmartDeviceInterface):
         self._AIR_CONDITIONER_SUPPORT_DEVICE_ID = os.environ[
             "SWITCHBOT_AIR_CONDITIONER_SUPPORT_DEVICE_ID"
         ]
-        self._AIR_CONDITIONER_EMERGENCY_DEVICE_ID = os.environ[
-            "SWITCHBOT_AIR_CONDITIONER_EMERGENCY_DEVICE_ID"
-        ]
-
+        
         # APIのベースURL
         self._API_BASE_URL = os.environ["SWITCHBOT_BASE_URL"]
 
@@ -135,7 +132,7 @@ class SwitchBotApi(SmartDeviceInterface):
                 )
                 SystemEventLogger.log_info(LogMessages.AIRCON_SETTINGS_RETRY)
                 return self._post_command(
-                    self._AIR_CONDITIONER_EMERGENCY_DEVICE_ID,
+                    self._AIR_CONDITIONER_SUPPORT_DEVICE_ID,
                     aircon_state.mode.description,
                     "default",
                     "customize",
