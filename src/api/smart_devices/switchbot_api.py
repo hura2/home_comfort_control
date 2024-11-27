@@ -163,8 +163,8 @@ class SwitchBotApi(SmartDeviceInterface):
         body = {"command": command, "parameter": parameter, "commandType": command_type}
         data = json.dumps(body)
         try:
-            # コマンド送信前に一時停止（例: 0.5秒待つ）
-            time.sleep(0.5)
+            # コマンド送信前に一時停止（例: 2秒待つ）
+            time.sleep(2)
             with requests.Session() as session:
                 response = session.post(url, data=data, headers=self._generate_swt_header())
                 response.raise_for_status()  # HTTPエラーがあれば例外を発生
