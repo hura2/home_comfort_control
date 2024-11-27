@@ -315,7 +315,7 @@ class SystemEventLogger:
         Args:
             e (Exception): 発生した例外
         """
-        SystemEventLogger.log_info(LogMessages.EXCEPTION_OCCURRED, exception_message=str(e))
+        SystemEventLogger.log_info(LogMessages.EXCEPTION_OCCURRED, exception=str(e))
 
     @staticmethod
     def format_state(state: AirconState) -> str:
