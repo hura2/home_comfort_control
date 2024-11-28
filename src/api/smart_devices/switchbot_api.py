@@ -65,6 +65,7 @@ class SwitchBotApi(SmartDeviceInterface):
     def circulator_fan_speed(self, speed=int, current_speed: int = None) -> SmartDeviceResponse:
         try:
             adjust_speed = current_speed
+            response = None
             while adjust_speed != speed:
                 if speed > adjust_speed:
                     response = self._increase_circulator_volume()
