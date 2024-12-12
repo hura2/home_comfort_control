@@ -38,6 +38,6 @@ class ComfortFactors:
     @icl.setter
     def icl(self, value: float):
         """ICL値のセッター"""
-        if not (0.0 <= value <= 2.0):
-            raise ValueError(f"ICL値は0.0〜2.0の範囲である必要があります。指定された値: {value}")
+        if not (0.0 <= value <= 2.5):
+            raise ValueError(f"ICL値は0.0〜2.5の範囲である必要があります。指定された値: {value}")
         self._icl = value
