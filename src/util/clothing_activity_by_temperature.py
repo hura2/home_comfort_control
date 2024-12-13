@@ -30,17 +30,10 @@ class ClothingActivityByTemperature:
         outdoor_temperature = 30.0
         max_temp = 35
         bedtime = False
-        met, icl = ClothingActivityByTemperatureCalculator.calculate_met_icl(outdoor_temperature, max_temp, bedtime)
+        met, icl = ClothingActivityByTemperature.calculate_met_icl(outdoor_temperature, max_temp, bedtime)
 
     """
 
-
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Tuple
-
-
-class ClothingActivityByTemperature:
     @staticmethod
     def calculate_comfort_factors(
         outdoor_temperature: float, forecast_max_temperature: float, is_sleeping: bool
@@ -133,30 +126,24 @@ class ClothingActivityByTemperature:
 
         # 高コスト時間帯でのICL調整
         current_day = now.weekday()
-        if (current_day not in [5, 6]) and (
-            settings.low_temp_settings.time_settings.heating.high_cost.start
-            <= now.time()
-            <= settings.low_temp_settings.time_settings.heating.high_cost.end
-        ):
-            icl += settings.low_temp_settings.time_settings.heating.high_cost.adjustment
-            SystemEventLogger.log_info(
-                LogMessages.ICL_ADJUSTMENT_HIGH_COST,
-                start_time=settings.low_temp_settings.time_settings.heating.high_cost.start,
-                end_time=settings.low_temp_settings.time_settings.heating.high_cost.end
-            )
+        for high_cost in settings.low_temp_settings.time_settings.heating.high_costs:
+            if (current_day not in [5, 6]) and (high_cost.start <= now.time() <= high_cost.end):
+                icl += high_cost.adjustment
+                SystemEventLogger.log_info(
+                    LogMessages.ICL_ADJUSTMENT_HIGH_COST,
+                    start_time=high_cost.start,
+                    end_time=high_cost.end,
+                )
 
         # 低コスト時間帯でのICL調整
-        if (current_day not in [5, 6]) and (
-            settings.low_temp_settings.time_settings.heating.low_cost.start
-            <= now.time()
-            <= settings.low_temp_settings.time_settings.heating.low_cost.end
-        ):
-            icl += settings.low_temp_settings.time_settings.heating.low_cost.adjustment
-            SystemEventLogger.log_info(
-                LogMessages.ICL_ADJUSTMENT_LOW_COST,
-                start_time=settings.low_temp_settings.time_settings.heating.low_cost.start,
-                end_time=settings.low_temp_settings.time_settings.heating.low_cost.end
-            )
+        for low_cost in settings.low_temp_settings.time_settings.heating.low_costs:
+            if low_cost.start <= now.time() <= low_cost.end:
+                icl += low_cost.adjustment
+                SystemEventLogger.log_info(
+                    LogMessages.ICL_ADJUSTMENT_LOW_COST,
+                    start_time=low_cost.start,
+                    end_time=low_cost.end,
+                )
 
         return ComfortFactors(met=met, icl=icl)
 
@@ -183,7 +170,9 @@ class ClothingActivityByTemperature:
             if is_sleeping
             else settings.low_temp_settings.met.daytime
         )
-        temperature = outdoor_temperature if outdoor_temperature is not None else forecast_max_temperature
+        temperature = (
+            outdoor_temperature if outdoor_temperature is not None else forecast_max_temperature
+        )
         icl = (
             max(1.00 - 0.025 * max(min(temperature, 40) - 10, 0), 0.7)
             if not is_sleeping

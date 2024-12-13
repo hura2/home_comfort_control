@@ -196,8 +196,8 @@ class ClothingActivityByTemperatureSettings:
                 def __init__(self, config):
                     self.config = config
                     self.use = self.config.get("use", False)
-                    self.high_cost = self._TimePeriod(config.get("high_cost", {}))
-                    self.low_cost = self._TimePeriod(config.get("low_cost", {}))
+                    self.high_costs = [self._TimePeriod(time) for time in config.get("high_cost", {})]
+                    self.low_costs = [self._TimePeriod(time) for time in config.get("low_cost", {})]
 
                 class _TimePeriod:
                     """時間帯の調整設定を管理するクラス"""
