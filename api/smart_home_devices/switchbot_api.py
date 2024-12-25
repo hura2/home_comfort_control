@@ -171,10 +171,9 @@ class SwitchBotApi(SmartHomeDeviceInterface):
             # コマンド送信前に一時停止（例: 2秒待つ）
             time.sleep(2)
             with requests.Session() as session:
-                # response = session.post(url, data=data, headers=self._generate_swt_header())
-                # response.raise_for_status()  # HTTPエラーがあれば例外を発生
-                # data = response.json()
-                return SmartHomeDeviceResponse(message=data)
+                response = session.post(url, data=data, headers=self._generate_swt_header())
+                response.raise_for_status()  # HTTPエラーがあれば例外を発生
+                data = response.json()
                 if data["statusCode"] == 100:
                     return SmartHomeDeviceResponse(message=data)
                 else:
