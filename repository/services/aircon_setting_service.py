@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from models.aircon_setting_model import AirconSettingModel
 from repository.queries.aircon_setting_queries import AirconSettingQueries
+from settings import LOCAL_TZ
 from shared.dataclass.aircon_settings import AirconSettings
 from shared.enums.aircon_fan_speed import AirconFanSpeed
 from shared.enums.aircon_mode import AirconMode
@@ -74,8 +75,8 @@ class AirconSettingService:
         :param date: 日付（例: "2024-12-25"）
         :return: エアコン設定のリスト
         """
-        start_datetime = datetime.strptime(f"{date} 00:00:00", "%Y-%m-%d %H:%M:%S")
-        end_datetime = datetime.strptime(f"{date} 23:59:59", "%Y-%m-%d %H:%M:%S")
+        start_datetime = datetime.strptime(f"{date} 00:00:00", "%Y-%m-%d %H:%M:%S").replace(tzinfo=LOCAL_TZ)
+        end_datetime = datetime.strptime(f"{date} 23:59:59", "%Y-%m-%d %H:%M:%S").replace(tzinfo=LOCAL_TZ)
         return self.query.get_aircon_settings_by_date(
             start_datetime.isoformat(), end_datetime.isoformat()
         )
