@@ -46,10 +46,10 @@ en:
     non_cooling_or_heating: "Current mode is neither cooling nor heating: %{current_mode}"
     indoor_temp_below_dewpoint: "Indoor temperature is below dew point."
     indoor_temp_below_dewpoint_high_pmv: "Indoor temperature is below dew point, but PMV is high (%{pmv})."
-    room_temp_diff_high: "Temperature difference between living room and other rooms is %{temp_diff:.1f}° or higher. Increasing airflow to balance temperature."
+    room_temp_diff_high: "Temperature difference between living room and other rooms is %{temp_diff}° or higher. Increasing airflow to balance temperature."
 
   humidity_related:
-    absolute_humidity_threshold_exceeded: "Absolute humidity exceeded the threshold (%{threshold:.1f})."
+    absolute_humidity_threshold_exceeded: "Absolute humidity exceeded the threshold (%{threshold})."
 
   outdoor_temperature_related:
     wait_for_natural_cooling: "Outdoor temperature is high; waiting for natural cooling."

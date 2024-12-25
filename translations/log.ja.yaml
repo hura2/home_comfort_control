@@ -46,10 +46,10 @@ ja:
     non_cooling_or_heating: "現在モードが冷房でも暖房でもない場合: %{current_mode}"
     indoor_temp_below_dewpoint: "室内温度が露点温度より低い。"
     indoor_temp_below_dewpoint_high_pmv: "室内温度が露点温度より低いが、PMVが高い（%{pmv}）。"
-    room_temp_diff_high: "リビングと他の部屋の温度の差が%{temp_diff:.1f}度以上です。温度差改善のため風量を上げます。"
+    room_temp_diff_high: "リビングと他の部屋の温度の差が%{temp_diff}度以上です。温度差改善のため風量を上げます。"
 
   humidity_related:
-    absolute_humidity_threshold_exceeded: "絶対湿度が閾値(%{threshold:.1f})を超えました。"
+    absolute_humidity_threshold_exceeded: "絶対湿度が閾値(%{threshold})を超えました。"
 
   outdoor_temperature_related:
     wait_for_natural_cooling: "外気温が高いので自然に温度が上がるのを待ちます。"
