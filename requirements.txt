@@ -1,11 +1,9 @@
--i https://pypi.org/simple
-pythermalcomfort>=2.0.0,<3.0.0
-supabase>=1.0.0,<3.0.0
-httpx<0.24.0,>=0.23.0
-pydantic<2.0.0,>=1.9.0
-pyyaml>=6.0.0,<7.0.0
-pandas>=2.0.0,<3.0.0
-scikit-learn>=1.0.0,<2.0.0
-python-dotenv>=1.0.0,<2.0.0
-pytest==8.3.3
-requests_mock==1.12.1
+pythermalcomfort
+python-dotenv
+Alembic
+psycopg2-binary
+SQLAlchemy
+pytz
+requests
+i18nice[YAML]
+pydantic

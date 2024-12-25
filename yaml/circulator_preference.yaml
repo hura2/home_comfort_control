@@ -1,0 +1,25 @@
+# サーキュレーター設定
+thresholds:
+  high_temperature:  # 高温時のスピード設定
+    - temperature_deff: 3.0
+      speed: 2
+    - temperature_deff: 2.5
+      speed: 1
+    - temperature_deff: 2.0
+      speed: 1
+    - temperature_deff: 1.5
+      speed: 0
+    - temperature_deff: 1.0
+      speed: 0
+
+  normal_temperature:  # 高温以外の時のスピード設定
+    - temperature_deff: 3.0
+      speed: 3
+    - temperature_deff: 2.5
+      speed: 2
+    - temperature_deff: 2.0
+      speed: 2
+    - temperature_deff: 1.5
+      speed: 2
+    - temperature_deff: 1.0
+      speed: 1

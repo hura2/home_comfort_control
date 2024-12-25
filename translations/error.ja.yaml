@@ -1,0 +1,5 @@
+ja:
+  env_config_loader:
+    get_variable: "環境変数[%{env_key}]を取得できません。"
+  open_weather_map_api:
+    fetch_forecast_api: "天気予報APIにリクエストできません。%{message}"

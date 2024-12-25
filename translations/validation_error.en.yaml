@@ -1,0 +1,29 @@
+en:
+  message: "An error occurred while reading the configuration file"
+  location: "Error location: %{location}"
+  details:
+    ge_le: "Acceptable range: %{ge}〜%{le}"
+    ge: "Lower limit: %{ge}"
+    le: "Upper limit: %{le}"
+  custom_message:
+    smart_home_device_preference:
+      convert_type_to_enum: "The specified device type [%{type}] is not supported."
+    weather_forecast_preference:
+      convert_type_to_enum: "The specified weather forecast [%{type}] is not supported."
+    notify_preference:
+      convert_type_to_enum: "The specified notification channel [%{type}] is not supported."
+      convert_category_to_enum: "The specified notification level [%{category}] is not supported."
+    sensor:
+      convert_type_to_enum: "The specified sensor type [%{type}] is not supported."
+    awake_period_preference:
+      validate_and_convert_time: "[%{value}] must be in time format. Example: 10:00"
+    time_period_preference:
+      validate_and_convert_time: "[%{value}] must be in time format. Example: 10:00"
+    aircon_settings:
+      convert_mode_to_enum: "The specified air conditioner mode [%{mode}] is not supported."
+      convert_fan_speed_to_enum: "The specified fan speed [%{fan_speed}] is not supported."
+      convert_power_to_enum: "The specified power [%{power}] is not supported."
+  message_map:
+    "Input should be a valid number, unable to parse string as a number": "Input should be a valid number"
+    "Input should be a valid boolean, unable to interpret input": "Input should be true or false"
+  default_message: "An unknown error occurred"

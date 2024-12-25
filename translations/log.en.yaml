@@ -1,0 +1,66 @@
+en:
+  time_related:
+    current_time: "Current time: %{current_time}"
+    forecast_max_temp: "Forecast max temperature: %{forecast_max_temperature}°"
+
+  environment_data:
+    co2_level: "CO2 level: %{co2_level}ppm"
+    sensor_data: "%{label}:%{location}: Temp %{temperature}°, Humidity %{humidity}%%, Absolute Humidity %{absolute_humidity}g/m³"
+    temp_diff: "Temperature difference with %{reference_label}:%{reference_location}: %{temp_diff}°"
+    co2_sensor: "CO2: %{co2_level}ppm"
+
+  icl_adjustment:
+    high_cost: "ICL adjustment performed for high-cost hours: %{start_time} - %{end_time}"
+    low_cost: "ICL adjustment performed for low-cost hours: %{start_time} - %{end_time}"
+
+  pmv_calculation:
+    surface_temperatures: "Surface temperatures: Wall %{wall}°, Ceiling %{ceiling}°, Floor %{floor}°, MRT: %{mrt}°"
+    sensible_temp: "Sensible temperature: %{sensible_temperature}°"
+    met_icl_values: "met: %{met}, icl: %{icl}"
+    relative_air_speed: "Relative air speed: %{relative_air_speed}m/s"
+    dynamic_clothing: "Dynamic clothing insulation: %{dynamic_clothing_insulation}"
+    pmv_ppd: "pmv = %{pmv}, ppd = %{ppd}%%"
+
+  aircon_related:
+    elapsed_time: "Time elapsed since last aircon setting: %{hours}h %{minutes}m"
+    aircon_state_change: "Changed from %{current_state} to %{new_state}"
+    aircon_state_init: "Changed to %{new_state}"
+    aircon_scores: |
+      Average score two weeks ago: %{week_before_last_score}
+      Average score last week: %{last_week_score}
+      Average score this week: %{this_week_score}
+      Yesterday's score: %{yesterday_score}
+      Today's predicted score: %{today_score}
+    aircon_settings_success: "Aircon settings successfully sent: %{aircon_state}"
+    aircon_settings_failed: "Failed to send aircon settings. Error: %{error_message}"
+    aircon_settings_retry: "Retrying to send via an alternative method"
+    min_runtime_not_reached: "Minimum runtime not yet reached. Continuing mode. Elapsed time: %{hours}h %{minutes}m"
+    min_elapsed_time_reached: "Minimum runtime elapsed. Settings can now be updated."
+    same_mode: "Current mode and new mode are the same: %{current_mode}"
+    different_mode: "Current mode and new mode differ: Current mode=%{current_mode}, New mode=%{new_mode}"
+    cooling_to_cooling: "Current mode is cooling; new mode is also cooling"
+    cooling_to_other: "Current mode is cooling; new mode is not cooling"
+    heating_to_heating: "Current mode is heating; new mode is also heating"
+    heating_to_other: "Current mode is heating; new mode is not heating"
+    aircon_mode_continue_and_update: "Continuing current mode while updating settings"
+    non_cooling_or_heating: "Current mode is neither cooling nor heating: %{current_mode}"
+    indoor_temp_below_dewpoint: "Indoor temperature is below dew point."
+    indoor_temp_below_dewpoint_high_pmv: "Indoor temperature is below dew point, but PMV is high (%{pmv})."
+    room_temp_diff_high: "Temperature difference between living room and other rooms is %{temp_diff:.1f}° or higher. Increasing airflow to balance temperature."
+
+  humidity_related:
+    absolute_humidity_threshold_exceeded: "Absolute humidity exceeded the threshold (%{threshold:.1f})."
+
+  outdoor_temperature_related:
+    wait_for_natural_cooling: "Outdoor temperature is high; waiting for natural cooling."
+    wait_for_natural_heating: "Outdoor temperature is low; waiting for natural heating."
+
+  circulator_related:
+    circulator_status: "Current circulator power: %{power}, Fan speed: %{fan_speed}"
+    circulator_update_fan_speed: "Set circulator fan speed to %{new_fan_speed}"
+    circulator_settings_success: "Circulator settings successfully sent. Power: %{power}, Fan speed: %{fan_speed}"
+    circulator_off_notify: "Circulator power turned OFF"
+    circulator_on_notify: "Set circulator fan speed to %{new_fan_speed}"
+
+  exception_related:
+    exception_occurred: "Exception occurred: %{exception}"

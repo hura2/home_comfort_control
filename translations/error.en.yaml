@@ -1,0 +1,5 @@
+en:
+  env_config_loader:
+    get_variable: "Unable to retrieve environment variable [%{env_key}]."
+  open_weather_map_api:
+    fetch_forecast_api: "Unable to request the weather forecast API. %{message}"

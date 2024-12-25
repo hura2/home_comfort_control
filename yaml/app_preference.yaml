@@ -1,0 +1,71 @@
+# 活動期間の設定
+awake_period:
+  start_time: "05:00"  # 起床時間（活動を開始する時間）
+  end_time: "22:50"    # 就寝時間（活動を終了する時間）
+# 湿度およびPMVに関する設定
+environment:
+  dehumidification_threshold: 13.0  # 除湿運転を開始するしきい値（絶対湿度 g/m³）
+  pmv_threshold: 0.0  # PMVがこの値以上の場合、暑い状態とみなす
+
+# 温度に関する閾値設定
+temperature_thresholds:
+  high: 30  # 天気予報の最高気温を基準とした高温の閾値
+  low: 15   # 天気予報の最高気温を基準とした低温の閾値
+
+# CO2に関する閾値設定
+co2_thresholds:
+  high: 600      # CO2がこの値以上の場合、換気が推奨される
+  warning: 800   # CO2がこの値以上の場合、強制的に換気が必要な状態とみなす
+
+# センサーに関する設定
+sensors:
+  main:
+    id: "floor"
+    label: "リビング"
+    location: "床"
+    type: "温湿度計"
+  sub:
+    id: "ceiling"                     # subはオプション
+    label: "リビング"
+    location: "天井"
+    type: "温湿度計"
+  supplementaries:
+    - id: "study"                         # supplementariesはオプション
+      label: "書斎"
+      location: "床"
+      type: "温湿度計"
+    - id: "bedroom"
+      label: "寝室"
+      location: "床"
+      type: "CO2センサー"
+  outdoor:                       # outdoorはオプション
+    id: "outdoor"
+    label: "外気"
+    type: "温湿度計"
+    location: "南庭"
+
+# サーキュレーター設定
+circulator:
+  use_circulator: true  # サーキュレーターを使用するかどうか
+
+# DB設定
+database:
+  use_database: true  # DBにログを残すかどうか
+
+# スマートデバイス設定
+smart_home_device:
+  device_type: "SWITCH_BOT"  # 使用するスマートデバイス
+
+# 天気予報設定
+weather_forecast:
+  type: "OPEN_WEATHER_MAP"  # 天気予報サービスの種類
+
+# 通知設定
+notify:
+  notifiers:
+    - type: "LINE"
+      category: "IMPORTANT"
+      enable: true
+    - type: "DISCORD"
+      category: "NORMAL"
+      enable: true

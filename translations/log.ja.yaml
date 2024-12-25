@@ -1,0 +1,66 @@
+ja:
+  time_related:
+    current_time: "現在時刻: %{current_time}"
+    forecast_max_temp: "最高気温予報: %{forecast_max_temperature}°"
+
+  environment_data:
+    co2_level: "CO2濃度: %{co2_level}ppm"
+    sensor_data: "%{label}:%{location}: 温度%{temperature}°, 湿度%{humidity}%%, 絶対湿度%{absolute_humidity}g/㎥"
+    temp_diff: "%{reference_label}:%{reference_location}との温度差%{temp_diff}°"
+    co2_sensor: "CO2: %{co2_level}ppm"
+
+  icl_adjustment:
+    high_cost: "高コスト時間帯のICL調整を行いました: %{start_time} - %{end_time}"
+    low_cost: "低コスト時間帯のICL調整を行いました: %{start_time} - %{end_time}"
+
+  pmv_calculation:
+    surface_temperatures: "表面温度:壁 %{wall}°, 天井 %{ceiling}°, 床 %{floor}°, 平均放射温度: %{mrt}°"
+    sensible_temp: "体感温度: %{sensible_temperature}°"
+    met_icl_values: "met: %{met}, icl: %{icl}"
+    relative_air_speed: "相対風速: %{relative_air_speed}m/s"
+    dynamic_clothing: "動的な衣服の断熱性: %{dynamic_clothing_insulation}"
+    pmv_ppd: "pmv = %{pmv}, ppd = %{ppd}%%"
+
+  aircon_related:
+    elapsed_time: "前回のエアコン設定からの経過: %{hours}時間%{minutes}分"
+    aircon_state_change: "%{current_state}から%{new_state}に変更"
+    aircon_state_init: "%{new_state}に変更"
+    aircon_scores: |
+      先々週のスコア平均: %{week_before_last_score}
+      先週のスコア平均: %{last_week_score}
+      今週のスコア平均: %{this_week_score}
+      昨日のスコア: %{yesterday_score}
+      今日のスコア予想: %{today_score}
+    aircon_settings_success: "エアコンの設定を送信しました: %{aircon_state}"
+    aircon_settings_failed: "エアコンの設定を送信できませんでした。エラーメッセージ: %{error_message}"
+    aircon_settings_retry: "別の方法で再送信を試みます"
+    min_runtime_not_reached: "最低経過時間前なのでモードを継続します。経過時間:%{hours}時間%{minutes}分"
+    min_elapsed_time_reached: "最低経過時間を経過したので、設定を変更可能です。"
+    same_mode: "現在のモードと新しいモードが同じ: %{current_mode}"
+    different_mode: "現在のモードと新しいモードが違う: 現在のモード=%{current_mode}, 新しいモード=%{new_mode}"
+    cooling_to_cooling: "現在モードが冷房モード、新しいモードも冷房モード"
+    cooling_to_other: "現在モードが冷房モード、新しいモードが冷房モード以外"
+    heating_to_heating: "現在モードが暖房モード、新しいモードも暖房モード"
+    heating_to_other: "現在モードが暖房モード、新しいモードが暖房モード以外"
+    aircon_mode_continue_and_update: "現在のモードを継続しつつ、設定を変更します"
+    non_cooling_or_heating: "現在モードが冷房でも暖房でもない場合: %{current_mode}"
+    indoor_temp_below_dewpoint: "室内温度が露点温度より低い。"
+    indoor_temp_below_dewpoint_high_pmv: "室内温度が露点温度より低いが、PMVが高い（%{pmv}）。"
+    room_temp_diff_high: "リビングと他の部屋の温度の差が%{temp_diff:.1f}度以上です。温度差改善のため風量を上げます。"
+
+  humidity_related:
+    absolute_humidity_threshold_exceeded: "絶対湿度が閾値(%{threshold:.1f})を超えました。"
+
+  outdoor_temperature_related:
+    wait_for_natural_cooling: "外気温が高いので自然に温度が上がるのを待ちます。"
+    wait_for_natural_heating: "外気温が低いので自然に温度が下がるのを待ちます。"
+
+  circulator_related:
+    circulator_status: "現在のサーキュレーターの電源: %{power}, 風量: %{fan_speed}"
+    circulator_update_fan_speed: "サーキュレーターの風量を%{new_fan_speed}に設定"
+    circulator_settings_success: "サーキュレーターの設定を送信しました。電源: %{power}, 風量: %{fan_speed}"
+    circulator_off_notify: "サーキュレーターの電源をOFFに設定"
+    circulator_on_notify: "サーキュレーターの風量を%{new_fan_speed}に設定"
+
+  exception_related:
+    exception_occurred: "例外発生: %{exception}"

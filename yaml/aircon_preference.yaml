@@ -1,0 +1,113 @@
+aircon_settings:  # PMV閾値設定
+  pmv_thresholds:  # PMVに基づくエアコンの設定閾値のリスト
+    - threshold: -0.2  # PMVが-0.2以下の場合
+      aircon_settings:
+        temperature: "29"       # 温度設定を29度にする
+        mode: POWERFUL_HEATING  # モードを強力暖房に設定
+        fan_speed: HIGH  # 停止時の風速
+        power: ON
+    - threshold: -0.16  # PMVが-0.18以下の場合
+      aircon_settings:
+        temperature: "25"       # 温度設定を25度にする
+        mode: HEATING     # モードを暖房に設定
+        fan_speed: HIGH  # 停止時の風速
+        power: ON
+    - threshold: -0.13   # PMVが-0.13以下の場合
+      aircon_settings:
+        temperature: "23"       # 温度設定を23度にする
+        mode: HEATING     # モードを暖房に設定
+        fan_speed: HIGH  # 停止時の風速
+        power: ON
+    - threshold: 0      # PMVが0の場合
+      aircon_settings:
+        temperature: "28"       # 温度設定を28度にする
+        mode: FAN         # モードをファンに設定
+        fan_speed: LOW    # ファンの速度を低に設定
+        power: ON
+    - threshold: 0.1    # PMVが0.1の場合
+      aircon_settings:
+        temperature: "28"       # 温度設定を28度にする
+        mode: FAN         # モードをファンに設定
+        fan_speed: LOW    # ファンの速度を低に設定
+        power: ON
+    - threshold: 0.15   # PMVが0.15の場合
+      aircon_settings:
+        temperature: "26"       # 温度設定を26度にする
+        mode: COOLING     # モードを冷房に設定
+        fan_speed: HIGH  # 停止時の風速
+        power: ON
+    - threshold: 0.18   # PMVが0.18の場合
+      aircon_settings:
+        temperature: "25"       # 温度設定を25度にする
+        mode: COOLING     # モードを冷房に設定
+        fan_speed: HIGH  # 停止時の風速
+        power: ON
+    - threshold: 0.2    # PMVが0.2の場合
+      aircon_settings:
+        temperature: "24"       # 温度設定を24度にする
+        mode: COOLING     # モードを冷房に設定
+        fan_speed: HIGH  # 停止時の風速
+        power: ON
+    - threshold: 1      # PMVが1の場合
+      aircon_settings:
+        temperature: "22"       # 温度設定を22度にする
+        mode: POWERFUL_COOLING  # モードを強力冷房に設定
+        fan_speed: HIGH  # 停止時の風速
+        power: ON
+  dry:  # 露害設定
+    aircon_settings:
+      temperature: "26"  # 露害温度（度）
+      mode: DRY
+      fan_speed: HIGH
+      power: ON
+  weakest_cooling:  # 冷房時の設定
+    aircon_settings:
+      temperature: "27"  # 温度（度）
+      mode: COOLING  # モード
+      fan_speed: LOW  # 風量
+      power: ON
+  weakest_heating:  # 暖房時の設定
+    aircon_settings:
+      temperature: "20"  # 温度（度）
+      mode: HEATING  # モード
+      fan_speed: LOW  # 風量
+      power: ON
+    
+conditional:  # 特定の条件下での設定
+  cooling:  # 冷房を有効にするための基準
+    activation:
+      outdoor_temperature_diff: 5  # 外気温との差（度）
+      threshold: 0.4  # 冷房を有効にするためのPMV閾値
+    off_state:
+      aircon_settings:
+        temperature: "28"  # 停止時の送風温度（度）
+        mode: FAN  # 停止時のモード
+        fan_speed: LOW  # 停止時の風速
+        power: ON
+  heating:  # 暖房を有効にするための基準
+    activation:
+      outdoor_temperature_diff: 5  # 外気温との差（度）
+      threshold: -0.3  # 暖房を有効にするためのPMV閾値
+    off_state:
+      aircon_settings:
+        temperature: "28"  # 停止時の送風温度（度）
+        mode: FAN  # 停止時のモード
+        fan_speed: LOW  # 停止時の風速
+        power: ON
+
+  circulator_threshold: 2.0  # 空気循環のための部屋の温度差（度）
+  summer_condensation:  # 露点温度に対する制御設定
+    dew_point_margin: 1  # 結露防止のための余裕（度）
+    pmv_threshold: 0.4  # 露点温度より低い場合でも、暑すぎる場合は冷房を有効にするためのPMV閾値
+    cooling_stop:  # 冷房停止時の設定
+      aircon_settings:
+        temperature: "28"  # 停止時の送風温度（度）
+        mode: FAN  # 停止時のモード 
+        fan_speed: LOW  # 停止時の風速
+        power: ON
+    condensation_override:  # 冷房時の設定
+      aircon_settings:
+        temperature: "26"  # 冷房温度（度）
+        mode: COOLING  # 冷房モード
+        fan_speed: HIGH  # 冷房時の風速
+        power: ON
