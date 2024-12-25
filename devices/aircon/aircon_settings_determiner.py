@@ -167,7 +167,7 @@ class AirconSettingsDeterminer:
                 threshold=app_preference.environment.dehumidification_threshold,
             )
             # しきい値を超えた場合、エアコン設定を除湿モードに更新
-            aircon_settings.update_if_none(aircon_preference.aircon_settings.dry)
+            aircon_settings.update_if_none(aircon_preference.aircon_settings.dry.aircon_settings)
 
     @staticmethod
     def _adjust_for_co2(home_sensor: HomeSensor, aircon_settings: AirconSettings):
@@ -232,7 +232,9 @@ class AirconSettingsDeterminer:
                     aircon_settings.update_if_none(
                         aircon_preference.conditional.cooling.off_state.aircon_settings
                     )
-                    SystemEventLogger.log_info("outdoor_temperature_related.wait_for_natural_cooling")
+                    SystemEventLogger.log_info(
+                        "outdoor_temperature_related.wait_for_natural_heating"
+                    )
 
             # 暖房モードの場合
             if AirconMode.is_heating_mode(aircon_settings.mode):
@@ -246,7 +248,9 @@ class AirconSettingsDeterminer:
                     aircon_settings.update_if_none(
                         aircon_preference.conditional.heating.off_state.aircon_settings
                     )
-                    SystemEventLogger.log_info("outdoor_temperature_related.wait_for_natural_heating")
+                    SystemEventLogger.log_info(
+                        "outdoor_temperature_related.wait_for_natural_cooling"
+                    )
 
         # その他の調整（湿度、CO2濃度、温度差、露点）
         AirconSettingsDeterminer._adjust_for_humidity(home_sensor, aircon_settings)
