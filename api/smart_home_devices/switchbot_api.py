@@ -46,7 +46,7 @@ class SwitchBotApi(SmartHomeDeviceInterface):
         try:
             return self._post_command(
                 self._CIRCULATOR_DEVICE_ID,
-                PowerMode.ON.id,
+                "電源",
                 "default",
                 "customize",
             )
@@ -58,7 +58,7 @@ class SwitchBotApi(SmartHomeDeviceInterface):
         try:
             return self._post_command(
                 self._CIRCULATOR_DEVICE_ID,
-                PowerMode.OFF.id,
+                "電源",
                 "default",
                 "customize",
             )
