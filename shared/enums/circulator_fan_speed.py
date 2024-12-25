@@ -7,5 +7,5 @@ class CirculatorFanSpeed(AttributesEnum):
     サーキュレーターのファン速度を表すEnumクラス。
     """
 
-    UP = Attributes(1, "風速プラス")
-    DOWN = Attributes(2, "風速マイナス")
+    UP = Attributes(1, "風力プラス")
+    DOWN = Attributes(2, "風力マイナス")
