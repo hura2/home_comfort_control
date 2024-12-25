@@ -72,18 +72,19 @@ class AirconIntensityScoreService:
                 time_difference = (current_time - last_setting.created_at).total_seconds()
                 intensity_score = AirconIntensityCalculator.calculate_intensity(
                     temperature=last_setting.temperature,
-                    mode=last_setting.mode,
-                    fan_speed=last_setting.fan_speed,
+                    mode_id=last_setting.mode_id,
+                    fan_speed_id=last_setting.fan_speed_id,
                     power=last_setting.power,
                 )
-                intensity_by_mode[last_setting.mode.id] += intensity_score * time_difference
+                intensity_by_mode[last_setting.mode_id] += intensity_score * time_difference
 
             # 新しい設定を記録
             last_setting = AirconSettingModel(
-                mode_id=settings.mode.id,
+                mode_id=settings.mode_id,
                 temperature=settings.temperature,
-                fan_speed_id=settings.fan_speed.id,
+                fan_speed_id=settings.fan_speed_id,
                 power=settings.power,
+                created_at=current_time,
             )
 
         # 最後の設定の持続時間を計算するかどうか
@@ -94,11 +95,11 @@ class AirconIntensityScoreService:
             time_difference = (end_of_day - last_setting.created_at).total_seconds()
             intensity_score = AirconIntensityCalculator.calculate_intensity(
                 temperature=last_setting.temperature,
-                mode=last_setting.mode,
-                fan_speed=last_setting.fan_speed,
+                mode_id=last_setting.mode_id,
+                fan_speed_id=last_setting.fan_speed_id,
                 power=last_setting.power,
             )
-            intensity_by_mode[last_setting.mode.id] += intensity_score * time_difference
+            intensity_by_mode[last_setting.mode_id] += intensity_score * time_difference
 
         # 全てのモードの強度スコアを合計
         total_intensity = sum(intensity_by_mode.values())
