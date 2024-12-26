@@ -1,6 +1,6 @@
 aircon_settings:  # PMV閾値設定
   pmv_thresholds:  # PMVに基づくエアコンの設定閾値のリスト
-    - threshold: -0.2  # PMVが-0.2以下の場合
+    - threshold: -0.3  # PMVが-0.2以下の場合
       aircon_settings:
         temperature: "29"       # 温度設定を29度にする
         mode: POWERFUL_HEATING  # モードを強力暖房に設定
