@@ -69,3 +69,8 @@ notify:
     - type: "DISCORD"
       category: "NORMAL"
       enable: true
+
+# 太陽光活用設定
+solar_utilization:
+  reduce_heating: true  # 太陽が出ている時は部屋が温まるので暖房を抑える
+  boost_aircon: true    # 太陽が出ている時は太陽光発電されるので冷房をより使う

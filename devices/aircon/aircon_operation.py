@@ -3,7 +3,6 @@ from logger.system_event_logger import SystemEventLogger
 from settings import aircon_preference
 from shared.dataclass.aircon_settings import AirconSettings
 from shared.enums.aircon_fan_speed import AirconFanSpeed
-from shared.enums.aircon_mode import AirconMode
 
 
 class AirconOperation:
@@ -73,9 +72,9 @@ class AirconOperation:
             SystemEventLogger.log_info(
                 "aircon_related.different_mode", current_mode=current_mode, new_mode=new_mode
             )
-            if AirconMode.is_cooling_mode(current_mode):
+            if current_mode.is_cooling():
                 SystemEventLogger.log_info("aircon_related.cooling_to_cooling")
-                if AirconMode.is_cooling_mode(new_mode):
+                if new_mode.is_cooling():
                     AirconStateManager.update_aircon_settings(
                         aircon_settings, current_aircon_settings
                     )
@@ -85,9 +84,9 @@ class AirconOperation:
                     AirconOperation._apply_weakest_setting(aircon_settings, current_aircon_settings)
                     return True
 
-            if AirconMode.is_heating_mode(current_mode):
+            if current_mode.is_heating():
                 SystemEventLogger.log_info("aircon_related.heating_to_heating")
-                if AirconMode.is_heating_mode(new_mode):
+                if new_mode.is_heating():
                     AirconStateManager.update_aircon_settings(
                         aircon_settings, current_aircon_settings
                     )
@@ -116,20 +115,19 @@ class AirconOperation:
             current_aircon_settings (AirconSettings): 現在のエアコンの状態。
         """
         # 最弱設定をエアコン設定に適用
-        # aircon_settings = AirconSettings()
-        if AirconMode.is_cooling_mode(current_aircon_settings.mode):
+        if current_aircon_settings.mode.is_cooling():
             weakest_settings = aircon_preference.aircon_settings.weakest_cooling
         else:
             weakest_settings = aircon_preference.aircon_settings.weakest_heating
 
         # 温度、モード、ファン速度を最弱設定に変更
-        aircon_settings.temperature = weakest_settings.temperature
-        aircon_settings.mode = weakest_settings.mode
+        aircon_settings.temperature = weakest_settings.aircon_settings.temperature
+        aircon_settings.mode = weakest_settings.aircon_settings.mode
         if aircon_settings.fan_speed not in [
             AirconFanSpeed.MEDIUM,
             AirconFanSpeed.HIGH,
         ]:
-            aircon_settings.fan_speed = weakest_settings.fan_speed
+            aircon_settings.fan_speed = weakest_settings.aircon_settings.fan_speed
 
         # 最弱設定を適用
         AirconStateManager.update_aircon_settings(aircon_settings, current_aircon_settings)
@@ -156,9 +154,6 @@ class AirconOperation:
             or current_aircon_settings.power.id != aircon_settings.power.id
         ):
             SystemEventLogger.log_info("aircon_related.mode_continue_and_update")
-            # AirconStateManager.update_aircon_state(aircon_state, current_aircon_state)
-            # return False  # 設定が異なるため更新を行った
 
-        # LoggerUtil.log_aircon_state(aircon_state, current_aircon_state)
         AirconStateManager.update_aircon_settings(aircon_settings, current_aircon_settings)
         return False

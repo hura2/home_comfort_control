@@ -73,7 +73,3 @@ class AirconStateManager:
             aircon_state=SystemEventLogger.format_settings(aircon_settings),
         )
         return aircon_settings
-        # 設定ファイル読み込み
-        # settings = GeneralConfig()
-        # if settings.database_settings.use_database:
-        # Analytics.insert_aircon_state(aircon_state)

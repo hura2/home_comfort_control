@@ -129,7 +129,7 @@ class SwitchBotApi(SmartHomeDeviceInterface):
                 res = self._post_command(
                     self._AIR_CONDITIONER_DEVICE_ID,
                     "setAll",
-                    f"{aircon_settings.temperature},{aircon_settings.mode.id},{aircon_settings.fan_speed.id},{aircon_settings.power.id}",
+                    f"{int(aircon_settings.temperature)},{aircon_settings.mode.id},{aircon_settings.fan_speed.id},{aircon_settings.power.name.lower()}",
                     "command",
                 )
                 return res

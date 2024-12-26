@@ -207,6 +207,19 @@ class AirconSettingsDeterminer:
             # 風量を強く設定
             aircon_settings.fan_speed = AirconFanSpeed.HIGH
 
+
+    # @staticmethod
+    # def _adjust_for_solar(aircon_settings: AirconSettings):
+    #     reduce_heating = True
+    #     boost_aircon = True
+    #     if reduce_heating:
+    #         if aircon_settings.mode.is_heating:
+    #             aircon_settings.mode = AirconMode.FAN
+        
+    #     if boost_aircon:
+    #         if aircon_settings.mode.is_cooling:
+    #             aircon_settings.mode = AirconMode.FAN
+
     @staticmethod
     def _get_aircon_settings_for_conditions(
         aircon_settings: AirconSettings,
@@ -221,7 +234,7 @@ class AirconSettingsDeterminer:
         # 外気温センサーがある場合
         if home_sensor.outdoor:
             # 冷房モードの場合
-            if AirconMode.is_cooling_mode(aircon_settings.mode):
+            if aircon_settings.mode.is_cooling():
                 # 冷房停止の判定
                 if AirconSettingsDeterminer._should_turn_off_cooling(
                     pmv_result,
@@ -237,7 +250,7 @@ class AirconSettingsDeterminer:
                     )
 
             # 暖房モードの場合
-            if AirconMode.is_heating_mode(aircon_settings.mode):
+            if aircon_settings.mode.is_heating():
                 # 暖房停止の判定
                 if AirconSettingsDeterminer._should_turn_off_heating(
                     pmv_result,

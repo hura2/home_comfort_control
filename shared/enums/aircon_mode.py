@@ -12,22 +12,20 @@ class AirconMode(AttributesEnum):
     POWERFUL_COOLING = Attributes(6, "パワフル冷房")
     POWERFUL_HEATING = Attributes(7, "パワフル暖房")
 
-    @classmethod
-    def is_cooling_mode(cls, mode: "AirconMode") -> bool:
+    def is_cooling(self) -> bool:
         """
-        指定されたモードが冷房関連のモードかどうかを判定します。
+        このモードが冷房かパワフル冷房かを判定します。
 
-        :param mode: 判定するエアコンモード
-        :return: 冷房関連のモードの場合はTrue、それ以外はFalse
+        Returns:
+            bool: 冷房またはパワフル冷房の場合はTrue、それ以外はFalse。
         """
-        return mode in {cls.COOLING, cls.POWERFUL_COOLING}
+        return self in {AirconMode.COOLING, AirconMode.POWERFUL_COOLING}
 
-    @classmethod
-    def is_heating_mode(cls, mode: "AirconMode") -> bool:
+    def is_heating(self) -> bool:
         """
-        指定されたモードが暖房関連のモードかどうかを判定します。
+        このモードが暖房かパワフル暖房かを判定します。
 
-        :param mode: 判定するエアコンモード
-        :return: 暖房関連のモードの場合はTrue、それ以外はFalse
+        Returns:
+            bool: 暖房またはパワフル暖房の場合はTrue、それ以外はFalse。
         """
-        return mode in {cls.HEATING, cls.POWERFUL_HEATING}
+        return self in {AirconMode.HEATING, AirconMode.POWERFUL_HEATING}
