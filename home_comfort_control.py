@@ -14,7 +14,7 @@ from repository.services.aircon_setting_service import AirconSettingService
 from repository.services.circulator_setting_service import CirculatorSettingService
 from repository.services.measurement_service import MeasurementService
 from repository.services.weather_forecast_service import WeatherForecastService
-from settings import app_preference
+from settings import LOCAL_TZ, app_preference
 from shared.dataclass.aircon_settings import AirconSettings
 from shared.dataclass.circulator_settings import CirculatorSettings
 from shared.dataclass.comfort_factors import ComfortFactors
@@ -66,7 +66,7 @@ class HomeComfortControl:
         return home_sensor
 
     def fetch_forecast(self):
-        if app_preference.database.use_database == False:
+        if app_preference.database.enabled == False:
             return
 
         with DBSessionManager.auto_commit_session() as session:
@@ -82,7 +82,7 @@ class HomeComfortControl:
         """
         forecast_max_temperature = None
         # データベースを使用する場合
-        if app_preference.database.use_database:
+        if app_preference.database.enabled:
             # データベースに保存されている最高気温を取得
             with DBSessionManager.session() as session:
                 weather_forecast_service = WeatherForecastService(session)
@@ -107,11 +107,11 @@ class HomeComfortControl:
         """
         now = TimeHelper.get_current_time()
         # 起床時間を取得
-        awake_period_start = TimeHelper.timezone().localize(
+        awake_period_start = LOCAL_TZ.localize(
             datetime.datetime.combine(now.date(), app_preference.awake_period.start_time)
         )
         # 就寝時間を取得
-        awake_period_end = TimeHelper.timezone().localize(
+        awake_period_end = LOCAL_TZ.localize(
             datetime.datetime.combine(now.date(), app_preference.awake_period.end_time)
         )
         # 就寝中かどうかを判断（起床時間内ならFalse、それ以外ならTrue）
@@ -130,7 +130,7 @@ class HomeComfortControl:
             CirculatorSettings: サーキュレーターの状態
         """
         # サーキュレーター使用設定が有効かどうかを確認
-        if app_preference.circulator.use_circulator:
+        if app_preference.circulator.enabled:
             # サーキュレーターの状態を設定
             circulator_settings = Circulator.set_circulator_by_temperature(
                 pmv, home_sensor.average_indoor_absolute_humidity, outdoor_temperature
@@ -156,7 +156,7 @@ class HomeComfortControl:
         """
         pmv = None
         # サーキュレーター使用設定が有効かどうかを確認
-        if app_preference.circulator.use_circulator:
+        if app_preference.circulator.enabled:
             # サーキュレーターをオンにしている場合、風量を増やしてPMV値を再計算
             if circulator_settings.power == PowerMode.ON:
                 pmv = ThermalComfort.calculate_pmv(
@@ -185,7 +185,7 @@ class HomeComfortControl:
             pmv_result, home_sensor, is_sleeping
         )
 
-        if app_preference.database.use_database:
+        if app_preference.database.enabled:
             # 前回のエアコン設定を取得し、経過時間をログに出力
             with DBSessionManager.auto_commit_session() as session:
                 aircon_setting_service = AirconSettingService(session)
@@ -231,7 +231,7 @@ class HomeComfortControl:
         # 初期化
         circulator_settings = CirculatorSettings()
 
-        if app_preference.circulator.use_circulator:
+        if app_preference.circulator.enabled:
             # 前回のサーキュレーター設定を取得
             with DBSessionManager.session() as session:
                 circulator_setting_service = CirculatorSettingService(session)
@@ -241,7 +241,9 @@ class HomeComfortControl:
 
             if is_sleeping:
                 # 就寝中は風量を0に設定
-                circulator_settings.power = Circulator.set_circulator(current_circulator_settings, 0)
+                circulator_settings.power = Circulator.set_circulator(
+                    current_circulator_settings, 0
+                )
                 circulator_settings.fan_speed = 0
             else:
                 # 送風で節電する場合
@@ -262,7 +264,9 @@ class HomeComfortControl:
                         )
 
             # ログ出力
-            SystemEventLogger.log_circulator_settings(current_circulator_settings, circulator_settings)
+            SystemEventLogger.log_circulator_settings(
+                current_circulator_settings, circulator_settings
+            )
 
         return circulator_settings
 
@@ -283,11 +287,13 @@ class HomeComfortControl:
             circulator_settings (CirculatorSettings): サーキュレーターの設定
         """
         # データベースを使用する場合
-        if app_preference.database.use_database:
+        if app_preference.database.enabled:
             with DBSessionManager.session() as session:
                 # エアコンの状態を記録
                 aircon_intensity_score_service = AirconIntensityScoreService(session)
-                scores= aircon_intensity_score_service.get_aircon_intensity_scores(TimeHelper.get_current_time())
+                scores = aircon_intensity_score_service.get_aircon_intensity_scores(
+                    TimeHelper.get_current_time()
+                )
 
                 SystemEventLogger.log_aircon_scores(scores)
 

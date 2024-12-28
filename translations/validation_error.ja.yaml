@@ -23,6 +23,8 @@ ja:
       convert_mode_to_enum: "指定されたエアコンモード[%{mode}]はサポートされていません。"
       convert_fan_speed_to_enum: "指定された風速[%{fan_speed}]はサポートされていません。"
       convert_power_to_enum: "指定された電源[%{power}]はサポートされていません。"
+    heating_reduction_preference:
+      validate_and_convert_time: "[%{value}]は時刻形式である必要があります。例: 10:00"
   message_map:
     "Input should be a valid number, unable to parse string as a number": "入力値は有効な数字である必要があります"
     "Input should be a valid boolean, unable to interpret input": "入力値はtrueかfalseである必要があります"

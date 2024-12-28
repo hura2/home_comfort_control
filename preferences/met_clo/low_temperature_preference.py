@@ -32,7 +32,7 @@ class LowTemperaturePreference(BaseModel):
         class HeatingPreference(BaseModel):
             """暖房時の設定を管理するクラス"""
 
-            use: bool
+            enabled: bool
             """暖房の使用有無"""
 
             high_costs: list[TimePeriodPreference]

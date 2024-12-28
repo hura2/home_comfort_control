@@ -5,8 +5,9 @@ from pydantic import BaseModel
 from shared.dataclass.sensor import Sensor
 
 
-class _SensorsPreference(BaseModel):
+class SensorsPreference(BaseModel):
     """センサー設定を管理するクラス"""
+
     main: Sensor
     """メインセンサー"""
     sub: Sensor

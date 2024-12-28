@@ -70,6 +70,6 @@ class AirconStateManager:
         smart_device.aircon(aircon_settings)
         SystemEventLogger.log_info(
             "aircon_related.aircon_settings_success",
-            aircon_state=SystemEventLogger.format_settings(aircon_settings),
+            aircon_settings=SystemEventLogger.format_settings(aircon_settings),
         )
         return aircon_settings

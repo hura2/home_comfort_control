@@ -10,19 +10,19 @@ from translations.translated_pydantic_value_error import TranslatedPydanticValue
 class TimePeriodPreference(BaseModel):
     """時間帯設定を管理するクラス"""
 
-    start: time
+    start_time: time
     """開始時間"""
 
-    end: time
+    end_time: time
     """終了時間"""
 
     met_adjustment: float = 0.0
     """加算代謝量"""
 
-    use: bool = False
-    """設定を使用するかどうかのフラグ"""
+    enabled: bool = False
+    """設定を有効化するかどうかのフラグ"""
 
-    @field_validator("start", "end", mode="before")
+    @field_validator("start_time", "end_time", mode="before")
     def validate_and_convert_time(cls, value, field):
         """
         時刻形式を検証し、strをtime型に変換します。

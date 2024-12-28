@@ -6,10 +6,11 @@ from preferences.met_clo.clo_preference import CloPreference
 from preferences.met_clo.met_preference import MetPreference
 from preferences.met_clo.time_period_preference import TimePeriodPreference
 
+
 class HighTemperaturePreference(BaseModel):
     """
     高温時の設定を管理するクラス。
-    
+
     代謝量、衣服熱抵抗、時間帯の設定を含み、それぞれの設定をプロパティとして提供します。
     """
 
@@ -25,12 +26,11 @@ class HighTemperaturePreference(BaseModel):
     class TimePreference(BaseModel):
         """時間帯設定を管理するクラス"""
 
-        lunch_time: TimePeriodPreference
+        lunch: TimePeriodPreference
         """昼食時間帯の設定"""
 
-        dinner_time: TimePeriodPreference
+        dinner: TimePeriodPreference
         """夕食時間帯の設定"""
 
-        pre_bedtime: TimePeriodPreference
+        sleep_prep: TimePeriodPreference
         """就寝前の時間帯設定"""
-

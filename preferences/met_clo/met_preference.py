@@ -8,8 +8,8 @@ from translations.translated_pydantic_value_error import TranslatedPydanticValue
 class MetPreference(BaseModel):
     """代謝量設定を管理するクラス"""
 
-    daytime: float = Field(..., ge=0.5, le=2, description="日中の代謝量（0から3の範囲）")
+    awake: float = Field(..., ge=0.5, le=2, description="日中の代謝量（0から3の範囲）")
     """日中の代謝量"""
 
-    bedtime: float = Field(..., ge=0.5, le=2, description="就寝時の代謝量（0から3の範囲）")
+    sleeping: float = Field(..., ge=0.5, le=2, description="就寝時の代謝量（0から3の範囲）")
     """就寝時の代謝量"""

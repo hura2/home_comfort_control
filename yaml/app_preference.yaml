@@ -46,11 +46,11 @@ sensors:
 
 # サーキュレーター設定
 circulator:
-  use_circulator: true  # サーキュレーターを使用するかどうか
+  enabled: true  # サーキュレーターを使用するかどうか
 
 # DB設定
 database:
-  use_database: true  # DBにログを残すかどうか
+  enabled: true  # DBにログを残すかどうか
 
 # スマートデバイス設定
 smart_home_device:
@@ -65,12 +65,7 @@ notify:
   notifiers:
     - type: "LINE"
       category: "IMPORTANT"
-      enable: true
+      enabled: true
     - type: "DISCORD"
       category: "NORMAL"
-      enable: true
-
-# 太陽光活用設定
-solar_utilization:
-  reduce_heating: true  # 太陽が出ている時は部屋が温まるので暖房を抑える
-  boost_aircon: true    # 太陽が出ている時は太陽光発電されるので冷房をより使う
+      enabled: true

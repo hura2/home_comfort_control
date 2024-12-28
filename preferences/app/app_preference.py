@@ -6,7 +6,7 @@ from preferences.app.co2_thresholds_preference import Co2ThresholdsPreference
 from preferences.app.database_preference import Databaseference
 from preferences.app.environment_preference import EnvironmentPreference
 from preferences.app.notify_preference import NotifyPreference
-from preferences.app.sensor_preference import _SensorsPreference
+from preferences.app.sensor_preference import SensorsPreference
 from preferences.app.smart_home_device_preference import SmartHomeDevicePreference
 from preferences.app.temperature_thresholds_preference import TemperatureThresholdsPreference
 from preferences.app.weather_forecast_preference import WeatherForecastPreference
@@ -16,6 +16,7 @@ class AppPreference(BaseModel):
     """
     アプリの設定を管理するクラス
     """
+
     awake_period: AwakePeriodPreference
     """起床時刻"""
     environment: EnvironmentPreference
@@ -24,7 +25,7 @@ class AppPreference(BaseModel):
     """温度防熱"""
     co2_thresholds: Co2ThresholdsPreference
     """CO2"""
-    sensors: _SensorsPreference
+    sensors: SensorsPreference
     """センサー"""
     circulator: CirculatorPreference
     """冷暖房"""

@@ -208,18 +208,6 @@ class AirconSettingsDeterminer:
             aircon_settings.fan_speed = AirconFanSpeed.HIGH
 
 
-    # @staticmethod
-    # def _adjust_for_solar(aircon_settings: AirconSettings):
-    #     reduce_heating = True
-    #     boost_aircon = True
-    #     if reduce_heating:
-    #         if aircon_settings.mode.is_heating:
-    #             aircon_settings.mode = AirconMode.FAN
-        
-    #     if boost_aircon:
-    #         if aircon_settings.mode.is_cooling:
-    #             aircon_settings.mode = AirconMode.FAN
-
     @staticmethod
     def _get_aircon_settings_for_conditions(
         aircon_settings: AirconSettings,

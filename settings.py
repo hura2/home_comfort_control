@@ -11,7 +11,9 @@ from preferences.yaml_loader import YamlLoader
 from translations.translated_pydantic_value_error import TranslatedPydanticValueError
 from util.string_helper import StringHelper
 
-# 日本時間を設定
+# DBのタイムゾーン
+DB_TZ = pytz.timezone("Asia/Tokyo")
+# 変換後のタイムゾーン
 LOCAL_TZ = pytz.timezone("Asia/Tokyo")
 
 i18n.set("file_format", "yaml")

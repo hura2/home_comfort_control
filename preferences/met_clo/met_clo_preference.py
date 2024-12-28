@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 from preferences.met_clo.high_temperature_preference import HighTemperaturePreference
 from preferences.met_clo.low_temperature_preference import LowTemperaturePreference
+from preferences.met_clo.solar_utilization_preference import SolarUtilizationPreference
 
 
 class MetCloPreference(BaseModel):
@@ -16,3 +17,6 @@ class MetCloPreference(BaseModel):
 
     low_temperature: LowTemperaturePreference
     """低温時の設定"""
+
+    solar_utilization:SolarUtilizationPreference
+    """太陽光利用"""

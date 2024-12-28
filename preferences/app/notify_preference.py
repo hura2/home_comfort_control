@@ -10,17 +10,17 @@ class NotifyPreference(BaseModel):
     通知設定全体を管理するクラス
     """
 
-    notifiers: list["_NotifierPreference"]  # 通知設定のリスト
+    notifiers: list["NotifierPreference"]  # 通知設定のリスト
     """通知設定のリスト"""
 
-    class _NotifierPreference(BaseModel):
+    class NotifierPreference(BaseModel):
         """各通知設定を管理するクラス"""
 
         type: NotificationChannel  # 通知チャンネル（LINE, DISCORD など）
         """通知チャンネル"""
         category: NotificationLevel  # 通知レベル（IMPORTANT, NORMAL など）
         """通知レベル"""
-        enable: bool  # 通知有効フラグ
+        enabled: bool  # 通知有効フラグ
         """通知有効フラグ"""
 
         @field_validator("type", mode="before")

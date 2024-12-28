@@ -1,12 +1,15 @@
 import inspect
 import logging
 import unicodedata
+from datetime import timezone
 from io import StringIO
 from typing import Tuple, Type
 
 import i18n
 
 from api.notify.notify_factory import NotifyFactory
+from models.weather_forecast_hourly_model import WeatherForecastHourlyModel
+from settings import DB_TZ, LOCAL_TZ
 from shared.dataclass.aircon_settings import AirconSettings
 from shared.dataclass.circulator_settings import CirculatorSettings
 from shared.dataclass.comfort_factors import ComfortFactors
@@ -282,14 +285,14 @@ class SystemEventLogger:
         """
         if current_aircon_settings is None:
             SystemEventLogger.log_info(
-                i18n.t("aircon_related.aircon_state_init"),
-                new_state=SystemEventLogger.format_settings(aircon_settings),
+                i18n.t("aircon_related.aircon_settings_init"),
+                new_settings=SystemEventLogger.format_settings(aircon_settings),
             )
         else:
             SystemEventLogger.log_info(
-                i18n.t("aircon_related.aircon_state_change"),
-                current_state=SystemEventLogger.format_settings(current_aircon_settings),
-                new_state=SystemEventLogger.format_settings(aircon_settings),
+                i18n.t("aircon_related.aircon_settings_change"),
+                current_settings=SystemEventLogger.format_settings(current_aircon_settings),
+                new_settings=SystemEventLogger.format_settings(aircon_settings),
             )
 
     @staticmethod
@@ -339,6 +342,37 @@ class SystemEventLogger:
             this_week_score=scores[2],
             yesterday_score=scores[3],
             today_score=scores[4],
+        )
+
+    @staticmethod
+    def log_closest_forecast_after(weather_forecast_hourly_model: WeatherForecastHourlyModel):
+        """
+        最近の天気予報をログに出力します。
+
+        Args:
+            weather_forecast_hourly_model (WeatherForecastHourlyModel): 最近の天気予報
+        """
+        SystemEventLogger.log_info(
+            i18n.t("aircon_related.closest_forecast_after"),
+            forecast_time=weather_forecast_hourly_model.forecast_time.replace(tzinfo=DB_TZ)
+            .astimezone(LOCAL_TZ)
+            .strftime("%Y-%m-%d %H:%M:%S"),
+            # cloud_percentageがNoneの場合はデフォルト値を使用
+            cloud_percentage=(
+                weather_forecast_hourly_model.cloud_percentage * 100
+                if weather_forecast_hourly_model.cloud_percentage is not None
+                else "N/A"
+            ),
+            weather=weather_forecast_hourly_model.weather,
+        )
+
+    @staticmethod
+    def log_solar_utilization_heating_reduction():
+        """
+        日射利用率の温暖化削減をログに出力します。
+        """
+        SystemEventLogger.log_info(
+            i18n.t("aircon_related.solar_utilization.heating_reduction")
         )
 
     @staticmethod

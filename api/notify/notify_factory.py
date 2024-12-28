@@ -40,7 +40,7 @@ class NotifyFactory:
         notifiers: list[tuple[NotifyInterface, NotificationLevel]] = []
 
         for notifier in app_preference.notify.notifiers:
-            if notifier.enable:
+            if notifier.enabled:
                 if notifier.type == NotificationChannel.LINE:
                     notifiers.append((LineNotify(), NotificationLevel.NORMAL))
                 elif notifier.type == NotificationChannel.DISCORD:

@@ -1,4 +1,6 @@
+from db.db_session_manager import DBSessionManager
 from logger.system_event_logger import SystemEventLogger
+from repository.services.weather_forecast_hourly_service import WeatherForecastHourlyService
 from settings import app_preference, met_clo_preference
 from shared.dataclass.comfort_factors import ComfortFactors
 from util.time_helper import TimeHelper
@@ -59,14 +61,14 @@ class MetCloAdjuster:
             ComfortFactors: 高温時のMETとCLOを含むインスタンス。
         """
         met = (
-            met_clo_preference.high_temperature.met.bedtime
+            met_clo_preference.high_temperature.met.sleeping
             if is_sleeping
-            else met_clo_preference.high_temperature.met.daytime
+            else met_clo_preference.high_temperature.met.awake
         )
         clo = (
-            met_clo_preference.high_temperature.clo.bedtime
+            met_clo_preference.high_temperature.clo.sleeping
             if is_sleeping
-            else met_clo_preference.high_temperature.clo.daytime
+            else met_clo_preference.high_temperature.clo.awake
         )
 
         # 食事時間帯によるMETの調整を実施
@@ -90,37 +92,40 @@ class MetCloAdjuster:
             ComfortFactors: METとCLO値を含むインスタンス。
         """
         met = (
-            met_clo_preference.low_temperature.met.bedtime
+            met_clo_preference.low_temperature.met.sleeping
             if is_sleeping
-            else met_clo_preference.low_temperature.met.daytime
+            else met_clo_preference.low_temperature.met.awake
         )
         clo = (
-            met_clo_preference.low_temperature.clo.bedtime
+            met_clo_preference.low_temperature.clo.sleeping
             if is_sleeping
-            else met_clo_preference.low_temperature.clo.daytime
+            else met_clo_preference.low_temperature.clo.awake
         )
 
         now = TimeHelper.get_current_time()
         # 高コスト時間帯でのmet調整
         current_day = now.weekday()
         for period in met_clo_preference.low_temperature.time.heating.high_costs:
-            if (current_day not in [5, 6]) and (period.start <= now.time() <= period.end):
+            if (current_day not in [5, 6]) and (period.start_time <= now.time() <= period.end_time):
                 met += period.met_adjustment
                 SystemEventLogger.log_info(
                     "icl_adjustment.high_cost",
-                    start_time=period.start,
-                    end_time=period.end,
+                    start_time=period.start_time,
+                    end_time=period.end_time,
                 )
 
         # 低コスト時間帯でのmet調整
         for period in met_clo_preference.low_temperature.time.heating.low_costs:
-            if (current_day not in [5, 6]) and (period.start <= now.time() <= period.end):
+            if (current_day not in [5, 6]) and (period.start_time <= now.time() <= period.end_time):
                 met += period.met_adjustment
                 SystemEventLogger.log_info(
                     "icl_adjustment.low_cost",
-                    start_time=period.start,
-                    end_time=period.end,
+                    start_time=period.start_time,
+                    end_time=period.end_time,
                 )
+
+        # 太陽光利用
+        met = MetCloAdjuster._adjust_for_solar(met)
 
         return ComfortFactors(met=met, clo=clo)
 
@@ -144,9 +149,9 @@ class MetCloAdjuster:
             ComfortFactors: METとCLO値を含むインスタンス。
         """
         met = (
-            met_clo_preference.low_temperature.met.bedtime
+            met_clo_preference.low_temperature.met.sleeping
             if is_sleeping
-            else met_clo_preference.low_temperature.met.daytime
+            else met_clo_preference.low_temperature.met.awake
         )
 
         clo = (
@@ -173,30 +178,83 @@ class MetCloAdjuster:
         # 食事時間帯の調整設定
         meal_adjustments = [
             (
-                met_clo_preference.high_temperature.time.lunch_time.use,
-                met_clo_preference.high_temperature.time.lunch_time.start,
-                met_clo_preference.high_temperature.time.lunch_time.end,
-                met_clo_preference.high_temperature.time.lunch_time.met_adjustment,
+                met_clo_preference.high_temperature.time.lunch.enabled,
+                met_clo_preference.high_temperature.time.lunch.start_time,
+                met_clo_preference.high_temperature.time.lunch.end_time,
+                met_clo_preference.high_temperature.time.lunch.met_adjustment,
             ),
             (
-                met_clo_preference.high_temperature.time.dinner_time.use,
-                met_clo_preference.high_temperature.time.dinner_time.start,
-                met_clo_preference.high_temperature.time.dinner_time.end,
-                met_clo_preference.high_temperature.time.dinner_time.met_adjustment,
+                met_clo_preference.high_temperature.time.dinner.enabled,
+                met_clo_preference.high_temperature.time.dinner.start_time,
+                met_clo_preference.high_temperature.time.dinner.end_time,
+                met_clo_preference.high_temperature.time.dinner.met_adjustment,
             ),
             (
-                met_clo_preference.high_temperature.time.pre_bedtime.use,
-                met_clo_preference.high_temperature.time.pre_bedtime.start,
-                met_clo_preference.high_temperature.time.pre_bedtime.end,
-                met_clo_preference.high_temperature.time.pre_bedtime.met_adjustment,
+                met_clo_preference.high_temperature.time.sleep_prep.enabled,
+                met_clo_preference.high_temperature.time.sleep_prep.start_time,
+                met_clo_preference.high_temperature.time.sleep_prep.end_time,
+                met_clo_preference.high_temperature.time.sleep_prep.met_adjustment,
             ),
         ]
 
         # 各食事時間帯に応じてMETを調整
-        for use, start, end, adjustment in meal_adjustments:
+        for enabled, start, end, adjustment in meal_adjustments:
             if (
-                use and start <= TimeHelper.get_current_time().time() <= end
+                enabled and start <= TimeHelper.get_current_time().time() <= end
             ):  # 設定が有効で、現在の時間帯に該当する場合
                 met = round(met + adjustment, 2)  # METを増加
 
+        return met
+
+    @staticmethod
+    def _adjust_for_solar(met: float) -> float:
+        """
+        太陽光利用による暖房抑制を考慮してMET値を調整する。
+
+        Args:
+            met (float): 調整前のMET値
+
+        Returns:
+            float: 調整後のMET値
+        """
+        # 現在の日時を取得
+        current_time = TimeHelper.get_current_time()
+
+        # 太陽光利用による暖房抑制が有効でない場合は何もせず返す
+        if not met_clo_preference.solar_utilization.heating_reduction.enabled:
+            return met
+
+        # 現在時刻が暖房抑制の設定時間外である場合は何もせず返す
+        heating_reduction = met_clo_preference.solar_utilization.heating_reduction
+        if not (heating_reduction.start_time <= current_time.time() <= heating_reduction.end_time):
+            return met
+
+        # データベースが無効化されている場合は何もせず返す
+        if not app_preference.database.enabled:
+            return met
+
+        # 現在時刻を基準に次の時間単位の天気予報を取得
+        next_hour_start = current_time.replace(minute=0, second=0, microsecond=0)
+        with DBSessionManager.session() as session:
+            weather_service = WeatherForecastHourlyService(session)
+            weather_forecast = weather_service.get_closest_forecast_after(next_hour_start)
+
+            # 天気予報データが存在する場合に処理を進める
+            if weather_forecast:
+                # ログに天気予報のデータを記録
+                SystemEventLogger.log_closest_forecast_after(weather_forecast)
+
+                # 曇り度が指定された閾値を下回る場合にMET値を調整
+                if (
+                    weather_forecast.cloud_percentage is not None
+                    and weather_forecast.cloud_percentage
+                    < heating_reduction.cloudiness_threshold / 100
+                ):
+                    # 曇り度が閾値を下回ることをログに記録
+                    SystemEventLogger.log_solar_utilization_heating_reduction()
+
+                    # 太陽光利用の効果を加味してMET値を調整
+                    return met + heating_reduction.met_adjustment
+
+        # デフォルトではMET値をそのまま返す
         return met

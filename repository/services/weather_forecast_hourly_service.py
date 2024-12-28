@@ -32,7 +32,7 @@ class WeatherForecastHourlyService:
     ) -> WeatherForecastHourlyModel:
         """
         時間単位の天気予報を新規に挿入する。
-        
+
         Args:
             weather_forecast_id (int): 天気予報ID
             weather_hourly (WeatherHourly): 気象情報
@@ -72,3 +72,15 @@ class WeatherForecastHourlyService:
             WeatherForecastHourlyModel: 天気予報
         """
         return self.query.get_by_forecast_time(forecast_time.isoformat())
+
+    def get_closest_forecast_after(self, forecast_time: datetime) -> WeatherForecastHourlyModel:
+        """
+        指定された日時を含まず、それ以降で直近の天気予報を取得する。
+
+        Args:
+            forecast_time (str): 天気予報の日付と時刻
+
+        Returns:
+            WeatherForecastHourlyModel: 指定された日時を含まない直近の天気予報
+        """
+        return self.query.get_closest_forecast_after(forecast_time.isoformat())

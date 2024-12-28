@@ -67,7 +67,7 @@ class MeasurementService:
             measurement_id=measurement.id, home_sensor=home_sensor
         )
 
-        if app_preference.circulator.use_circulator:
+        if app_preference.circulator.enabled:
             self.circulator_setting_service.insert(
                 measurement_id=measurement.id, circulator_settings=circulator_settings
             )

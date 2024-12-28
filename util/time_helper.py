@@ -2,6 +2,8 @@ from datetime import datetime
 
 import pytz
 
+from settings import LOCAL_TZ
+
 
 class TimeHelper:
     """
@@ -14,16 +16,6 @@ class TimeHelper:
     _now = None
 
     @staticmethod
-    def timezone():
-        """
-        タイムゾーンを設定します。
-
-        Returns:
-            tzinfo: タイムゾーン情報 (Asia/Tokyo など)
-        """
-        return pytz.timezone("Asia/Tokyo")
-
-    @staticmethod
     def get_current_time() -> datetime:
         """
         現在の日時情報を取得します。初回の呼び出し時に生成された情報を再利用します。
@@ -32,7 +24,7 @@ class TimeHelper:
             datetime: 現在の日時情報
         """
         if TimeHelper._now is None:
-            TimeHelper._now = datetime.now(TimeHelper.timezone())
+            TimeHelper._now = datetime.now(LOCAL_TZ)
         return TimeHelper._now
 
     @staticmethod

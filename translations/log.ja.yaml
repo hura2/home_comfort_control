@@ -23,15 +23,15 @@ ja:
 
   aircon_related:
     elapsed_time: "前回のエアコン設定からの経過: %{hours}時間%{minutes}分"
-    aircon_state_change: "%{current_state}から%{new_state}に変更"
-    aircon_state_init: "%{new_state}に変更"
+    aircon_settings_change: "%{current_settings}から%{new_settings}に変更"
+    aircon_settings_init: "%{new_settings}に変更"
     aircon_scores: |
       先々週のスコア平均: %{week_before_last_score}
       先週のスコア平均: %{last_week_score}
       今週のスコア平均: %{this_week_score}
       昨日のスコア: %{yesterday_score}
       今日のスコア予想: %{today_score}
-    aircon_settings_success: "エアコンの設定を送信しました: %{aircon_state}"
+    aircon_settings_success: "エアコンの設定を送信しました: %{aircon_settings}"
     aircon_settings_failed: "エアコンの設定を送信できませんでした。エラーメッセージ: %{error_message}"
     aircon_settings_retry: "別の方法で再送信を試みます"
     min_runtime_not_reached: "最低経過時間前なのでモードを継続します。経過時間:%{hours}時間%{minutes}分"
@@ -45,9 +45,11 @@ ja:
     aircon_mode_continue_and_update: "現在のモードを継続しつつ、設定を変更します"
     non_cooling_or_heating: "現在モードが冷房でも暖房でもない場合: %{current_mode}"
     indoor_temp_below_dewpoint: "室内温度が露点温度より低い。"
-    indoor_temp_below_dewpoint_high_pmv: "室内温度が露点温度より低いが、PMVが高い（%{pmv}）。"
+    indoor_temp_below_dewpoint_high_pmv: "室内温度が露点温度より低いが、PMVが高い（%{pmv}です。"
     room_temp_diff_high: "リビングと他の部屋の温度の差が%{temp_diff}度以上です。温度差改善のため風量を上げます。"
-
+    closest_forecast_after: "最も近い予報:%{forecast_time}、天気:%{weather}, 曇り度:%{cloud_percentage}%%"
+    solar_utilization:
+      heating_reduction: "太陽で温まるので暖房を抑制します。"
   humidity_related:
     absolute_humidity_threshold_exceeded: "絶対湿度が閾値(%{threshold})を超えました。"
 

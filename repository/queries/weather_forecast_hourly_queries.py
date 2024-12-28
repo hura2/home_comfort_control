@@ -76,3 +76,21 @@ class WeatherForecastHourlyQueries:
             .filter_by(forecast_time=forecast_time)
             .first()
         )
+    
+    def get_closest_forecast_after(self, forecast_time: str) -> WeatherForecastHourlyModel:
+        """
+        指定された日時を含まず、それ以降で直近の天気予報を取得する。
+
+        Args:
+            forecast_time (str): 天気予報の日付と時刻
+
+        Returns:
+            WeatherForecastHourlyModel: 指定された日時を含まない直近の天気予報
+        """
+        return (
+            self.session.query(WeatherForecastHourlyModel)
+            .filter(WeatherForecastHourlyModel.forecast_time > forecast_time)  # 指定日時「以降」ではなく「後」
+            .order_by(WeatherForecastHourlyModel.forecast_time.asc())          # 日時で昇順にソート
+            .first()                                                           # 最初のデータを取得
+        )
+
