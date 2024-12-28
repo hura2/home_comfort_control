@@ -22,6 +22,8 @@ def main():
     home_comfort_control.fetch_forecast()
     # 本日の最高気温を取得
     forecast_max_temperature = home_comfort_control.fetch_forecast_max_temperature()
+    # 現在時刻を基準に次の時間単位の天気予報を取得する
+    closest_future_forecast = home_comfort_control.get_closest_future_forecast()
     # センサー情報を取得
     home_sensor = home_comfort_control.initialize_home_sensor()
     # 外気の基準となる温度を決める
@@ -34,7 +36,7 @@ def main():
     # 就寝中かどうかを判断（起動時間内ならばFalse,それ以外はTrue）
     is_sleeping = home_comfort_control.is_within_sleeping_period()
     # ログに環境情報を出力
-    SystemEventLogger.log_environment_data(home_sensor, eff_temperature.forecast_temperature)
+    SystemEventLogger.log_environment_data(home_sensor, eff_temperature.forecast_temperature, closest_future_forecast)
     # METとICLの値を計算
     comfort_factors = MetCloAdjuster.calculate_comfort_factors(
         eff_temperature.value,

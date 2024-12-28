@@ -173,6 +173,7 @@ class SystemEventLogger:
     def log_environment_data(
         home_sensor: HomeSensor,
         forecast_max_temperature: float | None,
+        closest_future_forecast: WeatherForecastHourlyModel | None,
     ):
         """
         環境情報をログに出力します。
@@ -190,6 +191,8 @@ class SystemEventLogger:
             i18n.t("time_related.forecast_max_temp"),
             forecast_max_temperature=forecast_max_temperature,
         )
+        if closest_future_forecast:
+            SystemEventLogger.log_closest_forecast_after(closest_future_forecast)
         # CO2濃度があれば出力
         if home_sensor.main_co2_level:
             SystemEventLogger.log_info(
@@ -357,6 +360,7 @@ class SystemEventLogger:
             forecast_time=weather_forecast_hourly_model.forecast_time.replace(tzinfo=DB_TZ)
             .astimezone(LOCAL_TZ)
             .strftime("%Y-%m-%d %H:%M:%S"),
+            temperature=weather_forecast_hourly_model.temperature,
             # cloud_percentageがNoneの場合はデフォルト値を使用
             cloud_percentage=(
                 weather_forecast_hourly_model.cloud_percentage * 100
@@ -371,9 +375,7 @@ class SystemEventLogger:
         """
         日射利用率の温暖化削減をログに出力します。
         """
-        SystemEventLogger.log_info(
-            i18n.t("aircon_related.solar_utilization.heating_reduction")
-        )
+        SystemEventLogger.log_info(i18n.t("aircon_related.solar_utilization.heating_reduction"))
 
     @staticmethod
     def log_exception(e: Exception):

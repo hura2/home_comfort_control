@@ -47,7 +47,7 @@ en:
     indoor_temp_below_dewpoint: "Indoor temperature is below the dew point."
     indoor_temp_below_dewpoint_high_pmv: "Indoor temperature is below the dew point, but PMV is high (%{pmv})."
     room_temp_diff_high: "The temperature difference between the living room and other rooms is greater than %{temp_diff}°. Increasing air circulation to reduce the temperature difference."
-    closest_forecast_after: "Closest forecast: %{forecast_time}, Weather: %{weather}, Cloudiness: %{cloud_percentage}%%"
+    closest_forecast_after: "Closest forecast: %{forecast_time}, Temperature: %{temperature}°C, Weather: %{weather}, Cloudiness: %{cloud_percentage}%%"
     solar_utilization:
       heating_reduction: "Heating is reduced due to solar warming."
 

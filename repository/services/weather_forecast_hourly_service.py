@@ -6,6 +6,7 @@ from models.weather_forecast_hourly_model import WeatherForecastHourlyModel
 from repository.queries.weather_forecast_hourly_queries import WeatherForecastHourlyQueries
 from settings import LOCAL_TZ
 from shared.dataclass.weather_hourly import WeatherHourly
+from util.time_helper import TimeHelper
 
 
 class WeatherForecastHourlyService:
@@ -73,14 +74,12 @@ class WeatherForecastHourlyService:
         """
         return self.query.get_by_forecast_time(forecast_time.isoformat())
 
-    def get_closest_forecast_after(self, forecast_time: datetime) -> WeatherForecastHourlyModel:
+    def get_closest_future_forecast(self) -> WeatherForecastHourlyModel:
         """
         指定された日時を含まず、それ以降で直近の天気予報を取得する。
 
-        Args:
-            forecast_time (str): 天気予報の日付と時刻
 
         Returns:
-            WeatherForecastHourlyModel: 指定された日時を含まない直近の天気予報
+            WeatherForecastHourlyModel: 直近の天気予報
         """
-        return self.query.get_closest_forecast_after(forecast_time.isoformat())
+        return self.query.get_closest_forecast_after(TimeHelper.get_current_time().isoformat())

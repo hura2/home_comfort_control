@@ -47,7 +47,7 @@ ja:
     indoor_temp_below_dewpoint: "室内温度が露点温度より低い。"
     indoor_temp_below_dewpoint_high_pmv: "室内温度が露点温度より低いが、PMVが高い（%{pmv}です。"
     room_temp_diff_high: "リビングと他の部屋の温度の差が%{temp_diff}度以上です。温度差改善のため風量を上げます。"
-    closest_forecast_after: "最も近い予報:%{forecast_time}、天気:%{weather}, 曇り度:%{cloud_percentage}%%"
+    closest_forecast_after: "最も近い予報:%{forecast_time}、気温:%{temperature}°C, 天気:%{weather}, 曇り度:%{cloud_percentage}%%"
     solar_utilization:
       heating_reduction: "太陽で温まるので暖房を抑制します。"
   humidity_related:

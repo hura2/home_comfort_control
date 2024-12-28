@@ -8,11 +8,13 @@ from devices.aircon.aircon_settings_determiner import AirconSettingsDeterminer
 from devices.aircon.aircon_state_manager import AirconStateManager
 from devices.circulator import Circulator
 from logger.system_event_logger import SystemEventLogger
+from models.weather_forecast_hourly_model import WeatherForecastHourlyModel
 from repository.services.aircon_change_intarval_service import AirconChangeIntarvalService
 from repository.services.aircon_intensity_score_service import AirconIntensityScoreService
 from repository.services.aircon_setting_service import AirconSettingService
 from repository.services.circulator_setting_service import CirculatorSettingService
 from repository.services.measurement_service import MeasurementService
+from repository.services.weather_forecast_hourly_service import WeatherForecastHourlyService
 from repository.services.weather_forecast_service import WeatherForecastService
 from settings import LOCAL_TZ, app_preference
 from shared.dataclass.aircon_settings import AirconSettings
@@ -310,3 +312,15 @@ class HomeComfortControl:
                 # 昨日のエアコン強度スコアを登録
                 aircon_intensity_score_service = AirconIntensityScoreService(session)
                 aircon_intensity_score_service.register_yesterday_intensity_score()
+
+    def get_closest_future_forecast(self) -> WeatherForecastHourlyModel | None:
+        """
+        現在時刻を基準に次の時間単位の天気予報を取得する
+        Returns:
+            WeatherForecastHourlyModel: 天気予報データ
+        """
+        if app_preference.database.enabled:
+            with DBSessionManager.session() as session:
+                weather_service = WeatherForecastHourlyService(session)
+                return weather_service.get_closest_future_forecast()
+        return None

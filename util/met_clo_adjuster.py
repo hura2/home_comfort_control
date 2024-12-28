@@ -234,15 +234,12 @@ class MetCloAdjuster:
             return met
 
         # 現在時刻を基準に次の時間単位の天気予報を取得
-        next_hour_start = current_time.replace(minute=0, second=0, microsecond=0)
         with DBSessionManager.session() as session:
             weather_service = WeatherForecastHourlyService(session)
-            weather_forecast = weather_service.get_closest_forecast_after(next_hour_start)
+            weather_forecast = weather_service.get_closest_future_forecast()
 
             # 天気予報データが存在する場合に処理を進める
             if weather_forecast:
-                # ログに天気予報のデータを記録
-                SystemEventLogger.log_closest_forecast_after(weather_forecast)
 
                 # 曇り度が指定された閾値を下回る場合にMET値を調整
                 if (
