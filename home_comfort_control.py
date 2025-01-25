@@ -108,14 +108,25 @@ class HomeComfortControl:
             bool: 就寝時間内ならTrue、それ以外ならFalse
         """
         now = TimeHelper.get_current_time()
-        # 起床時間を取得
-        awake_period_start = LOCAL_TZ.localize(
-            datetime.datetime.combine(now.date(), app_preference.awake_period.start_time)
-        )
-        # 就寝時間を取得
-        awake_period_end = LOCAL_TZ.localize(
-            datetime.datetime.combine(now.date(), app_preference.awake_period.end_time)
-        )
+        if now.date().weekday() < 5:  # 土曜(5)または日曜(6)を休日と判定
+            # 起床時間を取得
+            awake_period_start = LOCAL_TZ.localize(
+                datetime.datetime.combine(now.date(), app_preference.weekday_awake_period.start_time)
+            )
+            # 就寝時間を取得
+            awake_period_end = LOCAL_TZ.localize(
+                datetime.datetime.combine(now.date(), app_preference.weekday_awake_period.end_time)
+            )
+        else:
+            # 起床時間を取得
+            awake_period_start = LOCAL_TZ.localize(
+                datetime.datetime.combine(now.date(), app_preference.weekend_awake_period.start_time)
+            )
+            # 就寝時間を取得
+            awake_period_end = LOCAL_TZ.localize(
+                datetime.datetime.combine(now.date(), app_preference.weekend_awake_period.end_time)
+            )
+
         # 就寝中かどうかを判断（起床時間内ならFalse、それ以外ならTrue）
         return awake_period_start > now or awake_period_end < now
 

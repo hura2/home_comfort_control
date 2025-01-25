@@ -17,8 +17,10 @@ class AppPreference(BaseModel):
     アプリの設定を管理するクラス
     """
 
-    awake_period: AwakePeriodPreference
-    """起床時刻"""
+    weekday_awake_period: AwakePeriodPreference
+    """平日活動期間"""
+    weekend_awake_period: AwakePeriodPreference
+    """休日活動期間"""
     environment: EnvironmentPreference
     """環境"""
     temperature_thresholds: TemperatureThresholdsPreference
