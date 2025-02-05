@@ -102,27 +102,29 @@ class MetCloAdjuster:
             else met_clo_preference.low_temperature.clo.awake
         )
 
-        now = TimeHelper.get_current_time()
-        # 高コスト時間帯でのmet調整
-        current_day = now.weekday()
-        for period in met_clo_preference.low_temperature.time.heating.high_costs:
-            if (current_day not in [5, 6]) and (period.start_time <= now.time() <= period.end_time):
-                met += period.met_adjustment
-                SystemEventLogger.log_info(
-                    "icl_adjustment.high_cost",
-                    start_time=period.start_time,
-                    end_time=period.end_time,
-                )
+        if met_clo_preference.low_temperature.time.heating.enabled:
+            # 暖房抑制を適用
+            now = TimeHelper.get_current_time()
+            # 高コスト時間帯でのmet調整
+            current_day = now.weekday()
+            for period in met_clo_preference.low_temperature.time.heating.high_costs:
+                if (current_day not in [5, 6]) and (period.start_time <= now.time() <= period.end_time):
+                    met += period.met_adjustment
+                    SystemEventLogger.log_info(
+                        "icl_adjustment.high_cost",
+                        start_time=period.start_time,
+                        end_time=period.end_time,
+                    )
 
-        # 低コスト時間帯でのmet調整
-        for period in met_clo_preference.low_temperature.time.heating.low_costs:
-            if (current_day not in [5, 6]) and (period.start_time <= now.time() <= period.end_time):
-                met += period.met_adjustment
-                SystemEventLogger.log_info(
-                    "icl_adjustment.low_cost",
-                    start_time=period.start_time,
-                    end_time=period.end_time,
-                )
+            # 低コスト時間帯でのmet調整
+            for period in met_clo_preference.low_temperature.time.heating.low_costs:
+                if (current_day not in [5, 6]) and (period.start_time <= now.time() <= period.end_time):
+                    met += period.met_adjustment
+                    SystemEventLogger.log_info(
+                        "icl_adjustment.low_cost",
+                        start_time=period.start_time,
+                        end_time=period.end_time,
+                    )
 
         # 太陽光利用
         met = MetCloAdjuster._adjust_for_solar(met)
