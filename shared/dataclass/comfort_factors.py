@@ -12,5 +12,5 @@ class ComfortFactors(BaseModel):
 
     met: float = Field(..., ge=0.8, le=3.0, description="MET値（0.8〜3.0の範囲で指定）")
     """MET値"""
-    clo: float = Field(..., ge=0.0, le=2.5, description="CLO値（0.0〜2.5の範囲で指定）")
+    clo: float = Field(..., ge=0.0, le=3.0, description="CLO値（0.0〜3.0の範囲で指定）")
     """CLO値"""

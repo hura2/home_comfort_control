@@ -4,7 +4,7 @@ weekday_awake_period:
   end_time: "22:50"    # 就寝時間（活動を終了する時間）
 # 休日の活動期間の設定
 weekend_awake_period:
-  start_time: "07:00"  # 起床時間（活動を開始する時間）
+  start_time: "06:30"  # 起床時間（活動を開始する時間）
   end_time: "22:50"    # 就寝時間（活動を終了する時間）
 
 # 湿度およびPMVに関する設定
