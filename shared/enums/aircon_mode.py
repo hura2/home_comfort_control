@@ -6,8 +6,8 @@ class AirconMode(AttributesEnum):
 
     AUTO = Attributes(1, "自動")
     COOLING = Attributes(2, "冷房")
-    FAN = Attributes(3, "送風")
-    DRY = Attributes(4, "ドライ")
+    FAN = Attributes(4, "送風")
+    DRY = Attributes(3, "ドライ")
     HEATING = Attributes(5, "暖房")
     POWERFUL_COOLING = Attributes(6, "パワフル冷房")
     POWERFUL_HEATING = Attributes(7, "パワフル暖房")
