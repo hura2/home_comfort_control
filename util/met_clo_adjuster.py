@@ -159,7 +159,8 @@ class MetCloAdjuster:
         clo = (
             max(1.00 - 0.025 * max(min(temperature, 40) - 10, 0), 0.7)
             if not is_sleeping
-            else max(2.0 - 0.06 * max(min(temperature, 15) - 9, 0), 1.2)
+            # else max(2.0 - 0.06 * max(min(temperature, 15) - 9, 0), 1.2)
+            else max(2.0 - 0.10 * max(min(temperature, 15) - 9, 0), 1.2)
         )
 
         return ComfortFactors(met=met, clo=clo)
