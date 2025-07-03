@@ -57,7 +57,7 @@ aircon_settings:  # PMV閾値設定
   dry:  # 露害設定
     aircon_settings:
       temperature: "26"  # 露害温度（度）
-      mode: POWERFUL_HEATING
+      mode: POWERFUL_COOLING
       fan_speed: HIGH
       power: ON
   weakest_cooling:  # 冷房時の設定
