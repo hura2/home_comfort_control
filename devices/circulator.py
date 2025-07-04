@@ -110,15 +110,15 @@ class Circulator:
         circulator_settings = CirculatorSettings()  # サーキュレーターの状態を取得
 
         # 最高気温が設定した高温の判断基準温度を超えているか確認
-        if outdoor_temperature >= app_preference.temperature_thresholds.high:
-            circulator_settings.power = PowerMode.ON  # サーキュレーターをオンにする
+        # if outdoor_temperature >= app_preference.temperature_thresholds.high:
+            # circulator_settings.power = PowerMode.ON  # サーキュレーターをオンにする
             # PMVがしきい値以上または絶対湿度が除湿しきい値以上の場合
-            if (
-                pmv >= app_preference.environment.pmv_threshold
-                or absolute_humidity >= app_preference.environment.dehumidification_threshold
-            ):
-                circulator_settings.fan_speed = 2  # サーキュレーターを稼働するスピードを設定
-            else:
-                circulator_settings.fan_speed = 0  # サーキュレーターを停止する
+            # if (
+            #     pmv >= app_preference.environment.pmv_threshold
+            #     or absolute_humidity >= app_preference.environment.dehumidification_threshold
+            # ):
+            #     circulator_settings.fan_speed = 2  # サーキュレーターを稼働するスピードを設定
+            # else:
+            #     circulator_settings.fan_speed = 0  # サーキュレーターを停止する
 
         return circulator_settings  # サーキュレーターの稼働状態とスピードを返す
