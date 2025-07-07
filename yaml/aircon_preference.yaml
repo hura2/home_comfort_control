@@ -42,7 +42,7 @@ aircon_settings:  # PMV閾値設定
         mode: COOLING     # モードを冷房に設定
         fan_speed: HIGH  # 停止時の風速
         power: ON
-    - threshold: 0.2    # PMVが0.2の場合
+    - threshold: 0.3    # PMVが0.2の場合
       aircon_settings:
         temperature: "24"       # 温度設定を24度にする
         mode: COOLING     # モードを冷房に設定
