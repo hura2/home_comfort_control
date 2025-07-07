@@ -34,19 +34,19 @@ aircon_settings:  # PMV閾値設定
       aircon_settings:
         temperature: "26"       # 温度設定を26度にする
         mode: COOLING     # モードを冷房に設定
-        fan_speed: HIGH  # 停止時の風速
+        fan_speed: AUTO  # 停止時の風速
         power: ON
     - threshold: 0.18   # PMVが0.18の場合
       aircon_settings:
         temperature: "25"       # 温度設定を25度にする
         mode: COOLING     # モードを冷房に設定
-        fan_speed: HIGH  # 停止時の風速
+        fan_speed: AUTO  # 停止時の風速
         power: ON
     - threshold: 0.5    # PMVが0.5の場合
       aircon_settings:
         temperature: "24"       # 温度設定を24度にする
         mode: COOLING     # モードを冷房に設定
-        fan_speed: HIGH  # 停止時の風速
+        fan_speed: AUTO  # 停止時の風速
         power: ON
     - threshold: 1      # PMVが1の場合
       aircon_settings:
@@ -58,7 +58,7 @@ aircon_settings:  # PMV閾値設定
     aircon_settings:
       temperature: "25"  # 露害温度（度）
       mode: DRY
-      fan_speed: HIGH
+      fan_speed: AUTO
       power: ON
   weakest_cooling:  # 冷房時の設定
     aircon_settings:
