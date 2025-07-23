@@ -55,8 +55,4 @@ class AirconChangeIntarvalService:
         if not aircon_change_interval:
             return None, None
 
-        duration_minutes = aircon_change_interval.duration_minutes  # 最小運転時間を取得
-        start_time = TimeHelper.parse_datetime_string(
-            aircon_change_interval.start_time
-        )  # 開始時刻を解析
-        return duration_minutes, start_time
+        return aircon_change_interval.duration_minutes, aircon_change_interval.start_time
