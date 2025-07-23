@@ -77,7 +77,7 @@ conditional:  # 特定の条件下での設定
   cooling:  # 冷房を有効にするための基準
     activation:
       outdoor_temperature_diff: 5  # 外気温との差（度）
-      threshold: 0.4  # 冷房を有効にするためのPMV閾値
+      threshold: 0.5  # 冷房を有効にするためのPMV閾値
     off_state:
       aircon_settings:
         temperature: "28"  # 停止時の送風温度（度）
