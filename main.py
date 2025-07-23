@@ -39,9 +39,10 @@ def main():
     SystemEventLogger.log_environment_data(home_sensor, eff_temperature.forecast_temperature, closest_future_forecast)
     # METとICLの値を計算
     comfort_factors = MetCloAdjuster.calculate_comfort_factors(
-        eff_temperature.value,
+        eff_temperature,
         is_sleeping,
     )
+    print(comfort_factors)
     # PMV値を計算
     pmv_result = ThermalComfort.calculate_pmv(home_sensor, eff_temperature.value, comfort_factors)
     # 高温条件の場合の、サーキュレーターの状態を取得

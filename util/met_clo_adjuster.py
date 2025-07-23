@@ -3,6 +3,7 @@ from logger.system_event_logger import SystemEventLogger
 from repository.services.weather_forecast_hourly_service import WeatherForecastHourlyService
 from settings import app_preference, met_clo_preference
 from shared.dataclass.comfort_factors import ComfortFactors
+from shared.dataclass.effective_outdoor_temperature import EffectiveOutdoorTemperature
 from util.time_helper import TimeHelper
 
 
@@ -16,7 +17,7 @@ class MetCloAdjuster:
     """
 
     @staticmethod
-    def calculate_comfort_factors(temperature: float, is_sleeping: bool) -> ComfortFactors:
+    def calculate_comfort_factors(temperature: EffectiveOutdoorTemperature, is_sleeping: bool) -> ComfortFactors:
         """
         ComfortFactorsを計算し、返す。
 
@@ -24,16 +25,16 @@ class MetCloAdjuster:
         - 高温、低温、中間の条件に分類してそれぞれのロジックを適用。
 
         引数:
-            outdoor_temperature (float): 外気温（摂氏）。
-            forecast_max_temperature (float): 予報された最高気温（摂氏）。
+            temperature (EffectiveOutdoorTemperature): 外気温（摂氏） 予報された最高気温（摂氏）。
             is_sleeping (bool): 就寝中かどうかのフラグ。
 
         戻り値:
             ComfortFactors: METとCLO値を含むインスタンス。
         """
-        now = TimeHelper.get_current_time()
-
-        match temperature:
+        if (temperature.forecast_temperature or 0) >= app_preference.temperature_thresholds.high:
+            return MetCloAdjuster._calculate_high_temp_comfort_factors(is_sleeping)
+         
+        match temperature.value:
             case temp if temp >= app_preference.temperature_thresholds.high:
                 # 高温条件の処理
                 return MetCloAdjuster._calculate_high_temp_comfort_factors(is_sleeping)
@@ -42,7 +43,7 @@ class MetCloAdjuster:
                 return MetCloAdjuster._calculate_low_temp_comfort_factors(is_sleeping)
             case _:
                 # 中間温度条件の処理
-                return MetCloAdjuster._calculate_mid_temp_comfort_factors(temperature, is_sleeping)
+                return MetCloAdjuster._calculate_mid_temp_comfort_factors(temperature.value, is_sleeping)
 
     @staticmethod
     def _calculate_high_temp_comfort_factors(is_sleeping: bool) -> ComfortFactors:
@@ -70,7 +71,7 @@ class MetCloAdjuster:
             if is_sleeping
             else met_clo_preference.high_temperature.clo.awake
         )
-
+        print(f"met: {met}, clo: {clo}")
         # 食事時間帯によるMETの調整を実施
         met = MetCloAdjuster.adjust_met_for_meal_times(met)
         return ComfortFactors(met=met, clo=clo)
