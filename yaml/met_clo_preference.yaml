@@ -3,7 +3,7 @@ high_temperature: # 高温時特有の設定
     awake: 1.0 # 日中の代謝量
     sleeping: 0.8 # 就寝時の代謝量
   clo: # 着衣量に関する設定
-    awake: 0.5 # 日中の着衣量
+    awake: 0.6 # 日中の着衣量
     sleeping: 0.8 # 就寝時の着衣量
   time: # 時間帯に関する設定
     lunch: # 昼食に関する時間設定
