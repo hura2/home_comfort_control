@@ -21,13 +21,13 @@ aircon_settings:  # PMV閾値設定
     - threshold: 0      # PMVが0の場合
       aircon_settings:
         temperature: "28"       # 温度設定を28度にする
-        mode: FAN         # モードをファンに設定
+        mode: COOLING         # モードをファンに設定
         fan_speed: LOW    # ファンの速度を低に設定
         power: ON
     - threshold: 0.1    # PMVが0.1の場合
       aircon_settings:
         temperature: "28"       # 温度設定を28度にする
-        mode: FAN         # モードをファンに設定
+        mode: COOLING         # モードをファンに設定
         fan_speed: LOW    # ファンの速度を低に設定
         power: ON
     - threshold: 0.15   # PMVが0.15の場合
