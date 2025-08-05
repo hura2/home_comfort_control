@@ -9,6 +9,9 @@ weekend_awake_period:
 
 # 快適管理設定
 comfort_control:
+  solar_panel_enabled: true
+  solar_active_hours: "8:00-17:00"
+  solar_cloud_threshold: 70  # 曇り度の閾値（％）
   disabled_periods:
     - day: "月"
       times:
@@ -25,6 +28,7 @@ comfort_control:
     - day: "金"
       times:
         - "8:00-17:00"
+  
 
 # 湿度およびPMVに関する設定
 environment:

@@ -60,7 +60,7 @@ def main():
 
     # PMVを元にエアコンの設定を判断
     aircon_settings = home_comfort_control.update_aircon_settings(
-        home_sensor, pmv_result, eff_temperature.value, is_sleeping
+        home_sensor, pmv_result, eff_temperature.value, closest_future_forecast, is_sleeping
     )
     # サーキュレーターの状態を更新
     circulator_settings = home_comfort_control.update_circulator_settings(

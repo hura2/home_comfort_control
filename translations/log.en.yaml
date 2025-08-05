@@ -68,6 +68,9 @@ en:
   comfort_control_disabled:
     all_day: "Disabled period: %{weekday}"
     specific_period: "Disabled period: %{weekday} %{start_time} to %{end_time}"
-    
+    solar_panel_enabled: "Enable solar power usage"
+    solar_active_hours: "Solar power active hours: %{start_time} to %{end_time}"
+    solar_cloud_threshold: "Cloudiness is below %{threshold}%, so air conditioning control is active"
+
   exception_related:
     exception_occurred: "Exception occurred: %{exception}"

@@ -16,7 +16,7 @@ from repository.services.circulator_setting_service import CirculatorSettingServ
 from repository.services.measurement_service import MeasurementService
 from repository.services.weather_forecast_hourly_service import WeatherForecastHourlyService
 from repository.services.weather_forecast_service import WeatherForecastService
-from settings import LOCAL_TZ, app_preference,aircon_preference
+from settings import LOCAL_TZ, aircon_preference, app_preference
 from shared.dataclass.aircon_settings import AirconSettings
 from shared.dataclass.circulator_settings import CirculatorSettings
 from shared.dataclass.comfort_factors import ComfortFactors
@@ -188,6 +188,7 @@ class HomeComfortControl:
         home_sensor: HomeSensor,
         pmv_result: PMVResult,
         outdoor_temperature: float,
+        closest_future_forecast: WeatherForecastHourlyModel | None,
         is_sleeping: bool,
     ) -> AirconSettings:
         """
@@ -196,13 +197,46 @@ class HomeComfortControl:
             home_sensor (HomeSensor): 家の温度と湿度データ
             pmv_result (PMVResults): PMV計算結果
             outdoor_temperature (float): 外気温度
+            closest_future_forecast (WeatherForecastHourlyModel | None): 最も近い未来の天気予報
             is_sleeping (bool): 寝ている時間
         """
-        #無効な曜日かどうかを判断
+
+        # 現在が快適管理の無効期間（曜日・時間帯）かどうかを判定
         if self.is_comfort_control_disabled():
+            # 無効期間の場合は、まず事前に設定されたエアコンのオフ状態の設定を適用する
             aircon_settings = aircon_preference.conditional.cooling.off_state.aircon_settings
+
+            # ただし太陽光パネルが有効ならば、現在時刻と曇り度をチェックして調整を行う
+            if app_preference.comfort_control.solar_panel_enabled:
+                SystemEventLogger.log_info("comfort_control_disabled.solar_panel_enabled")
+                current_time = TimeHelper.get_current_time().time()  # 現在の時刻を取得
+                active_hours = (
+                    app_preference.comfort_control.solar_active_hours
+                )  # 太陽光パネルの有効時間帯を取得
+                # 現在時刻が太陽光パネルの有効時間帯内かどうか確認
+                if active_hours.start_time <= current_time <= active_hours.end_time:
+                    SystemEventLogger.log_info(
+                        "comfort_control_disabled.solar_active_hours",
+                        start_time=active_hours.start_time,
+                        end_time=active_hours.end_time,
+                    )
+                    # 予報情報が存在し、曇り度（cloud_percentage）が閾値未満なら快晴と判断
+                    if (
+                        closest_future_forecast is not None
+                        and closest_future_forecast.cloud_percentage is not None
+                        and closest_future_forecast.cloud_percentage
+                        < app_preference.comfort_control.solar_cloud_threshold * 0.01
+                    ):
+                        SystemEventLogger.log_info(
+                            "comfort_control_disabled.solar_cloud_threshold",
+                            threshold=app_preference.comfort_control.solar_cloud_threshold,
+                        )
+                        # 快晴のため、PMV計算結果に基づいて最適なエアコン設定を決定する
+                        aircon_settings = AirconSettingsDeterminer.determine_aircon_settings(
+                            pmv_result, home_sensor, is_sleeping
+                        )
         else:
-            # PMVを元にエアコンの設定を判断
+            # 無効期間でなければ常にPMV計算に基づく最適なエアコン設定を適用する
             aircon_settings = AirconSettingsDeterminer.determine_aircon_settings(
                 pmv_result, home_sensor, is_sleeping
             )

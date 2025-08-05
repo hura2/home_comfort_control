@@ -67,6 +67,9 @@ ja:
   comfort_control_disabled:
     all_day: "無効期間です：%{weekday}曜日"
     specific_period: "無効期間です：%{weekday}曜日 %{start_time}〜%{end_time}"
+    solar_panel_enabled: "太陽光発電利用を有効化"
+    solar_active_hours: "太陽光発電利用時間内です：%{start_time}〜%{end_time}"
+    solar_cloud_threshold: "曇り度が%{threshold}%以下なので空調管理を実行"
 
   exception_related:
     exception_occurred: "例外発生: %{exception}"
