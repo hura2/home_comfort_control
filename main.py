@@ -7,7 +7,6 @@ from api.notify.notify_factory import NotifyFactory
 from api.smart_home_devices.smart_home_device_exception import SmartHomeDeviceException
 from home_comfort_control import HomeComfortControl
 from logger.system_event_logger import SystemEventLogger, logger
-from settings import app_preference
 from shared.dataclass.effective_outdoor_temperature import EffectiveOutdoorTemperature
 from translations.translated_value_error import TranslatedValueError
 from util.met_clo_adjuster import MetCloAdjuster
@@ -42,7 +41,6 @@ def main():
         eff_temperature,
         is_sleeping,
     )
-    print(comfort_factors)
     # PMV値を計算
     pmv_result = ThermalComfort.calculate_pmv(home_sensor, eff_temperature.value, comfort_factors)
     # 高温条件の場合の、サーキュレーターの状態を取得
@@ -59,6 +57,7 @@ def main():
 
     # 結果をログに出力
     SystemEventLogger.log_pmv(pmv_result, comfort_factors)
+
     # PMVを元にエアコンの設定を判断
     aircon_settings = home_comfort_control.update_aircon_settings(
         home_sensor, pmv_result, eff_temperature.value, is_sleeping
@@ -83,7 +82,7 @@ if __name__ == "__main__":
     # 環境変数の読み込み
     # 明示的に環境変数をクリア
     # os.environ.clear()
-    load_dotenv(".env", override=True)
+    # load_dotenv(".env", override=True)
     try:
         main()
         notify_manager = NotifyFactory.create_manager()

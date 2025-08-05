@@ -7,6 +7,25 @@ weekend_awake_period:
   start_time: "06:30"  # 起床時間（活動を開始する時間）
   end_time: "22:50"    # 就寝時間（活動を終了する時間）
 
+# 快適管理設定
+comfort_control:
+  disabled_periods:
+    - day: "月"
+      times:
+        - "8:00-17:00"
+    - day: "火" # 終日無効にする場合は、timesリストを省略する
+      times:
+        - "8:00-17:00"
+    - day: "水"
+      times:
+        - "8:00-17:00"
+    - day: "木"
+      times:
+        - "8:00-17:00"
+    - day: "金"
+      times:
+        - "8:00-17:00"
+
 # 湿度およびPMVに関する設定
 environment:
   dehumidification_threshold: 13.0  # 除湿運転を開始するしきい値（絶対湿度 g/m³）

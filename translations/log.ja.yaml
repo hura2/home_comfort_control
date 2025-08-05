@@ -64,5 +64,9 @@ ja:
     circulator_off_notify: "サーキュレーターの電源をOFFに設定"
     circulator_on_notify: "サーキュレーターの風量を%{new_fan_speed}に設定"
 
+  comfort_control_disabled:
+    all_day: "無効期間です：%{weekday}曜日"
+    specific_period: "無効期間です：%{weekday}曜日 %{start_time}〜%{end_time}"
+
   exception_related:
     exception_occurred: "例外発生: %{exception}"

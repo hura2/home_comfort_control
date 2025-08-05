@@ -25,6 +25,9 @@ en:
       convert_power_to_enum: "The specified power [%{power}] is not supported."
     heating_reduction_preference:
       validate_and_convert_time: "[%{value}] must be in time format. Example: 10:00"
+    comfort_period_preference:
+      validate_day_and_store_index: "[%{value}] must be one of: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, or Sunday."
+      validate_times: "[%{value}] must be in a valid time range format. Example: 10:00-11:00"
   message_map:
     "Input should be a valid number, unable to parse string as a number": "The input should be a valid number."
     "Input should be a valid boolean, unable to interpret input": "The input should be true or false."

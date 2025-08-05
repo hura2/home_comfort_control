@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from preferences.app.awake_period_preference import AwakePeriodPreference
 from preferences.app.circulator_preference import CirculatorPreference
 from preferences.app.co2_thresholds_preference import Co2ThresholdsPreference
+from preferences.app.comfort_control_preference import ComfortControlPreference
 from preferences.app.database_preference import Databaseference
 from preferences.app.environment_preference import EnvironmentPreference
 from preferences.app.notify_preference import NotifyPreference
@@ -21,6 +22,8 @@ class AppPreference(BaseModel):
     """平日活動期間"""
     weekend_awake_period: AwakePeriodPreference
     """休日活動期間"""
+    comfort_control: ComfortControlPreference
+    """快適管理"""
     environment: EnvironmentPreference
     """環境"""
     temperature_thresholds: TemperatureThresholdsPreference

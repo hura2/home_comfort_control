@@ -25,6 +25,9 @@ ja:
       convert_power_to_enum: "指定された電源[%{power}]はサポートされていません。"
     heating_reduction_preference:
       validate_and_convert_time: "[%{value}]は時刻形式である必要があります。例: 10:00"
+    comfort_period_preference:
+      validate_day_and_store_index: "[%{value}]は「月」「火」「水」「木」「金」「土」「日」のいずれかを指定してください。"
+      validate_times: "[%{value}]は時刻形式である必要があります。例: 10:00-11:00"
   message_map:
     "Input should be a valid number, unable to parse string as a number": "入力値は有効な数字である必要があります"
     "Input should be a valid boolean, unable to interpret input": "入力値はtrueかfalseである必要があります"

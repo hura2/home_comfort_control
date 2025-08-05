@@ -16,7 +16,7 @@ from repository.services.circulator_setting_service import CirculatorSettingServ
 from repository.services.measurement_service import MeasurementService
 from repository.services.weather_forecast_hourly_service import WeatherForecastHourlyService
 from repository.services.weather_forecast_service import WeatherForecastService
-from settings import LOCAL_TZ, app_preference
+from settings import LOCAL_TZ, app_preference,aircon_preference
 from shared.dataclass.aircon_settings import AirconSettings
 from shared.dataclass.circulator_settings import CirculatorSettings
 from shared.dataclass.comfort_factors import ComfortFactors
@@ -25,6 +25,7 @@ from shared.dataclass.pmv_result import PMVResult
 from shared.enums.power_mode import PowerMode
 from util.thermal_comfort import ThermalComfort
 from util.time_helper import TimeHelper
+from util.weekday_helper import WeekdayHelper
 
 
 class HomeComfortControl:
@@ -111,7 +112,9 @@ class HomeComfortControl:
         if now.date().weekday() < 5:  # 土曜(5)または日曜(6)を休日と判定
             # 起床時間を取得
             awake_period_start = LOCAL_TZ.localize(
-                datetime.datetime.combine(now.date(), app_preference.weekday_awake_period.start_time)
+                datetime.datetime.combine(
+                    now.date(), app_preference.weekday_awake_period.start_time
+                )
             )
             # 就寝時間を取得
             awake_period_end = LOCAL_TZ.localize(
@@ -120,7 +123,9 @@ class HomeComfortControl:
         else:
             # 起床時間を取得
             awake_period_start = LOCAL_TZ.localize(
-                datetime.datetime.combine(now.date(), app_preference.weekend_awake_period.start_time)
+                datetime.datetime.combine(
+                    now.date(), app_preference.weekend_awake_period.start_time
+                )
             )
             # 就寝時間を取得
             awake_period_end = LOCAL_TZ.localize(
@@ -193,10 +198,14 @@ class HomeComfortControl:
             outdoor_temperature (float): 外気温度
             is_sleeping (bool): 寝ている時間
         """
-        # PMVを元にエアコンの設定を判断
-        aircon_settings = AirconSettingsDeterminer.determine_aircon_settings(
-            pmv_result, home_sensor, is_sleeping
-        )
+        #無効な曜日かどうかを判断
+        if self.is_comfort_control_disabled():
+            aircon_settings = aircon_preference.conditional.cooling.off_state.aircon_settings
+        else:
+            # PMVを元にエアコンの設定を判断
+            aircon_settings = AirconSettingsDeterminer.determine_aircon_settings(
+                pmv_result, home_sensor, is_sleeping
+            )
 
         if app_preference.database.enabled:
             # 前回のエアコン設定を取得し、経過時間をログに出力
@@ -335,3 +344,45 @@ class HomeComfortControl:
                 weather_service = WeatherForecastHourlyService(session)
                 return weather_service.get_closest_future_forecast()
         return None
+
+    def is_comfort_control_disabled(self) -> bool:
+        """
+        現在の時刻が、設定された無効期間に該当するかを判定します。
+
+        Returns:
+            True: 操作を無効化（スキップ）すべき場合
+            False: 通常通り操作を行うべき場合
+        """
+        # 曜日を日本語で取得
+        current_datetime = TimeHelper.get_current_time()
+        current_time = current_datetime.time()
+
+        for period in app_preference.comfort_control.disabled_periods:
+            # 現在の曜日と一致するか確認
+            if period.day == current_datetime.weekday():
+                # timesがNoneの場合、終日無効と判断
+                if period.times is None or len(period.times) == 0:
+                    SystemEventLogger.log_info(
+                        "comfort_control_disabled.all_day",
+                        weekday=WeekdayHelper.index_to_name(period.day),
+                    )
+                    return True
+
+                # timesがリストで、空ではない場合
+                if period.times:
+                    for time_range in period.times:
+                        # 現在時刻が時間帯の範囲内か判定
+                        if time_range.start_time <= current_time < time_range.end_time:
+                            SystemEventLogger.log_info(
+                                "comfort_control_disabled.specific_period",
+                                weekday=WeekdayHelper.index_to_name(period.day),
+                                start_time=time_range.start_time,
+                                end_time=time_range.end_time,
+                            )
+                            return True
+
+                # timesが空リストの場合は、その曜日は無効時間帯がないため、処理を継続
+                return False
+
+        # どの無効期間にも該当しない場合
+        return False

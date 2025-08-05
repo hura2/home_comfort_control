@@ -65,5 +65,9 @@ en:
     circulator_off_notify: "Circulator power is set to OFF"
     circulator_on_notify: "Circulator fan speed set to %{new_fan_speed}"
 
+  comfort_control_disabled:
+    all_day: "Disabled period: %{weekday}"
+    specific_period: "Disabled period: %{weekday} %{start_time} to %{end_time}"
+    
   exception_related:
     exception_occurred: "Exception occurred: %{exception}"
