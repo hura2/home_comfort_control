@@ -15,7 +15,7 @@ comfort_control:
   disabled_periods:
     - day: "月"
       times:
-        - "8:00-15:00"
+        - "8:00-10:00"
     - day: "火" # 終日無効にする場合は、timesリストを省略する
       times:
         - "8:00-15:00"
