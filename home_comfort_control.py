@@ -16,7 +16,7 @@ from repository.services.circulator_setting_service import CirculatorSettingServ
 from repository.services.measurement_service import MeasurementService
 from repository.services.weather_forecast_hourly_service import WeatherForecastHourlyService
 from repository.services.weather_forecast_service import WeatherForecastService
-from settings import LOCAL_TZ, aircon_preference, app_preference
+from settings import LOCAL_TZ, app_preference
 from shared.dataclass.aircon_settings import AirconSettings
 from shared.dataclass.circulator_settings import CirculatorSettings
 from shared.dataclass.comfort_factors import ComfortFactors
@@ -25,7 +25,6 @@ from shared.dataclass.pmv_result import PMVResult
 from shared.enums.power_mode import PowerMode
 from util.thermal_comfort import ThermalComfort
 from util.time_helper import TimeHelper
-from util.weekday_helper import WeekdayHelper
 
 
 class HomeComfortControl:
@@ -201,46 +200,12 @@ class HomeComfortControl:
             is_sleeping (bool): 寝ている時間
         """
 
-        # 現在が快適管理の無効期間（曜日・時間帯）かどうかを判定
-        if self.is_comfort_control_disabled():
-            # 無効期間の場合は、まず事前に設定されたエアコンのオフ状態の設定を適用する
-            aircon_settings = aircon_preference.conditional.cooling.off_state.aircon_settings
+        # エアコンの設定を決定
+        aircon_settings = AirconSettingsDeterminer.determine_aircon_settings(
+            pmv_result, home_sensor, closest_future_forecast, is_sleeping
+        )
 
-            # ただし太陽光パネルが有効ならば、現在時刻と曇り度をチェックして調整を行う
-            if app_preference.comfort_control.solar_panel_enabled:
-                SystemEventLogger.log_info("comfort_control_disabled.solar_panel_enabled")
-                current_time = TimeHelper.get_current_time().time()  # 現在の時刻を取得
-                active_hours = (
-                    app_preference.comfort_control.solar_active_hours
-                )  # 太陽光パネルの有効時間帯を取得
-                # 現在時刻が太陽光パネルの有効時間帯内かどうか確認
-                if active_hours.start_time <= current_time <= active_hours.end_time:
-                    SystemEventLogger.log_info(
-                        "comfort_control_disabled.solar_active_hours",
-                        start_time=active_hours.start_time,
-                        end_time=active_hours.end_time,
-                    )
-                    # 予報情報が存在し、曇り度（cloud_percentage）が閾値未満なら快晴と判断
-                    if (
-                        closest_future_forecast is not None
-                        and closest_future_forecast.cloud_percentage is not None
-                        and closest_future_forecast.cloud_percentage
-                        < app_preference.comfort_control.solar_cloud_threshold * 0.01
-                    ):
-                        SystemEventLogger.log_info(
-                            "comfort_control_disabled.solar_cloud_threshold",
-                            threshold=app_preference.comfort_control.solar_cloud_threshold,
-                        )
-                        # 快晴のため、PMV計算結果に基づいて最適なエアコン設定を決定する
-                        aircon_settings = AirconSettingsDeterminer.determine_aircon_settings(
-                            pmv_result, home_sensor, is_sleeping
-                        )
-        else:
-            # 無効期間でなければ常にPMV計算に基づく最適なエアコン設定を適用する
-            aircon_settings = AirconSettingsDeterminer.determine_aircon_settings(
-                pmv_result, home_sensor, is_sleeping
-            )
-
+        # データバースの有効化
         if app_preference.database.enabled:
             # 前回のエアコン設定を取得し、経過時間をログに出力
             with DBSessionManager.auto_commit_session() as session:
@@ -378,45 +343,3 @@ class HomeComfortControl:
                 weather_service = WeatherForecastHourlyService(session)
                 return weather_service.get_closest_future_forecast()
         return None
-
-    def is_comfort_control_disabled(self) -> bool:
-        """
-        現在の時刻が、設定された無効期間に該当するかを判定します。
-
-        Returns:
-            True: 操作を無効化（スキップ）すべき場合
-            False: 通常通り操作を行うべき場合
-        """
-        # 曜日を日本語で取得
-        current_datetime = TimeHelper.get_current_time()
-        current_time = current_datetime.time()
-
-        for period in app_preference.comfort_control.disabled_periods:
-            # 現在の曜日と一致するか確認
-            if period.day == current_datetime.weekday():
-                # timesがNoneの場合、終日無効と判断
-                if period.times is None or len(period.times) == 0:
-                    SystemEventLogger.log_info(
-                        "comfort_control_disabled.all_day",
-                        weekday=WeekdayHelper.index_to_name(period.day),
-                    )
-                    return True
-
-                # timesがリストで、空ではない場合
-                if period.times:
-                    for time_range in period.times:
-                        # 現在時刻が時間帯の範囲内か判定
-                        if time_range.start_time <= current_time < time_range.end_time:
-                            SystemEventLogger.log_info(
-                                "comfort_control_disabled.specific_period",
-                                weekday=WeekdayHelper.index_to_name(period.day),
-                                start_time=time_range.start_time,
-                                end_time=time_range.end_time,
-                            )
-                            return True
-
-                # timesが空リストの場合は、その曜日は無効時間帯がないため、処理を継続
-                return False
-
-        # どの無効期間にも該当しない場合
-        return False

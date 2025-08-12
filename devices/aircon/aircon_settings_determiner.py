@@ -1,4 +1,5 @@
 from logger.system_event_logger import SystemEventLogger
+from models.weather_forecast_hourly_model import WeatherForecastHourlyModel
 from preferences.aircon.conditional_aircon_preference import ConditionalAirconPreference
 from preferences.aircon.conditional_preference import SummerCondensationPreference
 from settings import aircon_preference, app_preference
@@ -7,6 +8,8 @@ from shared.dataclass.home_sensor import HomeSensor
 from shared.dataclass.pmv_result import PMVResult
 from shared.enums.aircon_fan_speed import AirconFanSpeed
 from shared.enums.aircon_mode import AirconMode
+from util.time_helper import TimeHelper
+from util.weekday_helper import WeekdayHelper
 
 
 class AirconSettingsDeterminer:
@@ -19,6 +22,7 @@ class AirconSettingsDeterminer:
     def determine_aircon_settings(
         pmvResult: PMVResult,
         home_sensor: HomeSensor,
+        closest_future_forecast: WeatherForecastHourlyModel | None,
         is_sleeping: bool,
     ) -> AirconSettings:
         """
@@ -26,6 +30,7 @@ class AirconSettingsDeterminer:
         Args:
             pmvResult (PMVResult): PMV計算結果を持つオブジェクト。
             home_sensor (HomeSensor): 家庭の環境情報を格納したオブジェクト。
+            closest_future_forecast (WeatherForecastHourlyModel | None): 最も近い未来の天気予報。
             is_sleeping (bool): 寝ている時間。
         Returns:
             AirconSettings: 設定されたエアコンの設定。
@@ -34,7 +39,7 @@ class AirconSettingsDeterminer:
         aircon_settings = AirconSettingsDeterminer._get_aircon_settings_for_pmv(pmvResult.pmv)
         # 特殊な条件によるエアコン設定を適用
         aircon_settings = AirconSettingsDeterminer._get_aircon_settings_for_conditions(
-            aircon_settings, pmvResult, home_sensor, is_sleeping
+            aircon_settings, pmvResult, home_sensor, closest_future_forecast, is_sleeping
         )
         return aircon_settings
 
@@ -210,29 +215,44 @@ class AirconSettingsDeterminer:
             # 風量を強く設定
             aircon_settings.fan_speed = AirconFanSpeed.HIGH
 
-
     @staticmethod
     def _get_aircon_settings_for_conditions(
         aircon_settings: AirconSettings,
         pmv_result: PMVResult,
         home_sensor: HomeSensor,
+        closest_future_forecast: WeatherForecastHourlyModel | None,
         is_sleeping: bool,
     ) -> AirconSettings:
         """
-        エアコンの設定を調整するメソッド。
-        各種環境条件に基づいてエアコンの温度、モード、風量を変更する。
+        各種環境条件に基づき、エアコンの設定を調整するメソッド。
+
+        主な処理内容:
+            1. 外気温に基づく冷暖房の停止判定
+            2. 快適管理（湿度・CO₂）や太陽光パネル状態に基づく制御
+            3. 湿度・CO₂・温度差・露点などの条件に応じた細かい設定調整
+
+        引数:
+            aircon_settings: 現在のエアコン設定
+            pmv_result: PMV（Predicted Mean Vote）計算結果
+            home_sensor: 室内・室外センサーの測定値
+            closest_future_forecast: 直近の予報データ（天気・曇り度など）
+            is_sleeping: 睡眠中かどうかのフラグ
+
+        戻り値:
+            調整後のエアコン設定
         """
-        # 外気温センサーがある場合
+
+        # --- 1. 外気温に基づく冷暖房の停止判定 ---
         if home_sensor.outdoor:
             # 冷房モードの場合
             if aircon_settings.mode.is_cooling():
-                # 冷房停止の判定
+                # 外気温・PMVに基づき冷房停止すべきか判定
                 if AirconSettingsDeterminer._should_turn_off_cooling(
                     pmv_result,
                     home_sensor.outdoor.air_quality.temperature,
                     aircon_preference.conditional.cooling,
                 ):
-                    # 冷房停止のための設定更新
+                    # 冷房停止用設定に更新（風量・温度・モードなどをオフ状態へ）
                     aircon_settings.update_if_none(
                         aircon_preference.conditional.cooling.off_state.aircon_settings
                     )
@@ -242,13 +262,13 @@ class AirconSettingsDeterminer:
 
             # 暖房モードの場合
             if aircon_settings.mode.is_heating():
-                # 暖房停止の判定
+                # 外気温・PMVに基づき暖房停止すべきか判定
                 if AirconSettingsDeterminer._should_turn_off_heating(
                     pmv_result,
                     home_sensor.outdoor.air_quality.temperature,
                     aircon_preference.conditional.heating,
                 ):
-                    # 暖房停止のための設定更新
+                    # 暖房停止用設定に更新
                     aircon_settings.update_if_none(
                         aircon_preference.conditional.heating.off_state.aircon_settings
                     )
@@ -256,15 +276,41 @@ class AirconSettingsDeterminer:
                         "outdoor_temperature_related.wait_for_natural_cooling"
                     )
 
-        # その他の調整（湿度、CO2濃度、温度差、露点）
+        # --- 2. 快適管理および太陽光パネルによる制御 ---
+        if AirconSettingsDeterminer._is_comfort_control_disabled():
+            # 湿度・CO₂の快適管理は有効だが温度制御は行わない場合
+            if app_preference.comfort_control.environment_control_enabled:
+                SystemEventLogger.log_info("comfort_control_disabled.environment_control_enabled")
+                # 温度制御系の運転モード（冷房・暖房）は停止
+                if aircon_settings.mode.is_cooling() or aircon_settings.mode.is_heating():
+                    aircon_settings.update_if_none(
+                        aircon_preference.conditional.cooling.off_state.aircon_settings
+                    )
+            else:
+                # 湿度・CO₂の快適管理も無効な場合は太陽光制御を確認
+                if not AirconSettingsDeterminer._is_solar_control_available(closest_future_forecast):
+                    # 太陽光制御が無効なら運転停止
+                    aircon_settings.update_if_none(
+                        aircon_preference.conditional.cooling.off_state.aircon_settings
+                    )
+                    return aircon_settings  # 以降の調整処理は行わず終了
+
+        # --- 3. その他の環境要因による微調整 ---
+        # 湿度条件に応じた調整
         AirconSettingsDeterminer._adjust_for_humidity(home_sensor, aircon_settings)
+
+        # CO₂濃度条件に応じた調整
         AirconSettingsDeterminer._adjust_for_co2(home_sensor, aircon_settings)
+
+        # 室内外の温度差に応じたサーキュレーター運転調整（特に睡眠中に配慮）
         AirconSettingsDeterminer._adjust_for_temperature_difference(
             home_sensor,
             aircon_settings,
             is_sleeping,
             aircon_preference.conditional.circulator_threshold,
         )
+
+        # 露点温度に応じた結露防止調整（夏期など）
         AirconSettingsDeterminer._adjust_for_dew_point(
             pmv_result,
             home_sensor,
@@ -273,3 +319,94 @@ class AirconSettingsDeterminer:
         )
 
         return aircon_settings
+
+
+    @staticmethod
+    def _is_comfort_control_disabled() -> bool:
+        """
+        現在の時刻が、設定された無効期間に該当するかを判定します。
+
+        Returns:
+            True: 操作を無効化（スキップ）すべき場合
+            False: 通常通り操作を行うべき場合
+        """
+        # 曜日を日本語で取得
+        current_datetime = TimeHelper.get_current_time()
+        current_time = current_datetime.time()
+
+        for period in app_preference.comfort_control.disabled_periods:
+            # 現在の曜日と一致するか確認
+            if period.day == current_datetime.weekday():
+                # timesがNoneの場合、終日無効と判断
+                if period.times is None or len(period.times) == 0:
+                    SystemEventLogger.log_info(
+                        "comfort_control_disabled.all_day",
+                        weekday=WeekdayHelper.index_to_name(period.day),
+                    )
+                    return True
+
+                # timesがリストで、空ではない場合
+                if period.times:
+                    for time_range in period.times:
+                        # 現在時刻が時間帯の範囲内か判定
+                        if time_range.start_time <= current_time < time_range.end_time:
+                            SystemEventLogger.log_info(
+                                "comfort_control_disabled.specific_period",
+                                weekday=WeekdayHelper.index_to_name(period.day),
+                                start_time=time_range.start_time,
+                                end_time=time_range.end_time,
+                            )
+                            return True
+
+                # timesが空リストの場合は、その曜日は無効時間帯がないため、処理を継続
+                return False
+
+        # どの無効期間にも該当しない場合
+        return False
+    
+    @staticmethod
+    def _is_solar_control_available(closest_future_forecast: WeatherForecastHourlyModel | None) -> bool:
+        """
+        太陽光パネルによる快適管理が有効かどうかを判定する。
+
+        戻り値:
+            True  -> 太陽光パネルによる制御を行える状態
+            False -> 太陽光パネルによる制御が行えない状態（無効）
+        """
+        # 太陽光パネル機能がOFFの場合は無効
+        if not app_preference.comfort_control.solar_panel_enabled:
+            return False
+
+        SystemEventLogger.log_info("comfort_control_disabled.solar_panel_enabled")
+
+        # 現在時刻と有効時間帯のチェック
+        current_time = TimeHelper.get_current_time().time()
+        active_hours = app_preference.comfort_control.solar_active_hours
+        if not (active_hours.start_time <= current_time <= active_hours.end_time):
+            return False
+
+        SystemEventLogger.log_info(
+            "comfort_control_disabled.solar_active_hours",
+            start_time=active_hours.start_time,
+            end_time=active_hours.end_time,
+        )
+
+        # 曇り度チェック（閾値未満なら有効）
+        cloud_threshold = app_preference.comfort_control.solar_cloud_threshold
+        if (
+            closest_future_forecast is None
+            or closest_future_forecast.cloud_percentage is None
+            or closest_future_forecast.cloud_percentage >= cloud_threshold * 0.01
+        ):
+            SystemEventLogger.log_info(
+                "comfort_control_disabled.solar_cloud_threshold_disable",
+                threshold=cloud_threshold,
+            )
+            return False
+
+        SystemEventLogger.log_info(
+            "comfort_control_disabled.solar_cloud_threshold",
+            threshold=cloud_threshold,
+        )
+        return True
+

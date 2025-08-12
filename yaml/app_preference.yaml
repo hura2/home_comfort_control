@@ -12,10 +12,11 @@ comfort_control:
   solar_panel_enabled: true
   solar_active_hours: "8:00-18:00"
   solar_cloud_threshold: 70  # 曇り度の閾値（％）
+  environment_control_enabled: true # 湿度＋CO₂の快適管理はする
   disabled_periods:
     - day: "月"
       times:
-        - "8:00-10:00"
+        - "8:00-15:00"
     - day: "火" # 終日無効にする場合は、timesリストを省略する
       times:
         - "8:00-15:00"

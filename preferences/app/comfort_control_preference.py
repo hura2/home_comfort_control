@@ -19,6 +19,9 @@ class ComfortControlPreference(BaseModel):
     solar_cloud_threshold: int
     """日光パネルの曇り度の閾値（％）"""
 
+    environment_control_enabled: bool
+    """湿度＋CO₂の快適管理を有効にするかどうか"""
+
     disabled_periods: List[ComfortPeriodPreference]
     """無効化する期間設定のリスト"""
 

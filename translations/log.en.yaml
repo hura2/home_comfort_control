@@ -71,6 +71,8 @@ en:
     solar_panel_enabled: "Enable solar power usage"
     solar_active_hours: "Solar power active hours: %{start_time} to %{end_time}"
     solar_cloud_threshold: "Cloudiness is below %{threshold}%, so air conditioning control is active"
+    solar_cloud_threshold_disable: "Air conditioning control disabled because cloud cover is %{threshold}% or higher"
+    environment_control_enabled: "Environment control remains active during disabled periods"
 
   exception_related:
     exception_occurred: "Exception occurred: %{exception}"

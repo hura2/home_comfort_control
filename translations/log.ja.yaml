@@ -70,6 +70,8 @@ ja:
     solar_panel_enabled: "太陽光発電利用を有効化"
     solar_active_hours: "太陽光発電利用時間内です：%{start_time}〜%{end_time}"
     solar_cloud_threshold: "曇り度が%{threshold}%以下なので空調管理を実行"
+    solar_cloud_threshold_disable: "曇り度が%{threshold}%以上のため、空調管理を無効化します"
+    environment_control_enabled: "無効期間中でも環境制御は有効です"
 
   exception_related:
     exception_occurred: "例外発生: %{exception}"
