@@ -42,7 +42,7 @@ ja:
     cooling_to_other: "現在モードが冷房モード、新しいモードが冷房モード以外"
     heating_to_heating: "現在モードが暖房モード、新しいモードも暖房モード"
     heating_to_other: "現在モードが暖房モード、新しいモードが暖房モード以外"
-    aircon_mode_continue_and_update: "現在のモードを継続しつつ、設定を変更します"
+    mode_continue_and_update: "現在のモードを継続しつつ、設定を変更します"
     non_cooling_or_heating: "現在モードが冷房でも暖房でもない場合: %{current_mode}"
     indoor_temp_below_dewpoint: "室内温度が露点温度より低い。"
     indoor_temp_below_dewpoint_high_pmv: "室内温度が露点温度より低いが、PMVが高い（%{pmv}です。"

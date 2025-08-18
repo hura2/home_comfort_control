@@ -278,22 +278,16 @@ class AirconSettingsDeterminer:
 
         # --- 2. 快適管理および太陽光パネルによる制御 ---
         if AirconSettingsDeterminer._is_comfort_control_disabled():
-            # 湿度・CO₂の快適管理は有効だが温度制御は行わない場合
-            if app_preference.comfort_control.environment_control_enabled:
-                SystemEventLogger.log_info("comfort_control_disabled.environment_control_enabled")
-                # 温度制御系の運転モード（冷房・暖房）は停止
-                if aircon_settings.mode.is_cooling() or aircon_settings.mode.is_heating():
-                    aircon_settings.update_if_none(
-                        aircon_preference.conditional.cooling.off_state.aircon_settings
-                    )
-            else:
-                # 湿度・CO₂の快適管理も無効な場合は太陽光制御を確認
-                if not AirconSettingsDeterminer._is_solar_control_available(closest_future_forecast):
-                    # 太陽光制御が無効なら運転停止
-                    aircon_settings.update_if_none(
-                        aircon_preference.conditional.cooling.off_state.aircon_settings
-                    )
-                    return aircon_settings  # 以降の調整処理は行わず終了
+            # 太陽光パネルによる快適管理が無効
+            if not AirconSettingsDeterminer._is_solar_control_available(closest_future_forecast):
+                # 湿度・CO₂の快適管理は有効
+                if app_preference.comfort_control.environment_control_enabled:
+                    SystemEventLogger.log_info("comfort_control_disabled.environment_control_enabled")
+                    # 温度制御系の運転モード（冷房・暖房）は停止
+                    if aircon_settings.mode.is_cooling() or aircon_settings.mode.is_heating():
+                        aircon_settings.update_if_none(
+                            aircon_preference.conditional.cooling.off_state.aircon_settings
+                        )
 
         # --- 3. その他の環境要因による微調整 ---
         # 湿度条件に応じた調整

@@ -42,7 +42,7 @@ en:
     cooling_to_other: "Current mode is cooling, and the new mode is not cooling"
     heating_to_heating: "Current mode is heating, and the new mode is also heating"
     heating_to_other: "Current mode is heating, and the new mode is not heating"
-    aircon_mode_continue_and_update: "Continuing current mode while updating settings"
+    mode_continue_and_update: "Continuing current mode while updating settings"
     non_cooling_or_heating: "Current mode is neither cooling nor heating: %{current_mode}"
     indoor_temp_below_dewpoint: "Indoor temperature is below the dew point."
     indoor_temp_below_dewpoint_high_pmv: "Indoor temperature is below the dew point, but PMV is high (%{pmv})."
