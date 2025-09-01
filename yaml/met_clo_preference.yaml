@@ -18,7 +18,7 @@ high_temperature: # 高温時特有の設定
       enabled: true # 夕食時間設定を使用するかどうかのフラグ
     sleep_prep: # 就寝前に関する時間設定
       start_time: "23:00" # 就寝前開始時間（時）
-      end_time: "0:00" # 就寝前終了時間（時）
+      end_time: "23:59" # 就寝前終了時間（時）
       met_adjustment: 0.5 # 就寝前の加算代謝量
       enabled: true # 就寝前時間設定を使用するかどうかのフラグ
 
