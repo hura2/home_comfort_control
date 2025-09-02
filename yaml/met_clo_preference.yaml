@@ -12,7 +12,7 @@ high_temperature: # 高温時特有の設定
       met_adjustment: 0.2 # 昼食時の加算代謝量
       enabled: true # 食事時間設定を使用するかどうかのフラグ
     dinner: # 夕食に関する時間設定
-      start_time: "18:30" # 夕食開始時間（時）
+      start_time: "19:00" # 夕食開始時間（時）
       end_time: "20:30" # 夕食終了時間（時）
       met_adjustment: 0.4 # 夕食の加算代謝量
       enabled: true # 夕食時間設定を使用するかどうかのフラグ
