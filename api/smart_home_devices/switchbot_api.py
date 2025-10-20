@@ -239,6 +239,7 @@ class SwitchBotApi(SmartHomeDeviceInterface):
                         error_message = data["message"]
                         print(error_message)
             except requests.exceptions.RequestException as e:
+                print(e)    
                 time.sleep(retry_delay)
 
         # 置換処理
