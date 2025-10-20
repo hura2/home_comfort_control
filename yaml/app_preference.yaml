@@ -50,12 +50,12 @@ co2_thresholds:
 sensors:
   main:
     id: "floor"
-    label: "リビング"
+    label: "リビング床"
     location: "床"
     type: "温湿度計"
   sub:
     id: "ceiling"                     # subはオプション
-    label: "リビング"
+    label: "リビング天井"
     location: "天井"
     type: "温湿度計"
   supplementaries:
