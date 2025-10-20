@@ -33,7 +33,7 @@ comfort_control:
 
 # 湿度およびPMVに関する設定
 environment:
-  dehumidification_threshold: 13.0  # 除湿運転を開始するしきい値（絶対湿度 g/m³）
+  dehumidification_threshold: 12.0  # 除湿運転を開始するしきい値（絶対湿度 g/m³）
   pmv_threshold: 0.0  # PMVがこの値以上の場合、暑い状態とみなす
 
 # 温度に関する閾値設定
