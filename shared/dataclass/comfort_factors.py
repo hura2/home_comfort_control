@@ -10,7 +10,7 @@ class ComfortFactors(BaseModel):
         clo (float): CLO値。通常は0.0〜1.5程度（衣服の断熱性に基づく）。
     """
 
-    met: float = Field(..., ge=0.8, le=3.0, description="MET値（0.8〜3.0の範囲で指定）")
+    met: float = Field(..., ge=0.6, le=3.0, description="MET値（0.6〜3.0の範囲で指定）")
     """MET値"""
     clo: float = Field(..., ge=0.0, le=3.0, description="CLO値（0.0〜3.0の範囲で指定）")
     """CLO値"""
