@@ -78,11 +78,11 @@ class AirconOperation:
                     AirconStateManager.update_aircon_settings(
                         aircon_settings, current_aircon_settings
                     )
-                    return True
+                    return False
                 else:
                     SystemEventLogger.log_info("aircon_related.cooling_to_other")
                     AirconOperation._apply_weakest_setting(aircon_settings, current_aircon_settings)
-                    return True
+                    return False
 
             if current_mode.is_heating():
                 SystemEventLogger.log_info("aircon_related.heating_to_heating")
@@ -90,11 +90,11 @@ class AirconOperation:
                     AirconStateManager.update_aircon_settings(
                         aircon_settings, current_aircon_settings
                     )
-                    return True
+                    return False
                 else:
                     SystemEventLogger.log_info("aircon_related.heating_to_other")
                     AirconOperation._apply_weakest_setting(aircon_settings, current_aircon_settings)
-                    return True
+                    return False
 
             SystemEventLogger.log_info(
                 "aircon_related.non_cooling_or_heating", current_mode=current_mode
