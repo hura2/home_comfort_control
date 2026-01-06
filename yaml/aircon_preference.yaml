@@ -95,7 +95,7 @@ conditional:  # 特定の条件下での設定
         fan_speed: LOW  # 停止時の風速
         power: ON
 
-  circulator_threshold: 2.0  # 空気循環のための部屋の温度差（度）
+  circulator_threshold: 5.0  # 空気循環のための部屋の温度差（度）
   summer_condensation:  # 露点温度に対する制御設定
     dew_point_margin: 1  # 結露防止のための余裕（度）
     pmv_threshold: 0.4  # 露点温度より低い場合でも、暑すぎる場合は冷房を有効にするためのPMV閾値
