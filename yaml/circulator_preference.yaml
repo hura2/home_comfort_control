@@ -18,8 +18,8 @@ thresholds:
     - temperature_deff: 2.5
       speed: 4
     - temperature_deff: 2.0
-      speed: 4
+      speed: 2
     - temperature_deff: 1.5
-      speed: 3
+      speed: 2
     - temperature_deff: 1.0
       speed: 0
