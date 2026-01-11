@@ -68,7 +68,7 @@ aircon_settings:  # PMV閾値設定
       power: ON
   weakest_heating:  # 暖房時の設定
     aircon_settings:
-      temperature: "20"  # 温度（度）
+      temperature: "21"  # 温度（度）
       mode: HEATING  # モード
       fan_speed: LOW  # 風量
       power: ON
