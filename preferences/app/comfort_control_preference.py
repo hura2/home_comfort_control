@@ -10,6 +10,9 @@ from translations.translated_pydantic_value_error import TranslatedPydanticValue
 
 
 class ComfortControlPreference(BaseModel):
+    enabled: bool
+    """節電管理を有効にするかどうか"""
+
     solar_panel_enabled: bool
     """日光パネルを有効にするかどうか"""
 

@@ -9,26 +9,27 @@ weekend_awake_period:
 
 # 快適管理設定
 comfort_control:
+  enabled: false
   solar_panel_enabled: true
   solar_active_hours: "8:00-18:00"
   solar_cloud_threshold: 85  # 曇り度の閾値（％）
   environment_control_enabled: true # 湿度＋CO₂の快適管理はする
   disabled_periods:
-  #  - day: "月"
-  #    times:
-  #      - "8:00-15:00"
-  #  - day: "火" # 終日無効にする場合は、timesリストを省略する
-  #    times:
-  #      - "8:00-15:00"
-  #  - day: "水"
-  #    times:
-  #      - "8:00-15:00"
-  #  - day: "木"
-  #    times:
-  #      - "8:00-15:00"
-  #  - day: "金"
-  #    times:
-  #      - "8:00-15:00"
+   - day: "月"
+     times:
+       - "8:00-15:00"
+   - day: "火" # 終日無効にする場合は、timesリストを省略する
+     times:
+       - "8:00-15:00"
+   - day: "水"
+     times:
+       - "8:00-15:00"
+   - day: "木"
+     times:
+       - "8:00-15:00"
+   - day: "金"
+     times:
+       - "8:00-15:00"
   
 # 湿度およびPMVに関する設定
 environment:

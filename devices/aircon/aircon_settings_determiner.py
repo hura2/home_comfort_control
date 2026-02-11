@@ -324,6 +324,10 @@ class AirconSettingsDeterminer:
             True: 操作を無効化（スキップ）すべき場合
             False: 通常通り操作を行うべき場合
         """
+        # 無効化を行わない場合
+        if app_preference.comfort_control.enabled is False:
+            return False
+        
         # 曜日を日本語で取得
         current_datetime = TimeHelper.get_current_time()
         current_time = current_datetime.time()
