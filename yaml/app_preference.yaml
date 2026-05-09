@@ -4,12 +4,12 @@ weekday_awake_period:
   end_time: "22:50"    # 就寝時間（活動を終了する時間）
 # 休日の活動期間の設定
 weekend_awake_period:
-  start_time: "06:30"  # 起床時間（活動を開始する時間）
+  start_time: "06:00"  # 起床時間（活動を開始する時間）
   end_time: "22:50"    # 就寝時間（活動を終了する時間）
 
 # 快適管理設定
 comfort_control:
-  enabled: false
+  enabled: true
   solar_panel_enabled: true
   solar_active_hours: "8:00-18:00"
   solar_cloud_threshold: 85  # 曇り度の閾値（％）
