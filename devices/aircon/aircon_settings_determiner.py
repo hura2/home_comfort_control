@@ -118,7 +118,7 @@ class AirconSettingsDeterminer:
             < outdoor_temperature
             # さらにPMVが設定閾値を上回るとき
             and pmv_result.pmv > heating_preference.activation.threshold
-        ) or outdoor_temperature > app_preference.temperature_thresholds.high
+        ) or outdoor_temperature > app_preference.temperature_thresholds.low
         # もしくは、外気温が設定した高温閾値より高ければ暖房を停止
 
     @staticmethod
