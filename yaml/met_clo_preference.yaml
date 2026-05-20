@@ -1,6 +1,6 @@
 high_temperature: # 高温時特有の設定
   met: # 代謝量に関する設定
-    awake: 1.0 # 日中の代謝量
+    awake: 1.1 # 日中の代謝量
     sleeping: 0.8 # 就寝時の代謝量
   clo: # 着衣量に関する設定
     awake: 0.6 # 日中の着衣量
