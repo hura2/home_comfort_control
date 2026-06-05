@@ -164,7 +164,7 @@ class AirconSettingsDeterminer:
         室内の絶対湿度に基づいてエアコン設定を調整するメソッド。
         湿度がしきい値を超えると、除湿モードを適用する。
         """
-        if aircon_settings.mode.is_cooling():
+        if aircon_settings.mode.is_cooling() or aircon_settings.mode.is_heating():
             return
 
         if (
