@@ -111,13 +111,15 @@ class AirconSettingsDeterminer:
         - PMVが閾値を超え、屋外温度との差が屋内温度より高い場合、暖房停止
         - 屋外温度がアプリケーション設定で定義された最高温度閾値を上回った場合
         """
+        # PMVが設定閾値を超える場合
+        if pmv_result.pmv < heating_preference.activation.threshold:
+            return False
+
         return (
             # 外気温との差が屋内温度より小さい場合、暖房を停止する
             pmv_result.mean_radiant_temperature
             - heating_preference.activation.outdoor_temperature_diff
             < outdoor_temperature
-            # さらにPMVが設定閾値を上回るとき
-            and pmv_result.pmv > heating_preference.activation.threshold
         ) or outdoor_temperature > app_preference.temperature_thresholds.low
         # もしくは、外気温が設定した高温閾値より高ければ暖房を停止
 
@@ -164,7 +166,7 @@ class AirconSettingsDeterminer:
         """
         if aircon_settings.mode.is_cooling():
             return
-        
+
         if (
             # 室内の絶対湿度が設定されたしきい値を超える場合
             home_sensor.average_indoor_absolute_humidity
@@ -282,7 +284,9 @@ class AirconSettingsDeterminer:
             if not AirconSettingsDeterminer._is_solar_control_available(closest_future_forecast):
                 # 湿度・CO₂の快適管理は有効
                 if app_preference.comfort_control.environment_control_enabled:
-                    SystemEventLogger.log_info("comfort_control_disabled.environment_control_enabled")
+                    SystemEventLogger.log_info(
+                        "comfort_control_disabled.environment_control_enabled"
+                    )
                     # 温度制御系の運転モード（冷房・暖房）は停止
                     if aircon_settings.mode.is_cooling() or aircon_settings.mode.is_heating():
                         aircon_settings.update_if_none(
@@ -314,7 +318,6 @@ class AirconSettingsDeterminer:
 
         return aircon_settings
 
-
     @staticmethod
     def _is_comfort_control_disabled() -> bool:
         """
@@ -327,7 +330,7 @@ class AirconSettingsDeterminer:
         # 無効化を行わない場合
         if app_preference.comfort_control.enabled is False:
             return False
-        
+
         # 曜日を日本語で取得
         current_datetime = TimeHelper.get_current_time()
         current_time = current_datetime.time()
@@ -361,9 +364,11 @@ class AirconSettingsDeterminer:
 
         # どの無効期間にも該当しない場合
         return False
-    
+
     @staticmethod
-    def _is_solar_control_available(closest_future_forecast: WeatherForecastHourlyModel | None) -> bool:
+    def _is_solar_control_available(
+        closest_future_forecast: WeatherForecastHourlyModel | None,
+    ) -> bool:
         """
         太陽光パネルによる快適管理が有効かどうかを判定する。
 
@@ -407,4 +412,3 @@ class AirconSettingsDeterminer:
             threshold=cloud_threshold,
         )
         return True
-
