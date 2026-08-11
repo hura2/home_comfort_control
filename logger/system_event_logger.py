@@ -13,6 +13,7 @@ from settings import DB_TZ, LOCAL_TZ
 from shared.dataclass.aircon_settings import AirconSettings
 from shared.dataclass.circulator_settings import CirculatorSettings
 from shared.dataclass.comfort_factors import ComfortFactors
+from shared.dataclass.electric_fan_settings import ElectricFanSettings
 from shared.dataclass.home_sensor import HomeSensor
 from shared.dataclass.pmv_result import PMVResult
 from shared.dataclass.sensor import Sensor
@@ -329,6 +330,26 @@ class SystemEventLogger:
         if current_circulator_settings.power == PowerMode.ON and circulator_settings.fan_speed == 0:
             notify_manager = NotifyFactory.create_manager()
             notify_manager.notify_important("サーキュレーターの電源をOFFに設定")
+
+
+    @staticmethod
+    def log_electric_fan_settings(
+        current_electric_fan_settings: ElectricFanSettings, electric_fan_settings: ElectricFanSettings
+    ):
+        """
+        扇風機の状態をログに出力します。
+
+        Args:
+            current_electric_fan_settings (ElectricFanSettings): 扇風機の電源
+        """
+        SystemEventLogger.log_info(
+            i18n.t("electric_fan_related.electric_fan_status"),
+            power=current_electric_fan_settings.power.label,
+        )
+        SystemEventLogger.log_info(
+            i18n.t("electric_fan_related.electric_fan_settings_success"),
+            power=electric_fan_settings.power.label,
+        )
 
     @staticmethod
     def log_aircon_scores(scores: Tuple[int, int, int, int, int]):

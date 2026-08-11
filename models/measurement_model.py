@@ -10,12 +10,14 @@ from settings import LOCAL_TZ
 if TYPE_CHECKING:
     from models.aircon_setting_model import AirconSettingModel
     from models.circulator_setting_model import CirculatorSettingModel
+    from models.electric_fan_setting_model import ElectricFanSettingModel
     from models.pmv_model import PmvModel
     from models.sensor_reading_model import SensorReadingModel
 
 
 class MeasurementModel(Base):
     """計測日時"""
+
     __tablename__ = "measurements"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
@@ -37,3 +39,5 @@ class MeasurementModel(Base):
     """エアコン設定"""
     circulator_settings: Mapped["CirculatorSettingModel"] = relationship("CirculatorSettingModel", back_populates="measurement")  # type: ignore
     """サーキュレーター設定"""
+    electric_fan_settings: Mapped["ElectricFanSettingModel"] = relationship("ElectricFanSettingModel", back_populates="measurement")  # type: ignore
+    """扇風機設定"""

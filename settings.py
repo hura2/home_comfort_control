@@ -5,6 +5,7 @@ from pydantic import ValidationError
 from preferences.aircon.aircon_preference import AirconPreference
 from preferences.app.app_preference import AppPreference
 from preferences.circulator.circulator_preference import CirculatorPreference
+from preferences.electric_fan.electric_fan_preference import ElectricFanPreference
 from preferences.met_clo.met_clo_preference import MetCloPreference
 from preferences.thermal.thermal_preference import ThermalPreference
 from preferences.yaml_loader import YamlLoader
@@ -26,6 +27,9 @@ try:
     aircon_preference = AirconPreference(**YamlLoader.load_config("aircon_preference.yaml"))
     circulator_preference = CirculatorPreference(
         **YamlLoader.load_config("circulator_preference.yaml")
+    )
+    electric_fan_preference = ElectricFanPreference(
+        **YamlLoader.load_config("electric_fan_preference.yaml")
     )
     met_clo_preference = MetCloPreference(**YamlLoader.load_config("met_clo_preference.yaml"))
     thermal_preference = ThermalPreference(**YamlLoader.load_config("thermal_preference.yaml"))

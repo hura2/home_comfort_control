@@ -61,6 +61,32 @@ class SmartHomeDeviceInterface(ABC):
         pass
 
     @abstractmethod
+    def electric_fan_on(self) -> SmartHomeDeviceResponse:
+        """
+        扇風機をオンにするメソッド。
+
+        扇風機をオンにするための処理を行い、その結果を
+        SmartHomeDeviceResponseとして返す。
+
+        Returns:
+            SmartHomeDeviceResponse: 扇風機のオン操作結果。
+        """
+        pass
+
+    @abstractmethod
+    def electric_fan_off(self) -> SmartHomeDeviceResponse:
+        """
+        扇風機をオフにするメソッド。
+
+        扇風機をオフにするための処理を行い、その結果を
+        SmartHomeDeviceResponseとして返す。
+
+        Returns:
+            SmartHomeDeviceResponse: 扇風機のオフ操作結果。
+        """
+        pass
+
+    @abstractmethod
     def aircon(self, aircon_settings: AirconSettings) -> SmartHomeDeviceResponse:
         """
         エアコンを設定するメソッド。

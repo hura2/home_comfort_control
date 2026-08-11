@@ -77,6 +77,10 @@ sensors:
 circulator:
   enabled: true  # サーキュレーターを使用するかどうか
 
+# 扇風機設定
+electric_fan:
+  enabled: true  # 扇風機を使用するかどうか
+
 # DB設定
 database:
   enabled: true  # DBにログを残すかどうか

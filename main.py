@@ -35,7 +35,9 @@ def main():
     # 就寝中かどうかを判断（起動時間内ならばFalse,それ以外はTrue）
     is_sleeping = home_comfort_control.is_within_sleeping_period()
     # ログに環境情報を出力
-    SystemEventLogger.log_environment_data(home_sensor, eff_temperature.forecast_temperature, closest_future_forecast)
+    SystemEventLogger.log_environment_data(
+        home_sensor, eff_temperature.forecast_temperature, closest_future_forecast
+    )
     # METとICLの値を計算
     comfort_factors = MetCloAdjuster.calculate_comfort_factors(
         eff_temperature,
@@ -44,9 +46,12 @@ def main():
     # PMV値を計算
     pmv_result = ThermalComfort.calculate_pmv(home_sensor, eff_temperature.value, comfort_factors)
     # 高温条件の場合の、サーキュレーターの状態を取得
-    circulator_settings_heat_conditions = home_comfort_control.activate_circulator_in_heat_conditions(
-        home_sensor, pmv_result.pmv, eff_temperature.value
+    circulator_settings_heat_conditions = (
+        home_comfort_control.activate_circulator_in_heat_conditions(
+            home_sensor, pmv_result.pmv, eff_temperature.value
+        )
     )
+
     # サーキュレーターがオンになる場合、風量を増やしてPMV値を再計算
     pmv_result = (
         home_comfort_control.recalculate_pmv_with_circulator(
@@ -69,9 +74,14 @@ def main():
         is_sleeping,
         eff_temperature.value,
     )
+    # 扇風機の状態を更新
+    electric_fan_settings = home_comfort_control.update_electric_fan_settings(
+        is_sleeping,
+        pmv_result.mean_radiant_temperature,
+    )
     # データベースに記録
     home_comfort_control.record_environment_data(
-        home_sensor, pmv_result, aircon_settings, circulator_settings
+        home_sensor, pmv_result, aircon_settings, circulator_settings, electric_fan_settings
     )
 
     return True

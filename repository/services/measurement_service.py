@@ -6,11 +6,13 @@ from models.measurement_model import MeasurementModel
 from repository.queries.measurement_queries import MeasurementQueries
 from repository.services.aircon_setting_service import AirconSettingService
 from repository.services.circulator_setting_service import CirculatorSettingService
+from repository.services.electric_fan_setting_service import ElectricFanSettingService
 from repository.services.pmv_service import PmvService
 from repository.services.sensor_reading_service import SensorReadingService
 from settings import app_preference
 from shared.dataclass.aircon_settings import AirconSettings
 from shared.dataclass.circulator_settings import CirculatorSettings
+from shared.dataclass.electric_fan_settings import ElectricFanSettings
 from shared.dataclass.home_sensor import HomeSensor
 from shared.dataclass.pmv_result import PMVResult
 
@@ -29,6 +31,7 @@ class MeasurementService:
         self.pmv_service = PmvService(session)
         self.sensor_reading_service = SensorReadingService(session)
         self.circulator_setting_service = CirculatorSettingService(session)
+        self.electric_fan_setting_service = ElectricFanSettingService(session)
 
     def create_measurement_and_related_data(
         self,
@@ -37,20 +40,22 @@ class MeasurementService:
         pmv_result: PMVResult,
         aircon_settings: AirconSettings,
         circulator_settings: CirculatorSettings,
+        electric_fan_settings: ElectricFanSettings
     ) -> MeasurementModel:
         """
         Measurement とその関連するすべてのデータ（AirconSetting, PmvCalculation, SensorReading, CirculatorSetting）を
         同時に挿入するサービスメソッド。
 
-        :param measurement_type: 測定の種類 ('temperature', 'co2', 'pmv' など)
-        :param temperature: エアコン設定温度
-        :param mode: エアコンモード ('cooling', 'heating' など)
-        :param fan_speed: エアコンのファン速度 ('low', 'medium', 'high' など)
-        :param pmv_value: PMVの計算値
-        :param sensor_type: センサーの種類 (例: 'temperature', 'co2')
-        :param sensor_value: センサーの測定値
-        :param circulator_mode: サーキュレーターのモード
-        :return: 挿入された Measurement インスタンス
+        Args:
+            measurement_time (datetime): 測定時刻
+            home_sensor (HomeSensor): ホームセンサーの温度情報
+            pmv_result (PMVResult): PMV計算結果
+            aircon_settings (AirconSettings): 空調設定
+            circulator_settings (CirculatorSettings): 冷却機設定
+            electric_fan_settings (ElectricFanSettings): 扇風機設定
+
+        Returns:
+            MeasurementModel: 新しく挿入された測定日時
         """
         # Measurementを挿入
         measurement = self.measurement_queries.insert(measurement_time.isoformat())
@@ -70,6 +75,11 @@ class MeasurementService:
         if app_preference.circulator.enabled:
             self.circulator_setting_service.insert(
                 measurement_id=measurement.id, circulator_settings=circulator_settings
+            )
+
+        if app_preference.electric_fan.enabled:
+            self.electric_fan_setting_service.insert(
+                measurement_id=measurement.id, electric_fan_settings=electric_fan_settings
             )
 
         # 最後にMeasurementインスタンスを返す

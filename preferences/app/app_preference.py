@@ -5,6 +5,7 @@ from preferences.app.circulator_preference import CirculatorPreference
 from preferences.app.co2_thresholds_preference import Co2ThresholdsPreference
 from preferences.app.comfort_control_preference import ComfortControlPreference
 from preferences.app.database_preference import Databaseference
+from preferences.app.electric_fan_preference import ElectricFanPreference
 from preferences.app.environment_preference import EnvironmentPreference
 from preferences.app.notify_preference import NotifyPreference
 from preferences.app.sensor_preference import SensorsPreference
@@ -34,6 +35,8 @@ class AppPreference(BaseModel):
     """センサー"""
     circulator: CirculatorPreference
     """冷暖房"""
+    electric_fan: ElectricFanPreference
+    """扇風機"""
     database: Databaseference
     """データベース"""
     smart_home_device: SmartHomeDevicePreference

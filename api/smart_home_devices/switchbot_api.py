@@ -31,6 +31,7 @@ class SwitchBotApi(SmartHomeDeviceInterface):
         self._ACCESS_TOKEN = EnvConfigLoader.get_variable("SWITCHBOT_ACCESS_TOKEN")
         self._SECRET = EnvConfigLoader.get_variable("SWITCHBOT_SECRET")
         self._CIRCULATOR_DEVICE_ID = EnvConfigLoader.get_variable("SWITCHBOT_CIRCULATOR_DEVICE_ID")
+        self._ELECTRIC_FAN_DEVICE_ID = EnvConfigLoader.get_variable("SWITCHBOT_ELECTRIC_FAN_DEVICE_ID")
         self._AIR_CONDITIONER_DEVICE_ID = EnvConfigLoader.get_variable(
             "SWITCHBOT_AIR_CONDITIONER_DEVICE_ID"
         )
@@ -87,6 +88,30 @@ class SwitchBotApi(SmartHomeDeviceInterface):
         except SmartHomeDeviceException as e:
             raise SmartHomeDeviceException(e.message, e.send_command, "circulator_fan_speed")
 
+    def electric_fan_on(self) -> SmartHomeDeviceResponse:
+        """扇風機をオンにする"""
+        try:
+            return self._post_command(
+                self._ELECTRIC_FAN_DEVICE_ID,
+                "電源",
+                "default",
+                "customize",
+            )
+        except SmartHomeDeviceException as e:
+            raise SmartHomeDeviceException(e.message, e.send_command, "electric_fan")
+
+    def electric_fan_off(self) -> SmartHomeDeviceResponse:
+        """扇風機をoffにする"""
+        try:
+            return self._post_command(
+                self._ELECTRIC_FAN_DEVICE_ID,
+                "電源",
+                "default",
+                "customize",
+            )
+        except SmartHomeDeviceException as e:
+            raise SmartHomeDeviceException(e.message, e.send_command, "electric_fan")
+        
     def get_air_quality_by_sensor(self, sensor: Sensor) -> AirQuality:
         # 位置に応じたデバイスIDを取得
         device_id_key = f"SWITCHBOT_{sensor.id.upper()}_DEVICE_ID"

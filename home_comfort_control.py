@@ -7,18 +7,21 @@ from devices.aircon.aircon_operation import AirconOperation
 from devices.aircon.aircon_settings_determiner import AirconSettingsDeterminer
 from devices.aircon.aircon_state_manager import AirconStateManager
 from devices.circulator import Circulator
+from devices.electric_fan import ElectricFan
 from logger.system_event_logger import SystemEventLogger
 from models.weather_forecast_hourly_model import WeatherForecastHourlyModel
 from repository.services.aircon_change_intarval_service import AirconChangeIntarvalService
 from repository.services.aircon_intensity_score_service import AirconIntensityScoreService
 from repository.services.aircon_setting_service import AirconSettingService
 from repository.services.circulator_setting_service import CirculatorSettingService
+from repository.services.electric_fan_setting_service import ElectricFanSettingService
 from repository.services.measurement_service import MeasurementService
 from repository.services.weather_forecast_hourly_service import WeatherForecastHourlyService
 from repository.services.weather_forecast_service import WeatherForecastService
 from settings import LOCAL_TZ, app_preference
 from shared.dataclass.aircon_settings import AirconSettings
 from shared.dataclass.circulator_settings import CirculatorSettings
+from shared.dataclass.electric_fan_settings import ElectricFanSettings
 from shared.dataclass.comfort_factors import ComfortFactors
 from shared.dataclass.home_sensor import HomeSensor
 from shared.dataclass.pmv_result import PMVResult
@@ -291,12 +294,57 @@ class HomeComfortControl:
 
         return circulator_settings
 
+    def update_electric_fan_settings(
+        self,
+        is_sleeping: bool,
+        mean_radiant_temperature: float,
+    ) -> ElectricFanSettings:
+        """
+        扇風機の状態を更新する
+        Args:
+            home_sensor (HomeSensor): 家の温度と湿度データ
+            circulator_settings_heat_conditions (ElectricFanSettings): 扇風機の状態
+            is_sleeping (bool): 寝ている時間
+            mean_radiant_temperature (float): 室内または予報気温
+        Returns:
+            ElectricFanSettings: 扇風機の状態
+        """
+        # 初期化
+        electric_fan_settings = ElectricFanSettings()
+
+        if app_preference.electric_fan.enabled:
+            # 前回のサーキュレーター設定を取得
+            with DBSessionManager.session() as session:
+                electric_fan_setting_service = ElectricFanSettingService(session)
+                current_electric_fan_settings = (
+                    electric_fan_setting_service.get_latest_electric_fan_settings()
+                )
+
+            if is_sleeping:
+                # 就寝中は停止
+                electric_fan_settings.power = ElectricFan.set_power(
+                    current_electric_fan_settings, PowerMode.OFF
+                )
+            else:
+                electric_fan_settings = ElectricFan.set_electric_fan_by_temperature(
+                    current_electric_fan_settings,
+                    mean_radiant_temperature,
+                )
+
+            # ログ出力
+            SystemEventLogger.log_electric_fan_settings(
+                current_electric_fan_settings, electric_fan_settings
+            )
+
+        return electric_fan_settings
+    
     def record_environment_data(
         self,
         home_sensor: HomeSensor,
         pmv: PMVResult,
         aircon_settings: AirconSettings,
         circulator_settings: CirculatorSettings,
+        electric_fan_settings: ElectricFanSettings
     ) -> None:
         """
         環境データを記録する
@@ -306,6 +354,7 @@ class HomeComfortControl:
             pmv (PMVResults): PMV計算結果
             aircon_settings (AirconSettings): エアコンの設定
             circulator_settings (CirculatorSettings): サーキュレーターの設定
+            electric_fan_settings (ElectricFanSettings): 扇風機の設定
         """
         # データベースを使用する場合
         if app_preference.database.enabled:
@@ -326,6 +375,7 @@ class HomeComfortControl:
                     pmv_result=pmv,
                     aircon_settings=aircon_settings,
                     circulator_settings=circulator_settings,
+                    electric_fan_settings=electric_fan_settings,
                 )
 
                 # 昨日のエアコン強度スコアを登録

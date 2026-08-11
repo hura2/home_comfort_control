@@ -64,6 +64,11 @@ ja:
     circulator_off_notify: "サーキュレーターの電源をOFFに設定"
     circulator_on_notify: "サーキュレーターの風量を%{new_fan_speed}に設定"
 
+  electric_fan_related:
+    electric_fan_status: "現在の扇風機の電源: %{power}"
+    electric_fan_settings_success: "扇風機の設定を送信しました。電源: %{power}"
+    electric_fan_off_notify: "扇風機の電源をOFFに設定"
+
   comfort_control_disabled:
     all_day: "無効期間です：%{weekday}曜日"
     specific_period: "無効期間です：%{weekday}曜日 %{start_time}〜%{end_time}"

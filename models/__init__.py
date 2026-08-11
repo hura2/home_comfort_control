@@ -20,3 +20,4 @@ from models.sensor_type_model import SensorTypeModel
 from models.weather_forecast_model import WeatherForecastModel
 from models.weather_forecast_hourly_model import WeatherForecastHourlyModel
 from models.aircon_intensity_score_model import AirconIntensityScoreModel
+from models.electric_fan_setting_model import ElectricFanSettingModel
