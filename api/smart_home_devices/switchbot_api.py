@@ -303,6 +303,40 @@ class SwitchBotApi(SmartHomeDeviceInterface):
             "customize",
         )
 
+    def get_device_list(self) -> dict:
+        """
+        SwitchBotに登録されているデバイス一覧を取得します。
+
+        Returns:
+            dict: SwitchBot APIから取得したデバイス一覧
+
+        Raises:
+            SmartHomeDeviceException: API通信に失敗した場合、
+            またはAPIからエラーが返された場合
+        """
+        url = f"{self._API_BASE_URL}/v1.1/devices"
+
+        try:
+            with requests.Session() as session:
+                response = session.get(
+                    url,
+                    headers=self._generate_swt_header(),
+                )
+                response.raise_for_status()
+
+                data = response.json()
+
+                if data["statusCode"] == 100:
+                    return data["body"]
+
+                raise SmartHomeDeviceException(
+                    data["message"],
+                    f"url: {url}, data: {data}",
+                )
+
+        except requests.exceptions.RequestException as e:
+            raise SmartHomeDeviceException(str(e))
+        
     def _generate_swt_header(self) -> Dict[str, str]:
         """
         SWTリクエスト用のヘッダーを生成します。
