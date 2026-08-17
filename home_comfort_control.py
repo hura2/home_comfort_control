@@ -321,10 +321,11 @@ class HomeComfortControl:
                 )
 
                 _, setting_time = electric_fan_setting_service.get_first_electric_fan_on_settings()
+                hours = 0
                 if setting_time is not None:
                     hours, _ = TimeHelper.calculate_elapsed_time(setting_time)
                     SystemEventLogger.log_electric_fan_on_elapsed_time(hours)
-
+                    
             if is_sleeping:
                 # 就寝中の場合
                 electric_fan_settings.power = ElectricFan.set_power(
