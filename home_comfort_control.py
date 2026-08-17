@@ -18,11 +18,11 @@ from repository.services.electric_fan_setting_service import ElectricFanSettingS
 from repository.services.measurement_service import MeasurementService
 from repository.services.weather_forecast_hourly_service import WeatherForecastHourlyService
 from repository.services.weather_forecast_service import WeatherForecastService
-from settings import LOCAL_TZ, app_preference
+from settings import LOCAL_TZ, app_preference, electric_fan_preference
 from shared.dataclass.aircon_settings import AirconSettings
 from shared.dataclass.circulator_settings import CirculatorSettings
-from shared.dataclass.electric_fan_settings import ElectricFanSettings
 from shared.dataclass.comfort_factors import ComfortFactors
+from shared.dataclass.electric_fan_settings import ElectricFanSettings
 from shared.dataclass.home_sensor import HomeSensor
 from shared.dataclass.pmv_result import PMVResult
 from shared.enums.power_mode import PowerMode
@@ -320,11 +320,25 @@ class HomeComfortControl:
                     electric_fan_setting_service.get_latest_electric_fan_settings()
                 )
 
+                _, setting_time = electric_fan_setting_service.get_first_electric_fan_on_settings()
+                if setting_time is not None:
+                    hours, _ = TimeHelper.calculate_elapsed_time(setting_time)
+                    SystemEventLogger.log_electric_fan_on_elapsed_time(hours)
+
             if is_sleeping:
-                # 就寝中は停止
+                # 就寝中の場合
                 electric_fan_settings.power = ElectricFan.set_power(
                     current_electric_fan_settings, PowerMode.OFF
                 )
+            elif (
+                electric_fan_preference.auto_off_countermeasure.enabled
+                and hours >= electric_fan_preference.auto_off_countermeasure.hours
+            ):
+                # 自動オフ対策
+                electric_fan_settings.power = ElectricFan.set_power(
+                    current_electric_fan_settings, PowerMode.OFF
+                )
+                SystemEventLogger.log_electric_fan_auto_off_countermeasure()
             else:
                 electric_fan_settings = ElectricFan.set_electric_fan_by_temperature(
                     current_electric_fan_settings,
@@ -337,14 +351,14 @@ class HomeComfortControl:
             )
 
         return electric_fan_settings
-    
+
     def record_environment_data(
         self,
         home_sensor: HomeSensor,
         pmv: PMVResult,
         aircon_settings: AirconSettings,
         circulator_settings: CirculatorSettings,
-        electric_fan_settings: ElectricFanSettings
+        electric_fan_settings: ElectricFanSettings,
     ) -> None:
         """
         環境データを記録する

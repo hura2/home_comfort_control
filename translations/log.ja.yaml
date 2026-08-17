@@ -68,6 +68,8 @@ ja:
     electric_fan_status: "現在の扇風機の電源: %{power}"
     electric_fan_settings_success: "扇風機の設定を送信しました。電源: %{power}"
     electric_fan_off_notify: "扇風機の電源をOFFに設定"
+    electric_fan_on_elapsed_time: "扇風機をONにしてからの経過時間: %{hours}時間"
+    electric_fan_auto_off_countermeasure: "自動オフ対策のため、扇風機の電源を一旦OFFに設定"
 
   comfort_control_disabled:
     all_day: "無効期間です：%{weekday}曜日"

@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from preferences.electric_fan.auto_off_countermeasure_preference import AutoOffCountermeasurePreference
+
 
 class ElectricFanPreference(BaseModel):
     """
@@ -13,3 +15,8 @@ class ElectricFanPreference(BaseModel):
         ..., ge=20, le=40, description="体感温度の閾値（20から40の範囲）"
     )
     """体感温度の閾値"""
+
+    auto_off_countermeasure: AutoOffCountermeasurePreference = Field(
+        ..., description="扇風機の8時間自動オフ対策"
+    )
+    """扇風機の8時間自動オフ対策"""

@@ -65,6 +65,13 @@ en:
     circulator_off_notify: "Circulator power is set to OFF"
     circulator_on_notify: "Circulator fan speed set to %{new_fan_speed}"
 
+  electric_fan_related:
+    electric_fan_status: "Current electric fan power: %{power}"
+    electric_fan_settings_success: "Electric fan settings sent. Power: %{power}"
+    electric_fan_off_notify: "Set the electric fan power to OFF"
+    electric_fan_on_elapsed_time: "Elapsed time since the electric fan was turned ON: %{hours} hours"
+    electric_fan_auto_off_countermeasure: "Set the electric fan power to OFF temporarily as an automatic shutoff countermeasure"
+
   comfort_control_disabled:
     all_day: "Disabled period: %{weekday}"
     specific_period: "Disabled period: %{weekday} %{start_time} to %{end_time}"

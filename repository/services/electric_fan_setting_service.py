@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import Tuple
+
 from sqlalchemy.orm import Session
 
 from models.electric_fan_setting_model import ElectricFanSettingModel
@@ -61,4 +64,27 @@ class ElectricFanSettingService:
             swing=PowerMode[electric_fan_settings.swing],
             vertical_swing=PowerMode[electric_fan_settings.vertical_swing],
             rhythm=PowerMode[electric_fan_settings.rhythm],
+        )
+
+    def get_first_electric_fan_on_settings(
+        self,
+    ) -> Tuple[ElectricFanSettings | None, datetime | None]:
+        """
+        最初に電源がオンになった扇風機の設定情報を取得します。
+
+        Returns:
+            ElectricFanSettings: 最初に電源がオンになった扇風機の設定情報
+        """
+        electric_fan_setting_model = self.query.get_first_electric_fan_on_settings()
+        if electric_fan_setting_model is None:
+            return ElectricFanSettings(), None
+        return (
+            ElectricFanSettings(
+                power=PowerMode[electric_fan_setting_model.power],
+                fan_speed=electric_fan_setting_model.fan_speed,
+                swing=PowerMode[electric_fan_setting_model.swing],
+                vertical_swing=PowerMode[electric_fan_setting_model.vertical_swing],
+                rhythm=PowerMode[electric_fan_setting_model.rhythm],
+            ),
+            electric_fan_setting_model.measurement.measurement_time,
         )

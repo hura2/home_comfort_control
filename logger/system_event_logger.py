@@ -331,10 +331,10 @@ class SystemEventLogger:
             notify_manager = NotifyFactory.create_manager()
             notify_manager.notify_important("サーキュレーターの電源をOFFに設定")
 
-
     @staticmethod
     def log_electric_fan_settings(
-        current_electric_fan_settings: ElectricFanSettings, electric_fan_settings: ElectricFanSettings
+        current_electric_fan_settings: ElectricFanSettings,
+        electric_fan_settings: ElectricFanSettings,
     ):
         """
         扇風機の状態をログに出力します。
@@ -349,6 +349,29 @@ class SystemEventLogger:
         SystemEventLogger.log_info(
             i18n.t("electric_fan_related.electric_fan_settings_success"),
             power=electric_fan_settings.power.label,
+        )
+
+    @staticmethod
+    def log_electric_fan_on_elapsed_time(hours: int):
+        """
+        扇風機のONにしてからの経過時間をログに出力します。
+
+        Args:
+            hours (int): 経過時間
+        """
+        SystemEventLogger.log_info(
+            i18n.t("electric_fan_related.electric_fan_on_elapsed_time"),
+            hours=hours,
+        )
+
+    @staticmethod
+    def log_electric_fan_auto_off_countermeasure():
+        """
+        自動オフ対策のため、扇風機の電源をOFFに設定をログに出力します。
+
+        """
+        SystemEventLogger.log_info(
+            i18n.t("electric_fan_related.electric_fan_auto_off_countermeasure"),
         )
 
     @staticmethod
