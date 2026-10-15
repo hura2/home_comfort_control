@@ -1,0 +1,21 @@
+# Select parent Sol / Medium in Codex UI.
+[features]
+multi_agent = true
+
+[agents]
+enabled = true
+default_subagent_model = "gpt-6-luna"
+default_subagent_reasoning_effort = "low"
+max_concurrent_threads_per_session = 3
+
+[agents.luna_explorer]
+description = "限定調査 / Luna Low"
+config_file = "agents/luna_explorer.toml"
+
+[agents.luna_implementer]
+description = "限定実装・テスト / Luna Medium"
+config_file = "agents/luna_implementer.toml"
+
+[agents.luna_reviewer]
+description = "必要時の差分レビュー / Luna Low"
+config_file = "agents/luna_reviewer.toml"

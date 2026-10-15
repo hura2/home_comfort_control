@@ -1,0 +1,5 @@
+name = "luna_reviewer"
+model = "gpt-6-luna"
+model_reasoning_effort = "low"
+sandbox_mode = "read-only"
+developer_instructions = "親が必要と判断した差分・関連テストのみレビューする。実害のある不具合・回帰と根拠、未検証事項を短く返す。定例全面レビュー・自律的UI改善・編集・孫エージェント起動は禁止。"
